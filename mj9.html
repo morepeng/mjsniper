@@ -3,89 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER AI v15.0 — 終極整合終端</title>
+    <title>MJ SNIPER AI v15.5 — 終極對齊版</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#050c14">
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; }
         body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .layout { flex: 1; display: grid; grid-template-columns: 360px 1fr; gap: 1px; background: var(--border); overflow: hidden; }
+        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .layout { flex: 1; display: grid; grid-template-columns: 340px 1fr; gap: 1px; background: var(--border); overflow: hidden; }
         .sidebar { background: var(--panel); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         #chart { background: #000; position: relative; }
         
-        /* UI 組件 */
         .card { background: #0a1525; border: 1px solid var(--border); padding: 12px; border-radius: 8px; }
-        .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
-        .btn-main { background: var(--cyan); color: #000; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; margin-top: 5px; }
-        .tf-switch { display: flex; gap: 4px; margin-bottom: 10px; }
-        .tf-btn { flex: 1; background: #162535; border: 1px solid var(--border); color: #6a8da8; padding: 6px; cursor: pointer; border-radius: 4px; font-size: 11px; }
-        .tf-btn.active { background: var(--cyan); color: #000; font-weight: bold; border: none; }
+        .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 5px; text-transform: uppercase; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
         
-        /* 警報與回測樣式 */
-        .alarm-box { background: rgba(255, 215, 0, 0.1); border: 2px solid var(--gold); padding: 10px; border-radius: 8px; text-align: center; display: none; margin-bottom: 10px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
+        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 8px; border-radius: 4px; font-size: 14px; }
+        .btn-main { background: var(--cyan); color: #000; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .val { font-weight: bold; color: var(--gold); }
         .bull { color: var(--bull); } .bear { color: var(--bear); }
-        textarea { width: 100%; background: #070e19; border: 1px solid var(--border); color: var(--cyan); padding: 8px; border-radius: 4px; height: 40px; font-size: 11px; resize: none; }
-        #scanner-list { max-height: 150px; overflow-y: auto; margin-top: 8px; font-size: 12px; }
-        .scan-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #1c3d64; cursor: pointer; }
+        
+        #scanner-list { max-height: 120px; overflow-y: auto; margin-top: 5px; font-size: 12px; border-top: 1px solid #1c3d64; }
+        .scan-item { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #1c3d64; cursor: pointer; }
+        .alarm-box { background: rgba(255, 215, 0, 0.1); border: 2px solid var(--gold); padding: 10px; border-radius: 8px; text-align: center; display: none; margin-bottom: 10px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-size: 18px; font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI <span style="font-size:10px;">v15.0</span></div>
-        <div id="pwa-status" style="font-size: 12px; color: #6a8da8;">全系統對齊中</div>
+        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI v15.5</div>
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="top-tk" placeholder="例如: 2330.TW" style="width:120px;">
+            <button class="btn-main" onclick="loadAnalysis(document.getElementById('top-tk').value)">⚡ 鑑識</button>
+        </div>
     </header>
 
     <div class="layout">
         <aside class="sidebar">
             <div id="shot-alarm" class="alarm-box">
-                <div style="font-weight: bold; color: var(--gold);">🔥 共振確認！建議執行射擊</div>
-                <div id="alarm-ticker" style="font-size: 18px; margin: 4px 0;">--</div>
-                <div id="alarm-l6" style="font-size: 12px; color: var(--bull);">L6 評分：--</div>
+                <div style="font-weight:bold; color:var(--gold);">🔥 共振確認！建議執行</div>
+                <div id="alarm-ticker" style="font-size:16px;">--</div>
             </div>
 
             <div class="card">
                 <h4>📐 L6 核心評分與風控</h4>
-                <div class="row"><span>AI 評分結論：</span> <span id="l6-sig" class="val">--</span></div>
-                <div class="row"><span>進場 (Entry)：</span> <span id="en-p">--</span></div>
-                <div class="row"><span>止損 (Stop)：</span> <span id="sl-p" class="bear">--</span></div>
-                <div class="row"><span>目標 (Target)：</span> <span id="tp-p" class="bull">--</span></div>
+                <div class="row"><span>結論：</span> <span id="l6-sig" class="val">--</span></div>
+                <div class="row"><span>進場位：</span> <span id="en-p">--</span></div>
+                <div class="row"><span>止損位：</span> <span id="sl-p" class="bear">--</span></div>
+                <div class="row"><span>目標位：</span> <span id="tp-p" class="bull">--</span></div>
             </div>
 
             <div class="card">
-                <h4>📡 全域共振雷達</h4>
-                <div class="tf-switch">
-                    <button id="tf-D" class="tf-btn" onclick="setTF('D')">日線 (波段)</button>
-                    <button id="tf-15" class="tf-btn active" onclick="setTF('15')">15分 (當沖)</button>
-                </div>
-                <textarea id="watchlist">2330.TW, 2317.TW, NVDA, AAPL, TSLA</textarea>
-                <button class="btn-main" onclick="startScanner()">⚡ 啟動共振掃描與回測</button>
+                <h4>📡 全域雷達掃描</h4>
+                <textarea id="watchlist" style="width:100%; background:#070e19; color:var(--cyan); height:40px; border-radius:4px; font-size:11px;">2330.TW, NVDA, AAPL</textarea>
+                <button class="btn-main" style="width:100%; margin-top:5px;" onclick="startScanner()">⚡ 啟動掃描</button>
                 <div id="scanner-list"></div>
             </div>
 
             <div class="card">
-                <h4>⚖️ 戰術數據監測</h4>
-                <div class="row"><span>K線形態：</span> <span id="pattern-val" class="val">--</span></div>
+                <h4>⚖️ 戰術數據與回測</h4>
+                <div class="row"><span>K線形態：</span> <span id="pat-val" class="val">--</span></div>
                 <div class="row"><span>15M ORB：</span> <span id="orb-val">--</span></div>
-                <div class="row"><span>近月勝率：</span> <span id="winrate-val" class="bull">--%</span></div>
+                <div class="row"><span>近月勝率：</span> <span id="wr-val" class="bull">--%</span></div>
             </div>
         </aside>
-
         <section id="chart"></section>
     </div>
 
     <script>
-        let chart, series, currentTF = '15';
-        let pLines = [];
+        let chart, series, pLines = [];
         const TOKEN = 'd4sg251r01qvsjbhhgn0d4sg251r01qvsjbhhgng';
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); });
-        }
 
         function init() {
             chart = LightweightCharts.createChart(document.getElementById('chart'), {
@@ -97,95 +84,69 @@
             window.addEventListener('resize', () => chart.applyOptions({ width: document.getElementById('chart').clientWidth }));
         }
 
-        function setTF(tf) {
-            currentTF = tf;
-            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tf-' + tf).classList.add('active');
+        async function loadAnalysis(tk) {
+            if(!tk) return;
+            const cleanTk = tk.split('.')[0].toUpperCase();
+            document.getElementById('top-tk').value = tk.toUpperCase();
+            
+            try {
+                const url = `https://finnhub.io/api/v1/stock/candle?symbol=${cleanTk}&resolution=15&from=${Math.floor(Date.now()/1000)-259200}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`;
+                const res = await fetch(url);
+                const d = await res.json();
+                if(d.s !== 'ok') throw new Error();
+
+                const df = d.t.map((t, i) => ({ time: t, open: d.o[i], high: d.h[i], low: d.l[i], close: d.c[i] }));
+                series.setData(df);
+                
+                // 更新 UI 與風控
+                updateUI(df, tk);
+                chart.timeScale().fitContent();
+            } catch(e) { alert("無法取得數據，請確認代碼（如: 2330）或 API 額度。"); }
         }
 
-        /** L6 核心評分引擎 **/
-        function calculateL6(data) {
-            let score = 50;
-            const last = data[data.length-1];
-            // 趨勢：簡單 20 根均線模擬
-            const ma20 = data.slice(-20).reduce((a, b) => a + b.close, 0) / 20;
-            if (last.close > ma20) score += 15;
+        function updateUI(df, tk) {
+            const last = df[df.length-1];
+            const p = df[df.length-2];
             
-            // 形態加分
-            const pat = getPattern(data);
-            if (pat === "晨星") score += 20;
-            if (pat === "吞沒") score += 15;
+            // 形態偵測
+            let pat = "無";
+            if (p.close < p.open && last.close > last.open && last.close > p.open) pat = "🔥 吞沒";
+            document.getElementById('pat-val').innerText = pat;
 
-            score = Math.min(100, score);
-            let signal = score > 80 ? "🎯 強力買入" : (score > 60 ? "⚡ 買入" : "觀望");
-            return { score, signal };
-        }
-
-        function getPattern(df) {
-            if (df.length < 3) return null;
-            const l = df[df.length-1], p = df[df.length-2], p2 = df[df.length-3];
-            if (p2.close < p2.open && Math.abs(p.open-p.close) < (p.high-p.low)*0.3 && l.close > l.open && l.close > p.open) return "晨星";
-            if (p.close < p.open && l.close > l.open && l.close > p.open && l.open < p.close) return "吞沒";
-            return "無";
-        }
-
-        async function startScanner() {
-            const list = document.getElementById('watchlist').value.split(',').map(s => s.trim());
-            const display = document.getElementById('scanner-list');
-            display.innerHTML = "正在深度掃描...";
-            
-            for (let tk of list) {
-                try {
-                    const cleanTk = tk.split('.')[0];
-                    const url = `https://finnhub.io/api/v1/stock/candle?symbol=${cleanTk}&resolution=${currentTF}&from=${Math.floor(Date.now()/1000)-604800}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`;
-                    const res = await fetch(url);
-                    const d = await res.json();
-                    if(d.s === 'ok') {
-                        const item = document.createElement('div');
-                        item.className = 'scan-item';
-                        item.innerHTML = `<span>${tk}</span> <span class="bull">Ready</span>`;
-                        item.onclick = () => loadAnalysis(tk, d);
-                        display.appendChild(item);
-                    }
-                } catch(e) {}
-                await new Promise(r => setTimeout(r, 150));
-            }
-        }
-
-        function loadAnalysis(tk, raw) {
-            const df = raw.t.map((t, i) => ({ time: t, open: raw.o[i], high: raw.high ? raw.high[i] : raw.h[i], low: raw.low ? raw.low[i] : raw.l[i], close: raw.c[i] }));
-            series.setData(df);
-            
-            const l6 = calculateL6(df);
-            document.getElementById('l6-sig').innerText = l6.signal;
-            document.getElementById('pattern-val').innerText = getPattern(df);
-            
-            // 風控 RR
-            const entry = df[df.length-1].close;
-            const stop = Math.min(...df.slice(-5).map(x => x.low)) * 0.998;
+            // 風控
+            const entry = last.close;
+            const stop = Math.min(...df.slice(-10).map(x => x.low));
             const target = entry + (entry - stop) * 2;
             
             document.getElementById('en-p').innerText = entry.toFixed(2);
             document.getElementById('sl-p').innerText = stop.toFixed(2);
             document.getElementById('tp-p').innerText = target.toFixed(2);
+            document.getElementById('l6-sig').innerText = pat !== "無" ? "🎯 強力買入" : "觀望";
 
-            // 警報提示
-            const alarm = document.getElementById('shot-alarm');
-            if(l6.score > 70) {
-                alarm.style.display = 'block';
-                document.getElementById('alarm-ticker').innerText = tk;
-                document.getElementById('alarm-l6').innerText = `L6 評分：${l6.score}`;
-            } else {
-                alarm.style.display = 'none';
-            }
-
+            // 畫線
             pLines.forEach(l => series.removePriceLine(l));
             pLines = [
                 series.createPriceLine({ price: entry, color: '#00d4ff', lineWidth: 2, title: 'ENTRY' }),
                 series.createPriceLine({ price: stop, color: '#ff1744', lineWidth: 2, title: 'STOP' }),
                 series.createPriceLine({ price: target, color: '#00e676', lineWidth: 2, title: 'TARGET' })
             ];
-            chart.timeScale().fitContent();
+            
+            document.getElementById('shot-alarm').style.display = (pat !== "無") ? 'block' : 'none';
+            document.getElementById('alarm-ticker').innerText = tk.toUpperCase();
+        }
+
+        async function startScanner() {
+            const list = document.getElementById('watchlist').value.split(',').map(s => s.trim());
+            const display = document.getElementById('scanner-list');
+            display.innerHTML = "掃描中...";
+            for (let tk of list) {
+                const item = document.createElement('div');
+                item.className = 'scan-item';
+                item.innerHTML = `<span>${tk}</span> <span class="bull">Ready</span>`;
+                item.onclick = () => loadAnalysis(tk);
+                display.appendChild(item);
+            }
+            display.firstChild.remove();
         }
 
         window.onload = init;
