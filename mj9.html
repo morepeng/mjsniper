@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v21.0 - YAHOO PRO</title>
+    <title>MJ SNIPER v22.0 - YAHOO MULTI-PROXY</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; }
@@ -21,7 +21,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER v21.0 (YAHOO)</div>
+        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER v22.0 (穿透版)</div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="2330">
             <button class="btn-main" style="width:auto; padding:5px 15px; margin:0;" onclick="fetchYahoo(document.getElementById('top-tk').value)">⚡ 鑑識</button>
@@ -32,8 +32,8 @@
         <section id="chart"></section>
         <aside class="sidebar">
             <div class="card">
-                <h4>📐 無限雲端核心 (Yahoo)</h4>
-                <div id="stat-msg" style="color:#ffd700; font-size:12px; margin-bottom:8px;">系統就緒 - 免金鑰連線</div>
+                <h4>📐 雲端穿透核心 (Yahoo)</h4>
+                <div id="stat-msg" style="color:#ffd700; font-size:12px; margin-bottom:8px;">系統就緒 - 代理陣列已啟動</div>
                 <div style="display:flex; justify-content:space-between;"><span>標的：</span><span id="cur-tk" class="val">--</span></div>
                 <div style="display:flex; justify-content:space-between;"><span>現價：</span><span id="cur-p">--</span></div>
                 <div style="display:flex; justify-content:space-between;"><span>止損：</span><span id="sl-p" style="color:var(--bear)">--</span></div>
@@ -64,54 +64,65 @@
 
         async function fetchYahoo(tk) {
             if(!tk) return;
-            // 自動補全台股後綴
             const rawSym = tk.toUpperCase();
             const sym = isNaN(rawSym) ? rawSym : rawSym + '.TW'; 
             
-            document.getElementById('stat-msg').innerText = `🔄 正在連線 Yahoo 抓取 ${sym}...`;
+            document.getElementById('stat-msg').innerText = `🔄 突破網路牆抓取 ${sym}...`;
+            document.getElementById('stat-msg').style.color = "#00d4ff";
             document.getElementById('cur-tk').innerText = sym;
             
-            try {
-                // Yahoo Finance 15分K線目標網址
-                const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=15m&range=5d`;
-                // 透過全域代理繞過 CORS 限制
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
-                
-                const res = await fetch(proxyUrl);
-                const d = await res.json();
-                
-                if(d.chart && d.chart.result && d.chart.result.length > 0) {
-                    const r = d.chart.result[0];
-                    const t = r.timestamp;
-                    const q = r.indicators.quote[0];
-                    const df = [];
+            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=15m&range=5d`;
+            
+            // 建立多重代理通道陣列 (確保高可用性)
+            const proxyList = [
+                `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`
+            ];
+
+            let success = false;
+            
+            for(let i = 0; i < proxyList.length; i++) {
+                if(success) break;
+                try {
+                    document.getElementById('stat-msg').innerText = `🔄 嘗試通道 ${i+1}...`;
+                    const res = await fetch(proxyList[i]);
+                    if(!res.ok) continue;
                     
-                    for(let i=0; i<t.length; i++) {
-                        if(q.close[i] !== null) { // 過濾空值
-                            df.push({ 
-                                time: t[i], 
-                                open: q.open[i], 
-                                high: q.high[i], 
-                                low: q.low[i], 
-                                close: q.close[i] 
-                            });
+                    const d = await res.json();
+                    if(d.chart && d.chart.result && d.chart.result.length > 0) {
+                        const r = d.chart.result[0];
+                        const t = r.timestamp;
+                        const q = r.indicators.quote[0];
+                        const df = [];
+                        
+                        for(let j=0; j<t.length; j++) {
+                            if(q.close[j] !== null) { 
+                                df.push({ time: t[j], open: q.open[j], high: q.high[j], low: q.low[j], close: q.close[j] });
+                            }
                         }
+                        
+                        series.setData(df);
+                        updateStats(df);
+                        chart.timeScale().fitContent();
+                        
+                        document.getElementById('stat-msg').innerText = `✅ 數據載入成功 (通道 ${i+1})`;
+                        document.getElementById('stat-msg').style.color = "#00e676";
+                        success = true;
                     }
-                    
-                    series.setData(df);
-                    updateStats(df);
-                    chart.timeScale().fitContent();
-                    document.getElementById('stat-msg').innerText = "✅ 數據載入成功";
-                } else {
-                    document.getElementById('stat-msg').innerText = "❌ 查無此標的";
+                } catch(e) {
+                    console.log(`通道 ${i+1} 失敗`);
                 }
-            } catch(e) { 
-                console.error(e);
-                document.getElementById('stat-msg').innerText = "❌ 代理連線異常，請稍後重試"; 
+            }
+
+            if(!success) {
+                document.getElementById('stat-msg').innerText = "❌ 代理全數阻擋，請稍後重試";
+                document.getElementById('stat-msg').style.color = "#ff1744";
             }
         }
 
         function updateStats(df) {
+            if(!df || df.length === 0) return;
             const last = df[df.length-1];
             const stop = Math.min(...df.slice(-10).map(x => x.low));
             const target = last.close + (last.close - stop) * 1.5;
