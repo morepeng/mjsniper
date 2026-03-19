@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v25.2 - PATTERN MASTER</title>
+    <title>MJ SNIPER v25.3 - MASTER DECISION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; --purple: #bf40bf; }
         body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .sidebar { background: var(--panel); padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); max-height: 48vh; }
-        #chart { flex: 1; background: #000; min-height: 40vh; }
-        @media (min-width: 768px) { .layout { flex-direction: row; } .sidebar { width: 360px; border-bottom: none; border-right: 1px solid var(--border); max-height: 100%; } }
+        .sidebar { background: var(--panel); padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); max-height: 55vh; }
+        #chart { flex: 1; background: #000; min-height: 35vh; }
+        @media (min-width: 768px) { .layout { flex-direction: row; } .sidebar { width: 380px; border-bottom: none; border-right: 1px solid var(--border); max-height: 100%; } }
         .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
         .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
         .row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; align-items: center;}
@@ -22,40 +22,41 @@
         .tag.warn { background: var(--bear); color: #fff; font-weight: bold; }
         .tag.special { background: var(--purple); color: #fff; font-weight: bold; }
         .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; width: 80px; }
-        #ai-advice-box { font-size: 11px; line-height: 1.4; white-space: pre-wrap; color: #fff; background: #16263d; padding: 8px; border-radius: 4px; margin-top: 5px; border-left: 3px solid var(--cyan); }
+        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; width: 100px; font-size: 14px; }
+        #ai-advice-box { font-size: 11px; line-height: 1.5; white-space: pre-wrap; color: #fff; background: #16263d; padding: 10px; border-radius: 4px; margin-top: 5px; border-left: 4px solid var(--cyan); }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v25.2 (形態大師)</div>
-        <div style="display:flex; gap:5px;">
-            <input type="text" id="top-tk" placeholder="2330">
-            <button class="btn-main" onclick="fireSniper(document.getElementById('top-tk').value)">⚡ 射擊</button>
+        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v25.3 (決策強化)</div>
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="top-tk" placeholder="代號 (如:2330)">
+            <button class="btn-main" onclick="fireSniper(document.getElementById('top-tk').value)">⚡ 射擊鑑定</button>
         </div>
     </header>
 
     <div class="layout">
         <aside class="sidebar">
             <div class="card">
-                <h4>📐 AI 策略總評 <span id="status-tag" class="tag">READY</span></h4>
-                <div class="row"><span>標的：</span> <span id="cur-tk" class="val">--</span> <span id="cur-p" class="val">--</span></div>
-                <div class="row"><span>進場/目標：</span> <span class="bull" id="tp-p">--</span> <span class="bear" id="sl-p">--</span></div>
-                <div id="ai-advice-box">等待大數據鑑識中...</div>
+                <h4>📐 AI 戰略決策報告 <span id="status-tag" class="tag">READY</span></h4>
+                <div class="row"><span>鑑識標的：</span> <span id="cur-tk" class="val">--</span> <span id="cur-p" class="val">--</span></div>
+                <div class="row"><span>操盤建議位：</span> <span class="bull" id="tp-p">--</span> <span class="bear" id="sl-p">--</span></div>
+                <div id="ai-advice-box">請輸入標的代號並點擊射擊鑑定...</div>
             </div>
 
             <div class="card">
-                <h4>🧠 形態與 OBV 秘訣偵測</h4>
-                <div class="row"><span>OBV 評分：</span> <span id="obv-score" class="val">--</span> <span id="obv-sig" class="tag">--</span></div>
-                <div class="row"><span>技術形態：</span> <span id="tech-pattern" class="tag special">--</span></div>
-                <div class="row"><span>K線組合：</span> <span id="candle-pattern" class="tag">--</span></div>
+                <h4>🧠 OBV 秘訣與形態偵測</h4>
+                <div class="row"><span>OBV 四大秘訣：</span> <span id="obv-score" class="val">--</span> <span id="obv-sig" class="tag">--</span></div>
+                <div class="row"><span>技術形態識別：</span> <span id="tech-pattern" class="tag special">--</span></div>
+                <div class="row"><span>K線型態組合：</span> <span id="candle-pattern" class="tag">--</span></div>
             </div>
 
-            <div class="card" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-                <button class="btn-main" style="background:#fff;" onclick="fireSniper('NVDA')">NVDA</button>
-                <button class="btn-main" style="background:#fff;" onclick="fireSniper('MSFT')">MSFT</button>
-                <button class="btn-main" onclick="fireSniper('2330')">2330(台)</button>
-                <button class="btn-main" onclick="fireSniper('2317')">2317(台)</button>
+            <div class="card">
+                <h4>📊 結構與指標雷達 (SMC / OFI)</h4>
+                <div class="row"><span>SMC 聰明錢結構：</span> <span id="mod-smc" class="tag">--</span></div>
+                <div class="row"><span>OFI 訂單流失衡：</span> <span id="mod-ofi" class="tag">--</span></div>
+                <div class="row"><span>均線趨勢 / RSI：</span> <span id="mod-trend" class="tag">--</span> <span id="mod-rsi" class="tag">--</span></div>
+                <div class="row"><span>布林通道狀態：</span> <span id="mod-bb" class="tag">--</span></div>
             </div>
         </aside>
         <section id="chart"></section>
@@ -94,7 +95,6 @@
                     }
                     df.sort((a,b)=>a.time-b.time);
                     
-                    // 計算 OBV 數值
                     let obv = 0;
                     df = df.map((item, i) => {
                         if(i > 0) {
@@ -106,7 +106,7 @@
                     });
 
                     series.setData(df);
-                    runPatternAI(df);
+                    runEnhancedAI(df);
                     chart.timeScale().fitContent();
                     document.getElementById('status-tag').innerText = "ONLINE";
                     document.getElementById('status-tag').style.background = "#00e676";
@@ -114,58 +114,52 @@
             } catch(e) { console.error(e); }
         }
 
-        function runPatternAI(df) {
+        function runEnhancedAI(df) {
             const latest = df[df.length-1];
             const prev = df[df.length-2];
 
-            // 1. OBV 四大秘訣偵測 (移植您提供的邏輯)
+            // 1. OBV 秘訣偵測
             const obvEMA30 = df.slice(-30).reduce((a,b)=>a+b.obv,0)/30;
             const obvEMA3 = df.slice(-3).reduce((a,b)=>a+b.obv,0)/3;
             let obvScore = 0, secrets = [];
-            
             if(latest.obv > obvEMA30 && prev.obv <= obvEMA30) { obvScore += 5; secrets.push("🎯 秘訣一: 突破30日均線"); }
-            const isPriceHigh = latest.close == Math.max(...df.slice(-30).map(x=>x.close));
-            const isObvHigh = latest.obv == Math.max(...df.slice(-30).map(x=>x.obv));
-            if(isPriceHigh && isObvHigh) { obvScore += 8; secrets.push("💎 秘訣二: 價量齊創新高"); }
+            if(latest.close == Math.max(...df.slice(-30).map(x=>x.close)) && latest.obv == Math.max(...df.slice(-30).map(x=>x.obv))) { obvScore += 8; secrets.push("💎 秘訣二: 價量齊創新高"); }
             if(obvEMA3 > obvEMA30) { obvScore += 4; secrets.push("📈 秘訣四: 短均線上穿"); }
-
             document.getElementById('obv-score').innerText = obvScore;
-            document.getElementById('obv-sig').innerText = obvScore >= 10 ? "資金重兵" : obvScore >= 5 ? "量能轉強" : "中性";
+            document.getElementById('obv-sig').innerText = obvScore >= 10 ? "資金重兵" : "量能轉強";
             document.getElementById('obv-sig').className = `tag ${obvScore>=5?'active':''}`;
 
-            // 2. 技術形態偵測 (Wedge, Flag, Double Bottom)
-            let techLabel = "掃描中...";
-            const recentHighs = df.slice(-20).map(x=>x.high);
-            const recentLows = df.slice(-20).map(x=>x.low);
-            const breakout = latest.close > Math.max(...df.slice(-20, -1).map(x=>x.high)) * 1.01;
+            // 2. SMC & OFI 歸位邏輯
+            const isBOS = latest.close > df[df.length-10].close;
+            document.getElementById('mod-smc').innerText = isBOS ? "多方結構 (BOS)" : "空方結構 (CHOCH)";
+            document.getElementById('mod-smc').className = `tag ${isBOS?'active':'warn'}`;
             
-            if(breakout) techLabel = "🚀 Breakout Up";
-            else if (latest.close < Math.min(...df.slice(-10).map(x=>x.low)) * 1.05) techLabel = "🛡️ Double Bottom?";
-            else techLabel = "穩定整理";
-            document.getElementById('tech-pattern').innerText = techLabel;
+            const avgVol = df.slice(-20).reduce((a,b)=>a+b.vol,0)/20;
+            const isOFI = df[df.length-2].vol > avgVol * 1.5;
+            document.getElementById('mod-ofi').innerText = isOFI ? "異常大量區" : "流動性正常";
+            document.getElementById('mod-ofi').className = `tag ${isOFI?'active':''}`;
 
-            // 3. K線形態評分 (Hammer, Engulfing)
-            const body = Math.abs(latest.close - latest.open);
-            const lowerWick = Math.min(latest.close, latest.open) - latest.low;
-            const isHammer = lowerWick > body * 2;
-            document.getElementById('candle-pattern').innerText = isHammer ? "🔨 Hammer (看漲)" : "無顯著組合";
-            document.getElementById('candle-pattern').className = `tag ${isHammer?'active':''}`;
+            // 3. 其他技術指標
+            const ma20 = df.slice(-20).reduce((a,b)=>a+b.close,0)/20;
+            document.getElementById('mod-trend').innerText = latest.close > ma20 ? "多頭" : "空頭";
+            document.getElementById('mod-trend').className = `tag ${latest.close > ma20 ? 'active' : 'warn'}`;
 
-            // 4. AI 綜合建議箱
+            // 4. AI 綜合報告
             const sl = Math.min(...df.slice(-15).map(x=>x.low));
             const tp = latest.close + (latest.close - sl) * 1.5;
             document.getElementById('cur-p').innerText = `$${latest.close.toFixed(2)}`;
-            document.getElementById('sl-p').innerText = `SL: ${sl.toFixed(2)}`;
-            document.getElementById('tp-p').innerText = `TP: ${tp.toFixed(2)}`;
+            document.getElementById('sl-p').innerText = `止損: ${sl.toFixed(2)}`;
+            document.getElementById('tp-p').innerText = `目標: ${tp.toFixed(2)}`;
 
-            let advice = `【AI 鑑識報告】\n`;
-            advice += `評分: ${obvScore}分 | 信心度: ${obvScore >= 10 ? '極高' : '中'}\n`;
-            advice += secrets.length > 0 ? secrets.join("\n") : "💡 目前量能穩定，等待爆發點";
-            if(isHammer && obvScore >= 5) advice += "\n🔥 偵測到槌子線+資金流入，強烈看多！";
-            
+            let advice = `【MJ AI 鑑識報告】\n`;
+            advice += `評分: ${obvScore}分 | 結構: ${isBOS?'多方':'空方'}\n`;
+            advice += secrets.length > 0 ? secrets.join("\n") : "💡 等待量能爆發點";
+            if(isOFI) advice += "\n⚠️ 注意：偵測到主力異動(OFI)！";
             document.getElementById('ai-advice-box').innerText = advice;
-        }
 
+            // 形態識別
+            document.getElementById('tech-pattern').innerText = isBOS && isOFI ? "🚀 強勢突破" : "掃描完畢";
+        }
         window.onload = init;
     </script>
 </body>
