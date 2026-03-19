@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v25.3 - MASTER DECISION</title>
+    <title>MJ SNIPER v25.4 - PATTERN ANALYZER</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; --purple: #bf40bf; }
@@ -28,9 +28,9 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v25.3 (決策強化)</div>
+        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v25.4 (形態大解讀)</div>
         <div style="display:flex; gap:8px;">
-            <input type="text" id="top-tk" placeholder="代號 (如:2330)">
+            <input type="text" id="top-tk" placeholder="代號">
             <button class="btn-main" onclick="fireSniper(document.getElementById('top-tk').value)">⚡ 射擊鑑定</button>
         </div>
     </header>
@@ -39,24 +39,23 @@
         <aside class="sidebar">
             <div class="card">
                 <h4>📐 AI 戰略決策報告 <span id="status-tag" class="tag">READY</span></h4>
-                <div class="row"><span>鑑識標的：</span> <span id="cur-tk" class="val">--</span> <span id="cur-p" class="val">--</span></div>
-                <div class="row"><span>操盤建議位：</span> <span class="bull" id="tp-p">--</span> <span class="bear" id="sl-p">--</span></div>
-                <div id="ai-advice-box">請輸入標的代號並點擊射擊鑑定...</div>
+                <div class="row"><span>標的/價格：</span> <span id="cur-tk" class="val">--</span> <span id="cur-p" class="val">--</span></div>
+                <div id="ai-advice-box">請輸入代號進行全方位形態分析...</div>
             </div>
 
             <div class="card">
-                <h4>🧠 OBV 秘訣與形態偵測</h4>
+                <h4>🧠 OBV 秘訣與形態掃描</h4>
                 <div class="row"><span>OBV 四大秘訣：</span> <span id="obv-score" class="val">--</span> <span id="obv-sig" class="tag">--</span></div>
                 <div class="row"><span>技術形態識別：</span> <span id="tech-pattern" class="tag special">--</span></div>
-                <div class="row"><span>K線型態組合：</span> <span id="candle-pattern" class="tag">--</span></div>
+                <div class="row"><span>K線型態組合：</span> <span id="candle-pattern" class="tag active">--</span></div>
             </div>
 
             <div class="card">
-                <h4>📊 結構與指標雷達 (SMC / OFI)</h4>
+                <h4>📊 指標雷達 (SMC / OFI / BB)</h4>
                 <div class="row"><span>SMC 聰明錢結構：</span> <span id="mod-smc" class="tag">--</span></div>
                 <div class="row"><span>OFI 訂單流失衡：</span> <span id="mod-ofi" class="tag">--</span></div>
-                <div class="row"><span>均線趨勢 / RSI：</span> <span id="mod-trend" class="tag">--</span> <span id="mod-rsi" class="tag">--</span></div>
-                <div class="row"><span>布林通道狀態：</span> <span id="mod-bb" class="tag">--</span></div>
+                <div class="row"><span>RSI / 趨勢 MA：</span> <span id="mod-rsi" class="tag">--</span> <span id="mod-trend" class="tag">--</span></div>
+                <div class="row"><span>布林通道狀態：</span> <span id="mod-bb" class="tag special">--</span></div>
             </div>
         </aside>
         <section id="chart"></section>
@@ -82,7 +81,6 @@
             const rawSym = tk.toUpperCase();
             const sym = isNaN(rawSym) ? rawSym : rawSym + '.TW'; 
             document.getElementById('cur-tk').innerText = sym;
-            
             try {
                 const res = await fetch(`${GAS_URL}?tk=${sym}`);
                 const d = await res.json();
@@ -94,19 +92,16 @@
                         if(q.close[i]) df.push({ time: t[i], open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i], vol: q.volume[i]||0 });
                     }
                     df.sort((a,b)=>a.time-b.time);
-                    
                     let obv = 0;
                     df = df.map((item, i) => {
                         if(i > 0) {
                             if(item.close > df[i-1].close) obv += item.vol;
                             else if(item.close < df[i-1].close) obv -= item.vol;
                         }
-                        item.obv = obv;
-                        return item;
+                        item.obv = obv; return item;
                     });
-
                     series.setData(df);
-                    runEnhancedAI(df);
+                    runAdvancedAnalysis(df);
                     chart.timeScale().fitContent();
                     document.getElementById('status-tag').innerText = "ONLINE";
                     document.getElementById('status-tag').style.background = "#00e676";
@@ -114,51 +109,60 @@
             } catch(e) { console.error(e); }
         }
 
-        function runEnhancedAI(df) {
-            const latest = df[df.length-1];
+        function runAdvancedAnalysis(df) {
+            const last = df[df.length-1];
             const prev = df[df.length-2];
+            const p2 = df[df.length-3];
 
-            // 1. OBV 秘訣偵測
-            const obvEMA30 = df.slice(-30).reduce((a,b)=>a+b.obv,0)/30;
-            const obvEMA3 = df.slice(-3).reduce((a,b)=>a+b.obv,0)/3;
-            let obvScore = 0, secrets = [];
-            if(latest.obv > obvEMA30 && prev.obv <= obvEMA30) { obvScore += 5; secrets.push("🎯 秘訣一: 突破30日均線"); }
-            if(latest.close == Math.max(...df.slice(-30).map(x=>x.close)) && latest.obv == Math.max(...df.slice(-30).map(x=>x.obv))) { obvScore += 8; secrets.push("💎 秘訣二: 價量齊創新高"); }
-            if(obvEMA3 > obvEMA30) { obvScore += 4; secrets.push("📈 秘訣四: 短均線上穿"); }
-            document.getElementById('obv-score').innerText = obvScore;
-            document.getElementById('obv-sig').innerText = obvScore >= 10 ? "資金重兵" : "量能轉強";
-            document.getElementById('obv-sig').className = `tag ${obvScore>=5?'active':''}`;
+            // 1. K線型態組合解讀
+            let candleP = "常態";
+            const body = Math.abs(last.close - last.open);
+            const lowerWick = Math.min(last.close, last.open) - last.low;
+            const upperWick = last.high - Math.max(last.close, last.open);
+            if(lowerWick > body * 2) candleP = "🔨 槌子線(看漲)";
+            else if(upperWick > body * 2) candleP = "☄️ 射擊之星(看跌)";
+            else if(last.close > prev.open && last.open < prev.close && prev.close < prev.open) candleP = "🔥 吞噬線(看漲)";
+            document.getElementById('candle-pattern').innerText = candleP;
 
-            // 2. SMC & OFI 歸位邏輯
-            const isBOS = latest.close > df[df.length-10].close;
-            document.getElementById('mod-smc').innerText = isBOS ? "多方結構 (BOS)" : "空方結構 (CHOCH)";
-            document.getElementById('mod-smc').className = `tag ${isBOS?'active':'warn'}`;
-            
-            const avgVol = df.slice(-20).reduce((a,b)=>a+b.vol,0)/20;
-            const isOFI = df[df.length-2].vol > avgVol * 1.5;
-            document.getElementById('mod-ofi').innerText = isOFI ? "異常大量區" : "流動性正常";
-            document.getElementById('mod-ofi').className = `tag ${isOFI?'active':''}`;
-
-            // 3. 其他技術指標
+            // 2. 布林通道狀態解讀
             const ma20 = df.slice(-20).reduce((a,b)=>a+b.close,0)/20;
-            document.getElementById('mod-trend').innerText = latest.close > ma20 ? "多頭" : "空頭";
-            document.getElementById('mod-trend').className = `tag ${latest.close > ma20 ? 'active' : 'warn'}`;
+            const sd = Math.sqrt(df.slice(-20).reduce((a,b)=>a+Math.pow(b.close-ma20,2),0)/20);
+            const ub = ma20 + 2*sd, lb = ma20 - 2*sd;
+            let bbStatus = "通道內";
+            if(last.close >= ub) bbStatus = "🚀 觸碰頂軌(過熱)";
+            else if(last.close <= lb) bbStatus = "📉 觸碰底軌(超賣)";
+            else if(sd < (ma20*0.01)) bbStatus = "🤐 通道擠壓(即將變盤)";
+            document.getElementById('mod-bb').innerText = bbStatus;
 
-            // 4. AI 綜合報告
-            const sl = Math.min(...df.slice(-15).map(x=>x.low));
-            const tp = latest.close + (latest.close - sl) * 1.5;
-            document.getElementById('cur-p').innerText = `$${latest.close.toFixed(2)}`;
-            document.getElementById('sl-p').innerText = `止損: ${sl.toFixed(2)}`;
-            document.getElementById('tp-p').innerText = `目標: ${tp.toFixed(2)}`;
+            // 3. OBV 四大秘訣
+            const obvEMA30 = df.slice(-30).reduce((a,b)=>a+b.obv,0)/30;
+            let obvScore = 0;
+            if(last.obv > obvEMA30 && prev.obv <= obvEMA30) obvScore += 5;
+            if(last.close == Math.max(...df.slice(-30).map(x=>x.close)) && last.obv == Math.max(...df.slice(-30).map(x=>x.obv))) obvScore += 8;
+            document.getElementById('obv-score').innerText = obvScore;
+            document.getElementById('obv-sig').innerText = obvScore >= 8 ? "主力進攻" : "中性";
 
-            let advice = `【MJ AI 鑑識報告】\n`;
-            advice += `評分: ${obvScore}分 | 結構: ${isBOS?'多方':'空方'}\n`;
-            advice += secrets.length > 0 ? secrets.join("\n") : "💡 等待量能爆發點";
-            if(isOFI) advice += "\n⚠️ 注意：偵測到主力異動(OFI)！";
+            // 4. 其他核心指標 (SMC / OFI / RSI)
+            const isBOS = last.close > df[df.length-10].close;
+            document.getElementById('mod-smc').innerText = isBOS ? "BOS(多)" : "CHOCH(空)";
+            document.getElementById('mod-smc').className = `tag ${isBOS?'active':'warn'}`;
+            const avgV = df.slice(-20).reduce((a,b)=>a+b.vol,0)/20;
+            document.getElementById('mod-ofi').innerText = last.vol > avgV * 1.5 ? "異常大量" : "正常";
+            
+            let g=0, l=0;
+            for(let i=df.length-14; i<df.length; i++) {
+                let c = df[i].close-df[i-1].close; if(c>0) g+=c; else l-=c;
+            }
+            const rsi = l==0?100:100-(100/(1+(g/14)/(l/14)));
+            document.getElementById('mod-rsi').innerText = `RSI:${Math.round(rsi)}`;
+            document.getElementById('mod-rsi').className = `tag ${rsi<35?'active':rsi>65?'warn':''}`;
+
+            // 5. 綜合建議
+            let advice = `【MJ AI 鑑識報告】\n● 型態: ${candleP}\n● 布林: ${bbStatus}\n● OBV分數: ${obvScore}\n`;
+            if(last.close <= lb && obvScore >= 5) advice += "🔥 強烈建議: 觸底+資金進場, 抄底機會!";
+            else if(last.close >= ub && rsi > 70) advice += "⚠️ 警告: 觸頂+超買, 建議獲利了結!";
             document.getElementById('ai-advice-box').innerText = advice;
-
-            // 形態識別
-            document.getElementById('tech-pattern').innerText = isBOS && isOFI ? "🚀 強勢突破" : "掃描完畢";
+            document.getElementById('cur-p').innerText = `$${last.close.toFixed(2)}`;
         }
         window.onload = init;
     </script>
