@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER AI v24.2 - AUTO FIX</title>
+    <title>MJ SNIPER AI v25.0 - DECISION MATRIX</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; }
@@ -11,17 +11,17 @@
         .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         
         .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .sidebar { background: var(--panel); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border); max-height: 40vh; }
+        .sidebar { background: var(--panel); padding: 10px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); max-height: 45vh; }
         #chart { flex: 1; background: #000; position: relative; min-height: 50vh; }
         
         @media (min-width: 768px) { 
             .layout { flex-direction: row; } 
-            .sidebar { width: 340px; border-bottom: none; border-right: 1px solid var(--border); max-height: 100%; } 
+            .sidebar { width: 350px; border-bottom: none; border-right: 1px solid var(--border); max-height: 100%; } 
         }
 
-        .card { background: #0a1525; border: 1px solid var(--border); padding: 12px; border-radius: 8px; }
-        .card h4 { margin: 0 0 10px 0; color: var(--cyan); font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; align-items: center;}
+        .card { background: #0a1525; border: 1px solid var(--border); padding: 10px 12px; border-radius: 8px; }
+        .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; align-items: center;}
         input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; font-size: 14px; width: 80px; }
         .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s;}
         .val { font-weight: bold; color: var(--gold); font-size: 14px;}
@@ -33,7 +33,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 15px;">🎯 MJ SNIPER AI v24.2</div>
+        <div style="font-weight: bold; color: var(--cyan); font-size: 15px;">🎯 MJ SNIPER AI v25.0</div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="2330">
             <button class="btn-main" onclick="fireSniper(document.getElementById('top-tk').value)">⚡ 射擊</button>
@@ -43,28 +43,31 @@
     <div class="layout">
         <aside class="sidebar">
             <div class="card">
-                <h4>📐 實時數據分析</h4>
+                <h4>📐 AI 決策中心</h4>
                 <div class="row"><span style="color:#888;">數據源：</span> <span class="tag" id="status-tag" style="background:#1c3d64;">系統就緒</span></div>
                 <div class="row"><span>目標標的：</span> <span id="cur-tk" class="val">--</span></div>
-                <div class="row"><span>AI 結論：</span> <span id="ai-msg" style="color:var(--cyan); font-weight:bold;">等待鑑識...</span></div>
-                <div style="margin: 10px 0; border-top: 1px dashed var(--border);"></div>
+                <div class="row"><span>綜合建議：</span> <span id="ai-msg" style="color:var(--cyan); font-weight:bold; font-size:15px;">等待鑑識...</span></div>
+                <div style="margin: 8px 0; border-top: 1px dashed var(--border);"></div>
                 <div class="row"><span>進場位 (Entry)：</span> <span id="cur-p" class="val">--</span></div>
-                <div class="row"><span>止損位 (SL)：</span> <span id="sl-p" class="bear">--</span></div>
+                <div class="row"><span>防守位 (SL)：</span> <span id="sl-p" class="bear">--</span></div>
                 <div class="row"><span>目標位 (TP)：</span> <span id="tp-p" class="bull">--</span></div>
             </div>
 
             <div class="card">
-                <h4>🧠 狙擊手模組狀態</h4>
-                <div class="row"><span>SMC (聰明錢區塊)：</span> <span id="mod-smc" class="tag">未掃描</span></div>
-                <div class="row"><span>OFI (訂單流失衡)：</span> <span id="mod-ofi" class="tag">未掃描</span></div>
-                <div class="row"><span>OBV (能量潮趨勢)：</span> <span id="mod-obv" class="tag">未掃描</span></div>
+                <h4>🧠 技術模組雷達</h4>
+                <div class="row"><span>均線趨勢 (MA)：</span> <span id="mod-trend" class="tag">未掃描</span></div>
+                <div class="row"><span>相對強弱 (RSI)：</span> <span id="mod-rsi" class="tag">未掃描</span></div>
+                <div class="row"><span>布林通道 (BB)：</span> <span id="mod-bb" class="tag">未掃描</span></div>
+                <div class="row"><span>聰明錢 (SMC)：</span> <span id="mod-smc" class="tag">未掃描</span></div>
+                <div class="row"><span>訂單流 (OFI)：</span> <span id="mod-ofi" class="tag">未掃描</span></div>
+                <div class="row"><span>能量潮 (OBV)：</span> <span id="mod-obv" class="tag">未掃描</span></div>
             </div>
 
             <div class="card">
                 <h4>📡 快速陣列切換</h4>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
                     <button class="btn-main" style="background:#fff;" onclick="fireSniper('NVDA')">NVDA</button>
-                    <button class="btn-main" style="background:#fff;" onclick="fireSniper('TSLA')">TSLA</button>
+                    <button class="btn-main" style="background:#fff;" onclick="fireSniper('MSFT')">MSFT</button>
                     <button class="btn-main" onclick="fireSniper('2330')">2330 (台)</button>
                     <button class="btn-main" onclick="fireSniper('2317')">2317 (台)</button>
                 </div>
@@ -92,20 +95,18 @@
 
         async function fireSniper(tk) {
             if(!tk) return;
-            
             const rawSym = tk.toUpperCase();
             const sym = isNaN(rawSym) ? rawSym : rawSym + '.TW'; 
             
             document.getElementById('cur-tk').innerText = sym;
-            document.getElementById('status-tag').innerText = "衛星連線中...";
+            document.getElementById('status-tag').innerText = "雲端擷取中...";
             document.getElementById('status-tag').style.background = "#ffd700";
             document.getElementById('ai-msg').innerText = "🧠 AI 運算中...";
             document.getElementById('ai-msg').style.color = "#ffd700";
             
             try {
                 const res = await fetch(`${GAS_URL}?tk=${sym}`);
-                if(!res.ok) throw new Error(`HTTP ${res.status}`);
-                
+                if(!res.ok) throw new Error(`連線被拒 (${res.status})`);
                 const d = await res.json();
                 
                 if(d.chart && d.chart.result && d.chart.result.length > 0) {
@@ -113,13 +114,23 @@
                     const t = r.timestamp;
                     const q = r.indicators.quote[0];
                     
-                    let df = [], volData = [];
+                    // 💡 終極圖表防呆：過濾無效值、去重複並強制排序時間戳記
+                    let rawData = [];
                     for(let i=0; i<t.length; i++) {
-                        if(q.close[i] !== null) { 
-                            df.push({ time: t[i], open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i] });
-                            // 防呆：如果 Yahoo 漏給成交量，預設補 0，避免當機
-                            const v = (q.volume && q.volume[i] !== null && q.volume[i] !== undefined) ? q.volume[i] : 0;
-                            volData.push({ time: t[i], value: v, color: q.close[i] >= q.open[i] ? 'rgba(0, 230, 118, 0.4)' : 'rgba(255, 23, 68, 0.4)' });
+                        if(q.close[i] !== null && t[i] !== null) { 
+                            const v = (q.volume && q.volume[i] != null) ? q.volume[i] : 0;
+                            rawData.push({ time: t[i], open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i], volume: v });
+                        }
+                    }
+                    rawData.sort((a,b) => a.time - b.time); // 強制時間排序，解決 Yahoo MSFT/台股 亂序 Bug
+                    
+                    let df = [], volData = [];
+                    let uniqueTimes = new Set();
+                    for(let item of rawData) {
+                        if(!uniqueTimes.has(item.time)) {
+                            uniqueTimes.add(item.time);
+                            df.push({ time: item.time, open: item.open, high: item.high, low: item.low, close: item.close });
+                            volData.push({ time: item.time, value: item.volume, color: item.close >= item.open ? 'rgba(0, 230, 118, 0.4)' : 'rgba(255, 23, 68, 0.4)' });
                         }
                     }
                     
@@ -128,32 +139,109 @@
                     runAIModules(df, volData);
                     chart.timeScale().fitContent();
                     
-                    document.getElementById('status-tag').innerText = "連線成功";
+                    document.getElementById('status-tag').innerText = "分析完成";
                     document.getElementById('status-tag').style.background = "var(--bull)";
                 } else {
                     throw new Error("查無標的或無開盤數據");
                 }
             } catch(e) { 
-                console.error(e);
-                document.getElementById('status-tag').innerText = "錯誤: " + e.message.substring(0, 15);
+                document.getElementById('status-tag').innerText = "錯誤: " + e.message;
                 document.getElementById('status-tag').style.background = "var(--bear)";
-                document.getElementById('ai-msg').innerText = "❌ " + e.message;
-                document.getElementById('ai-msg').style.color = "var(--bear)";
+                document.getElementById('ai-msg').innerText = "❌ 暫無決策";
             }
         }
 
+        // --- 技術指標運算核心 ---
+        function calcSMA(data, period) {
+            let res = [];
+            for(let i=0; i<data.length; i++) {
+                if(i < period - 1) res.push(null);
+                else {
+                    let sum = 0;
+                    for(let j=0; j<period; j++) sum += data[i-j].close;
+                    res.push(sum/period);
+                }
+            }
+            return res;
+        }
+
         function runAIModules(df, volData) {
-            if(!df || df.length < 20) return;
+            if(!df || df.length < 50) return;
             const last = df[df.length-1];
+            let score = 0; // AI 決策分數
             
-            const recentLows = df.slice(-15).map(x => x.low);
-            const stopLoss = Math.min(...recentLows);
+            // 1. 基礎支撐壓力 (SL & TP)
+            const stopLoss = Math.min(...df.slice(-15).map(x => x.low));
             const risk = last.close - stopLoss;
             const target = last.close + (risk * 1.5); 
 
-            let markers = [];
-            let isBullish = last.close > df[df.length-10].close;
+            // 2. 趨勢濾網 (Trend MA)
+            const sma20 = calcSMA(df, 20);
+            const sma50 = calcSMA(df, 50);
+            const curSMA20 = sma20[sma20.length-1];
+            const curSMA50 = sma50[sma50.length-1];
+            if(last.close > curSMA20 && curSMA20 > curSMA50) {
+                document.getElementById('mod-trend').innerText = "多頭排列 (Bullish)";
+                document.getElementById('mod-trend').className = "tag active";
+                score += 1;
+            } else if (last.close < curSMA20 && curSMA20 < curSMA50) {
+                document.getElementById('mod-trend').innerText = "空頭瀑布 (Bearish)";
+                document.getElementById('mod-trend').className = "tag warn";
+                score -= 1;
+            } else {
+                document.getElementById('mod-trend').innerText = "區間震盪 (Ranging)";
+                document.getElementById('mod-trend').className = "tag";
+            }
+
+            // 3. 布林通道 (BB)
+            let sumSq = 0;
+            for(let i=0; i<20; i++) sumSq += Math.pow(df[df.length-1-i].close - curSMA20, 2);
+            let sd = Math.sqrt(sumSq / 20);
+            let bbUpper = curSMA20 + 2*sd;
+            let bbLower = curSMA20 - 2*sd;
+            if(last.close <= bbLower) {
+                document.getElementById('mod-bb').innerText = "觸底反彈區 (買點)";
+                document.getElementById('mod-bb').className = "tag active";
+                score += 2; // 極端值加分較重
+            } else if(last.close >= bbUpper) {
+                document.getElementById('mod-bb').innerText = "觸頂回落區 (賣點)";
+                document.getElementById('mod-bb').className = "tag warn";
+                score -= 2;
+            } else {
+                document.getElementById('mod-bb').innerText = "通道內安全區";
+                document.getElementById('mod-bb').className = "tag";
+            }
+
+            // 4. RSI (14) 相對強弱
+            let gains = 0, losses = 0;
+            for(let i = df.length - 14; i < df.length; i++) {
+                let change = df[i].close - df[i-1].close;
+                if(change > 0) gains += change; else losses -= change;
+            }
+            let rs = (gains / 14) / (losses / 14);
+            let rsi = losses === 0 ? 100 : 100 - (100 / (1 + rs));
             
+            if(rsi < 30) {
+                document.getElementById('mod-rsi').innerText = `超賣區 (\${Math.round(rsi)})`;
+                document.getElementById('mod-rsi').className = "tag active";
+                score += 1;
+            } else if(rsi > 70) {
+                document.getElementById('mod-rsi').innerText = `超買區 (\${Math.round(rsi)})`;
+                document.getElementById('mod-rsi').className = "tag warn";
+                score -= 1;
+            } else {
+                document.getElementById('mod-rsi').innerText = `中性 (\${Math.round(rsi)})`;
+                document.getElementById('mod-rsi').className = "tag";
+            }
+
+            // 5. SMC 聰明錢結構
+            let isBullish = last.close > df[df.length-10].close;
+            document.getElementById('mod-smc').innerText = isBullish ? "多方結構 (BOS)" : "空方結構 (CHOCH)";
+            document.getElementById('mod-smc').className = isBullish ? "tag active" : "tag warn";
+            if(isBullish) score += 1; else score -= 1;
+
+            // 6. OFI & OBV
+            let markers = [];
             const avgVol = volData.slice(-20).reduce((a,b)=>a+b.value, 0) / 20;
             if(volData[volData.length-2].value > avgVol * 1.5) {
                 markers.push({ time: df[df.length-2].time, position: 'belowBar', color: '#ffd700', shape: 'arrowUp', text: 'OFI' });
@@ -170,25 +258,38 @@
                 if(df[i].close < df[i-1].close) obv -= volData[i].value;
             }
             if(obv > 0) {
-                document.getElementById('mod-obv').innerText = "資金流入 (Bullish)";
+                document.getElementById('mod-obv').innerText = "資金淨流入";
                 document.getElementById('mod-obv').className = "tag active";
+                score += 1;
             } else {
-                document.getElementById('mod-obv').innerText = "資金流出 (Bearish)";
+                document.getElementById('mod-obv').innerText = "資金淨流出";
                 document.getElementById('mod-obv').className = "tag warn";
+                score -= 1;
             }
 
+            // --- AI 總結矩陣 ---
+            let aiMsg = "", aiColor = "";
+            if(score >= 3) {
+                aiMsg = "🟢 強烈買進 (Strong Buy)"; aiColor = "var(--bull)";
+            } else if (score >= 1) {
+                aiMsg = "↗️ 偏多操作 (Buy)"; aiColor = "#00d4ff";
+            } else if (score <= -3) {
+                aiMsg = "🔴 強烈賣出 (Strong Sell)"; aiColor = "var(--bear)";
+            } else if (score <= -1) {
+                aiMsg = "↘️ 偏空操作 (Sell)"; aiColor = "#ff7a00";
+            } else {
+                aiMsg = "🟡 區間觀望 (Wait)"; aiColor = "var(--gold)";
+            }
+            
+            document.getElementById('ai-msg').innerText = aiMsg;
+            document.getElementById('ai-msg').style.color = aiColor;
+            
+            // 更新價位面板
             document.getElementById('cur-p').innerText = last.close.toFixed(2);
             document.getElementById('sl-p').innerText = stopLoss.toFixed(2);
             document.getElementById('tp-p').innerText = target.toFixed(2);
-            
-            document.getElementById('mod-smc').innerText = isBullish ? "多方結構 (BOS)" : "空方結構 (CHOCH)";
-            document.getElementById('mod-smc').className = isBullish ? "tag active" : "tag warn";
-            
-            document.getElementById('ai-msg').innerText = isBullish && obv > 0 ? "🟢 資金與結構同步偏多，建議做多" : "🔴 趨勢有風險，建議觀望或做空";
-            document.getElementById('ai-msg').style.color = isBullish && obv > 0 ? "var(--bull)" : "var(--bear)";
 
             series.setMarkers(markers);
-
             pLines.forEach(l => series.removePriceLine(l));
             pLines = [
                 series.createPriceLine({ price: last.close, color: '#00d4ff', title: '進場', lineStyle: 2 }),
