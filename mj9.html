@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER AI v24.0 - ULTIMATE</title>
+    <title>MJ SNIPER AI v24.1 - ULTIMATE</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; }
         body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         
-        /* 電腦版左側面板，手機版上下堆疊 */
         .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .sidebar { background: var(--panel); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border); max-height: 40vh; }
         #chart { flex: 1; background: #000; position: relative; min-height: 50vh; }
@@ -21,20 +20,20 @@
         }
 
         .card { background: #0a1525; border: 1px solid var(--border); padding: 12px; border-radius: 8px; }
-        .card h4 { margin: 0 0 10px 0; color: var(--cyan); font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 5px; display: flex; align-items: center; gap: 5px;}
+        .card h4 { margin: 0 0 10px 0; color: var(--cyan); font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
         .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; align-items: center;}
-        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; font-size: 14px; width: 90px; }
+        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; font-size: 14px; width: 80px; }
         .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s;}
-        .btn-main:hover { background: #fff; }
         .val { font-weight: bold; color: var(--gold); font-size: 14px;}
         .bull { color: var(--bull); font-weight: bold;} .bear { color: var(--bear); font-weight: bold;}
-        .tag { font-size: 10px; padding: 2px 6px; border-radius: 3px; background: #1c3d64; color: #fff; }
+        .tag { font-size: 11px; padding: 3px 6px; border-radius: 3px; background: #1c3d64; color: #fff; }
         .tag.active { background: var(--bull); color: #000; font-weight: bold; }
+        .tag.warn { background: var(--bear); color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 15px;">🎯 MJ SNIPER AI v24.0</div>
+        <div style="font-weight: bold; color: var(--cyan); font-size: 15px;">🎯 MJ SNIPER AI v24.1</div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="2330">
             <button class="btn-main" onclick="fireSniper(document.getElementById('top-tk').value)">⚡ 射擊</button>
@@ -45,11 +44,11 @@
         <aside class="sidebar">
             <div class="card">
                 <h4>📐 實時數據分析</h4>
-                <div class="row"><span style="color:#888;">數據源：</span> <span class="tag active" id="status-tag">Google 衛星連線中</span></div>
+                <div class="row"><span style="color:#888;">數據源：</span> <span class="tag" id="status-tag" style="background:#1c3d64;">系統就緒</span></div>
                 <div class="row"><span>目標標的：</span> <span id="cur-tk" class="val">--</span></div>
                 <div class="row"><span>AI 結論：</span> <span id="ai-msg" style="color:var(--cyan); font-weight:bold;">等待鑑識...</span></div>
                 <div style="margin: 10px 0; border-top: 1px dashed var(--border);"></div>
-                <div class="row"><span>目前價格 (Entry)：</span> <span id="cur-p" class="val">--</span></div>
+                <div class="row"><span>進場位 (Entry)：</span> <span id="cur-p" class="val">--</span></div>
                 <div class="row"><span>止損位 (SL)：</span> <span id="sl-p" class="bear">--</span></div>
                 <div class="row"><span>目標位 (TP)：</span> <span id="tp-p" class="bull">--</span></div>
             </div>
@@ -62,12 +61,12 @@
             </div>
 
             <div class="card">
-                <h4>📡 快速切換陣列</h4>
+                <h4>📡 快速陣列切換</h4>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                    <button class="btn-main" style="background:#1c3d64; color:#fff;" onclick="fireSniper('NVDA')">NVDA</button>
-                    <button class="btn-main" style="background:#1c3d64; color:#fff;" onclick="fireSniper('TSLA')">TSLA</button>
-                    <button class="btn-main" style="background:#1c3d64; color:#fff;" onclick="fireSniper('2330')">2330 (台)</button>
-                    <button class="btn-main" style="background:#1c3d64; color:#fff;" onclick="fireSniper('2317')">2317 (台)</button>
+                    <button class="btn-main" style="background:#fff;" onclick="fireSniper('NVDA')">NVDA</button>
+                    <button class="btn-main" style="background:#fff;" onclick="fireSniper('TSLA')">TSLA</button>
+                    <button class="btn-main" onclick="fireSniper('2330')">2330 (台)</button>
+                    <button class="btn-main" onclick="fireSniper('2317')">2317 (台)</button>
                 </div>
             </div>
         </aside>
@@ -76,7 +75,9 @@
 
     <script>
         let chart, series, volumeSeries, pLines = [];
-        const GAS_URL = "@(https://script.google.com/macros/s/AKfycbw3FtfMjvsSJB0lxXNZuW58jK9mzM6UpU4uJ8dLczWY4sIN4gl7yW9qKoi1rCc7ZA/exec)"; // 已替換為您的專屬網址
+        
+        // 👇👇👇 請在這裡貼上您專屬的 Google 網址 👇👇👇
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw3FtfMjvsSJB0lxXNZuW58jK9mzM6UpU4uJ8dLczWY4sIN4gl7yW9qKoi1rCc7ZA/exec";
 
         function init() {
             chart = LightweightCharts.createChart(document.getElementById('chart'), {
@@ -85,30 +86,30 @@
                 timeScale: { borderColor: '#1c3d64', timeVisible: true }
             });
             
-            // K線主圖
-            series = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744', borderVisible: false, wickUpColor: '#00e676', wickDownColor: '#ff1744' });
-            
-            // 成交量副圖
-            volumeSeries = chart.addHistogramSeries({
-                color: '#26a69a',
-                priceFormat: { type: 'volume' },
-                priceScaleId: '', 
-            });
+            series = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744', borderVisible: false });
+            volumeSeries = chart.addHistogramSeries({ color: '#26a69a', priceFormat: { type: 'volume' }, priceScaleId: '' });
             volumeSeries.priceScale().applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } });
         }
 
         async function fireSniper(tk) {
             if(!tk) return;
+            
+            if(GAS_URL.includes("👉")) {
+                alert("🛑 系統錯誤：您還沒有貼上 Google 衛星網址！\n請用記事本打開 mj9.html，找到 GAS_URL 並替換成您的專屬網址。");
+                return;
+            }
+
             const rawSym = tk.toUpperCase();
             const sym = isNaN(rawSym) ? rawSym : rawSym + '.TW'; 
             
             document.getElementById('cur-tk').innerText = sym;
-            document.getElementById('status-tag').innerText = "抓取數據中...";
+            document.getElementById('status-tag').innerText = "衛星連線中...";
             document.getElementById('status-tag').style.background = "#ffd700";
             document.getElementById('ai-msg').innerText = "🧠 AI 運算中...";
+            document.getElementById('ai-msg').style.color = "#ffd700";
             
             try {
-                const res = await fetch(\?tk=\);
+                const res = await fetch(`${GAS_URL}?tk=${sym}`);
                 const d = await res.json();
                 
                 if(d.chart && d.chart.result && d.chart.result.length > 0) {
@@ -126,19 +127,17 @@
                     
                     series.setData(df);
                     volumeSeries.setData(volData);
-                    
-                    // 執行 AI 分析模組
                     runAIModules(df, volData);
-                    
                     chart.timeScale().fitContent();
-                    document.getElementById('status-tag').innerText = "ONLINE";
+                    
+                    document.getElementById('status-tag').innerText = "連線成功";
                     document.getElementById('status-tag').style.background = "var(--bull)";
                 } else {
-                    alert("查無標的數據");
+                    document.getElementById('status-tag').innerText = "查無資料";
+                    document.getElementById('status-tag').style.background = "var(--bear)";
                 }
             } catch(e) { 
-                console.error(e);
-                document.getElementById('status-tag').innerText = "連線失敗";
+                document.getElementById('status-tag').innerText = "網路異常";
                 document.getElementById('status-tag').style.background = "var(--bear)";
             }
         }
@@ -147,25 +146,38 @@
             if(!df || df.length < 20) return;
             const last = df[df.length-1];
             
-            // 1. 基礎支撐壓力與風險報酬比 (Risk-Reward)
+            // 基礎支撐壓力 (SL & TP)
             const recentLows = df.slice(-15).map(x => x.low);
             const stopLoss = Math.min(...recentLows);
             const risk = last.close - stopLoss;
-            const target = last.close + (risk * 1.5); // 預設 1:1.5 盈虧比
+            const target = last.close + (risk * 1.5); 
 
-            // 2. 模擬 SMC & OFI 計算 (標記於圖表)
             let markers = [];
             let isBullish = last.close > df[df.length-10].close;
             
-            // 尋找最近的大量 K 線作為 OFI 訂單流失衡區
+            // OFI 訂單流分析
             const avgVol = volData.slice(-20).reduce((a,b)=>a+b.value, 0) / 20;
             if(volData[volData.length-2].value > avgVol * 1.5) {
                 markers.push({ time: df[df.length-2].time, position: 'belowBar', color: '#ffd700', shape: 'arrowUp', text: 'OFI' });
-                document.getElementById('mod-ofi').innerText = "發現異常大量";
+                document.getElementById('mod-ofi').innerText = "異常大量區";
                 document.getElementById('mod-ofi').className = "tag active";
             } else {
-                document.getElementById('mod-ofi').innerText = "正常";
+                document.getElementById('mod-ofi').innerText = "流動性正常";
                 document.getElementById('mod-ofi').className = "tag";
+            }
+
+            // OBV 能量潮分析 (計算近10筆資金流入/流出)
+            let obv = 0;
+            for(let i = df.length - 10; i < df.length; i++) {
+                if(df[i].close > df[i-1].close) obv += volData[i].value;
+                if(df[i].close < df[i-1].close) obv -= volData[i].value;
+            }
+            if(obv > 0) {
+                document.getElementById('mod-obv').innerText = "資金流入 (Bullish)";
+                document.getElementById('mod-obv').className = "tag active";
+            } else {
+                document.getElementById('mod-obv').innerText = "資金流出 (Bearish)";
+                document.getElementById('mod-obv').className = "tag warn";
             }
 
             // 更新面板狀態
@@ -173,22 +185,19 @@
             document.getElementById('sl-p').innerText = stopLoss.toFixed(2);
             document.getElementById('tp-p').innerText = target.toFixed(2);
             
-            document.getElementById('mod-smc').innerText = isBullish ? "結構向上 (BOS)" : "結構向下 (CHOCH)";
-            document.getElementById('mod-smc').className = "tag active";
-            document.getElementById('mod-obv').innerText = "同步計算中...";
-            document.getElementById('mod-obv').className = "tag active";
+            document.getElementById('mod-smc').innerText = isBullish ? "多方結構 (BOS)" : "空方結構 (CHOCH)";
+            document.getElementById('mod-smc').className = isBullish ? "tag active" : "tag warn";
             
-            document.getElementById('ai-msg').innerText = isBullish ? "🟢 偏多方控盤，適合低多" : "🔴 偏空方控盤，注意風險";
-            document.getElementById('ai-msg').style.color = isBullish ? "var(--bull)" : "var(--bear)";
+            document.getElementById('ai-msg').innerText = isBullish && obv > 0 ? "🟢 資金與結構同步偏多，建議做多" : "🔴 趨勢有風險，建議觀望或做空";
+            document.getElementById('ai-msg').style.color = isBullish && obv > 0 ? "var(--bull)" : "var(--bear)";
 
             series.setMarkers(markers);
 
-            // 繪製戰術參考線
             pLines.forEach(l => series.removePriceLine(l));
             pLines = [
-                series.createPriceLine({ price: last.close, color: '#00d4ff', title: '現價', lineStyle: 2 }),
-                series.createPriceLine({ price: stopLoss, color: '#ff1744', title: '止損 (SL)', lineStyle: 2 }),
-                series.createPriceLine({ price: target, color: '#00e676', title: '目標 (TP)', lineStyle: 2 })
+                series.createPriceLine({ price: last.close, color: '#00d4ff', title: '進場', lineStyle: 2 }),
+                series.createPriceLine({ price: stopLoss, color: '#ff1744', title: '止損', lineStyle: 2 }),
+                series.createPriceLine({ price: target, color: '#00e676', title: '目標', lineStyle: 2 })
             ];
         }
 
