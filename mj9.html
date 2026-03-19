@@ -3,50 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER AI v18.0 — 全球機動版</title>
-    <link rel="manifest" href="manifest.json">
+    <title>MJ SNIPER v19.0 - MOBILE PRO</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; }
+        :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; }
         body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .layout { flex: 1; display: grid; grid-template-columns: 340px 1fr; gap: 1px; background: var(--border); overflow: hidden; }
-        .sidebar { background: var(--panel); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        #chart { background: #000; position: relative; }
-        .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
-        .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* 手機版 RWD 排版核心修正 */
+        .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        #chart { flex: 2; min-height: 300px; background: #000; }
+        .sidebar { flex: 1; background: var(--panel); padding: 10px; overflow-y: auto; border-top: 1px solid var(--border); }
+        
+        @media (min-width: 768px) {
+            .layout { flex-direction: row; }
+            .sidebar { width: 340px; flex: none; border-top: none; border-right: 1px solid var(--border); }
+        }
+
+        .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
         .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
-        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; font-size: 14px; width: 80px; }
-        .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        .val { font-weight: bold; color: var(--gold); }
-        .bull { color: var(--bull); } .bear { color: var(--bear); }
-        .status-tag { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: var(--bull); color: #000; font-weight: bold; }
-        @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } #chart { height: 100%; } }
+        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 8px; border-radius: 4px; width: 100px; }
+        .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; }
+        .val { font-weight: bold; color: #ffd700; }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER v18.0</div>
+        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER v19.0</div>
         <div style="display:flex; gap:5px;">
-            <input type="text" id="top-tk" placeholder="2330">
-            <button class="btn-main" onclick="fetchCloudData(document.getElementById('top-tk').value)">⚡ 射擊</button>
+            <input type="text" id="top-tk" placeholder="NVDA">
+            <button class="btn-main" onclick="fetchData(document.getElementById('top-tk').value)">⚡ 射擊</button>
         </div>
     </header>
 
     <div class="layout">
         <aside class="sidebar">
             <div class="card">
-                <h4>📐 雲端即時鑑識</h4>
-                <div class="row"><span>數據來源：</span> <span class="status-tag">CLOUD ONLINE</span></div>
-                <div class="row"><span>目前價格：</span> <span id="cur-p" class="val">--</span></div>
-                <div class="row"><span>止損位：</span> <span id="sl-p" class="bear">--</span></div>
-                <div class="row"><span>目標位：</span> <span id="tp-p" class="bull">--</span></div>
+                <h4>📐 雲端即時分析</h4>
+                <div class="row"><span>標的：</span> <span id="cur-tk" class="val">--</span></div>
+                <div class="row"><span>價格：</span> <span id="cur-p">--</span></div>
+                <div class="row"><span>止損：</span> <span id="sl-p" style="color:var(--bear)">--</span></div>
+                <div class="row"><span>目標：</span> <span id="tp-p" style="color:var(--bull)">--</span></div>
             </div>
             <div class="card">
-                <h4>📡 快速掃描清單</h4>
-                <textarea id="watchlist" style="width:100%; background:#070e19; color:var(--cyan); height:40px; border:none; font-size:11px;">2330, NVDA, AAPL, TSLA</textarea>
-                <button class="btn-main" style="width:100%; margin-top:5px;" onclick="startRadar()">⚡ 啟動掃描</button>
-                <div id="radar-list" style="margin-top:8px;"></div>
+                <h4>📡 快速切換</h4>
+                <div id="radar-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('NVDA')">NVDA</button>
+                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('AAPL')">AAPL</button>
+                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('TSLA')">TSLA</button>
+                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('2330')">2330</button>
+                </div>
             </div>
         </aside>
         <section id="chart"></section>
@@ -65,25 +71,33 @@
             series = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744' });
         }
 
-        async function fetchCloudData(tk) {
+        async function fetchData(tk) {
             if(!tk) return;
-            const sym = tk.toUpperCase().split('.')[0];
+            const sym = tk.toUpperCase();
+            document.getElementById('cur-tk').innerText = sym;
+            
             try {
-                // 直接使用 HTTPS 請求 Finnhub 雲端數據，繞過本地電腦
-                const url = `https://finnhub.io/api/v1/stock/candle?symbol=${sym}&resolution=15&from=${Math.floor(Date.now()/1000)-432000}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`;
+                // 優化台股請求路徑
+                let query = sym;
+                if(!isNaN(sym)) query = sym + ".TW"; // 如果是純數字自動補上 .TW
+
+                const url = `https://finnhub.io/api/v1/stock/candle?symbol=${query}&resolution=15&from=${Math.floor(Date.now()/1000)-604800}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`;
                 const res = await fetch(url);
                 const d = await res.json();
+                
                 if(d.s === 'ok') {
                     const df = d.t.map((t, i) => ({ time: t, open: d.o[i], high: d.h[i], low: d.l[i], close: d.c[i] }));
                     render(df);
-                } else { alert("查無此標的，台股請輸入代碼 (例如 2330)"); }
-            } catch(e) { alert("雲端連線失敗，請檢查網路。"); }
+                } else {
+                    alert("雲端查無資料。提示：Finnhub 免費版對台股支援較弱，請優先測試 NVDA 確認連線是否正常。");
+                }
+            } catch(e) { alert("網路連線異常。"); }
         }
 
         function render(df) {
             series.setData(df);
             const last = df[df.length-1];
-            const stop = Math.min(...df.slice(-12).map(x => x.low));
+            const stop = Math.min(...df.slice(-10).map(x => x.low));
             const target = last.close + (last.close - stop) * 1.5;
             
             document.getElementById('cur-p').innerText = last.close.toFixed(2);
@@ -97,19 +111,6 @@
                 series.createPriceLine({ price: target, color: '#00e676', title: 'TARGET' })
             ];
             chart.timeScale().fitContent();
-        }
-
-        function startRadar() {
-            const list = document.getElementById('watchlist').value.split(',').map(s => s.trim());
-            const div = document.getElementById('radar-list');
-            div.innerHTML = "";
-            list.forEach(tk => {
-                const el = document.createElement('div');
-                el.style.cssText = "padding:8px; border-bottom:1px solid #1c3d64; cursor:pointer; font-size:12px;";
-                el.innerHTML = `<span>${tk}</span> <span style="float:right; color:var(--cyan)">GO</span>`;
-                el.onclick = () => fetchCloudData(tk);
-                div.appendChild(el);
-            });
         }
 
         window.onload = init;
