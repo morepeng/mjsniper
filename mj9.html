@@ -9,39 +9,43 @@
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; }
         body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         .layout { flex: 1; display: grid; grid-template-columns: 340px 1fr; gap: 1px; background: var(--border); overflow: hidden; }
         .sidebar { background: var(--panel); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        #chart { background: #000; }
+        #chart { background: #000; position: relative; }
         .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
+        .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
         .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
-        .btn-main { background: var(--cyan); color: #000; border: none; padding: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; }
+        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; font-size: 14px; width: 80px; }
+        .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .val { font-weight: bold; color: var(--gold); }
+        .bull { color: var(--bull); } .bear { color: var(--bear); }
         .status-tag { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: var(--bull); color: #000; font-weight: bold; }
         @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } #chart { height: 100%; } }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI v18.0</div>
-        <div style="display:flex; gap:8px;">
-            <input type="text" id="top-tk" placeholder="2330" style="width:80px;">
+        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER v18.0</div>
+        <div style="display:flex; gap:5px;">
+            <input type="text" id="top-tk" placeholder="2330">
             <button class="btn-main" onclick="fetchCloudData(document.getElementById('top-tk').value)">⚡ 射擊</button>
         </div>
     </header>
+
     <div class="layout">
-        <aside class="sidebar" id="side-p">
+        <aside class="sidebar">
             <div class="card">
                 <h4>📐 雲端即時鑑識</h4>
-                <div class="row"><span>系統狀態：</span> <span class="status-tag">CLOUD ONLINE</span></div>
+                <div class="row"><span>數據來源：</span> <span class="status-tag">CLOUD ONLINE</span></div>
                 <div class="row"><span>目前價格：</span> <span id="cur-p" class="val">--</span></div>
-                <div class="row"><span>止損 (SL)：</span> <span id="sl-p" style="color:var(--bear)">--</span></div>
-                <div class="row"><span>目標 (TP)：</span> <span id="tp-p" style="color:var(--bull)">--</span></div>
+                <div class="row"><span>止損位：</span> <span id="sl-p" class="bear">--</span></div>
+                <div class="row"><span>目標位：</span> <span id="tp-p" class="bull">--</span></div>
             </div>
             <div class="card">
-                <h4>📡 全球機動掃描</h4>
+                <h4>📡 快速掃描清單</h4>
                 <textarea id="watchlist" style="width:100%; background:#070e19; color:var(--cyan); height:40px; border:none; font-size:11px;">2330, NVDA, AAPL, TSLA</textarea>
-                <button class="btn-main" style="width:100%; margin-top:5px;" onclick="startMobileScan()">⚡ 啟動掃描</button>
+                <button class="btn-main" style="width:100%; margin-top:5px;" onclick="startRadar()">⚡ 啟動掃描</button>
                 <div id="radar-list" style="margin-top:8px;"></div>
             </div>
         </aside>
@@ -63,15 +67,17 @@
 
         async function fetchCloudData(tk) {
             if(!tk) return;
-            const sym = tk.toUpperCase().split('.')[0]; // 純代碼搜尋
+            const sym = tk.toUpperCase().split('.')[0];
             try {
-                const res = await fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${sym}&resolution=15&from=${Math.floor(Date.now()/1000)-432000}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`);
+                // 直接使用 HTTPS 請求 Finnhub 雲端數據，繞過本地電腦
+                const url = `https://finnhub.io/api/v1/stock/candle?symbol=${sym}&resolution=15&from=${Math.floor(Date.now()/1000)-432000}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`;
+                const res = await fetch(url);
                 const d = await res.json();
                 if(d.s === 'ok') {
                     const df = d.t.map((t, i) => ({ time: t, open: d.o[i], high: d.h[i], low: d.l[i], close: d.c[i] }));
                     render(df);
-                } else { alert("查無資料，請確認代碼是否正確。"); }
-            } catch(e) { alert("雲端連線失敗，請檢查手機網路。"); }
+                } else { alert("查無此標的，台股請輸入代碼 (例如 2330)"); }
+            } catch(e) { alert("雲端連線失敗，請檢查網路。"); }
         }
 
         function render(df) {
@@ -93,7 +99,7 @@
             chart.timeScale().fitContent();
         }
 
-        function startMobileScan() {
+        function startRadar() {
             const list = document.getElementById('watchlist').value.split(',').map(s => s.trim());
             const div = document.getElementById('radar-list');
             div.innerHTML = "";
