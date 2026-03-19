@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER AI v16.0 — 數據對齊版</title>
+    <title>MJ SNIPER AI v16.5 — Yahoo 數據優先版</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
@@ -15,20 +15,20 @@
         #chart { background: #000; position: relative; }
         .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
         .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
-        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; }
-        .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; font-size: 14px; }
+        .btn-main { background: var(--cyan); color: #000; border: none; padding: 10px 15px; font-weight: bold; border-radius: 6px; cursor: pointer; }
         .val { font-weight: bold; color: var(--gold); }
         .bull { color: var(--bull); } .bear { color: var(--bear); }
-        .source-tag { font-size: 10px; padding: 2px 4px; border-radius: 3px; background: #1c3d64; }
+        .source-tag { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #1c3d64; color: var(--cyan); }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI v16.0</div>
+        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI v16.5</div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="2330.TW" style="width:100px;">
-            <button class="btn-main" onclick="loadMultiSource(document.getElementById('top-tk').value)">⚡ 鑑識</button>
+            <button class="btn-main" onclick="executeScan(document.getElementById('top-tk').value)">⚡ 鑑識</button>
         </div>
     </header>
 
@@ -36,18 +36,17 @@
         <aside class="sidebar">
             <div class="card">
                 <h4>📐 L6 核心評分與風控</h4>
-                <div class="row"><span>數據來源：</span> <span id="data-src" class="source-tag">--</span></div>
+                <div class="row"><span>數據來源：</span> <span id="data-src" class="source-tag">等待數據...</span></div>
                 <div class="row"><span>AI 結論：</span> <span id="l6-sig" class="val">--</span></div>
                 <div class="row"><span>進場位：</span> <span id="en-p">--</span></div>
                 <div class="row"><span>止損位：</span> <span id="sl-p" class="bear">--</span></div>
                 <div class="row"><span>目標位：</span> <span id="tp-p" class="bull">--</span></div>
             </div>
-
             <div class="card">
-                <h4>📡 全域雷達</h4>
-                <textarea id="watchlist" style="width:100%; background:#070e19; color:var(--cyan); height:40px; border-radius:4px; font-size:11px;">2330.TW, NVDA, AAPL</textarea>
-                <button class="btn-main" style="width:100%; margin-top:5px;" onclick="startScanner()">⚡ 啟動掃描</button>
-                <div id="scanner-list" style="margin-top:5px; font-size:12px;"></div>
+                <h4>📡 全域形態雷達</h4>
+                <textarea id="watchlist" style="width:100%; background:#070e19; color:var(--cyan); height:40px; border-radius:4px; font-size:11px; border:1px solid var(--border);">2330.TW, NVDA, AAPL</textarea>
+                <button class="btn-main" style="width:100%; margin-top:8px;" onclick="startGlobalScanner()">⚡ 啟動全域掃描</button>
+                <div id="scanner-list" style="margin-top:10px; font-size:12px;"></div>
             </div>
         </aside>
         <section id="chart"></section>
@@ -55,54 +54,58 @@
 
     <script>
         let chart, series, pLines = [];
-        const KEYS = {
-            FINNHUB: 'd4sg251r01qvsjbhhgn0d4sg251r01qvsjbhhgng',
-            ALPHA: 'JRV6HWQ13Q6PHG4C',
-            FLASK: 'http://127.0.0.1:5000/api/kline'
+        const CONFIG = {
+            YAHOO_LOCAL: 'http://127.0.0.1:5000/api/kline',
+            FINNHUB_KEY: 'd4sg251r01qvsjbhhgn0d4sg251r01qvsjbhhgng',
+            ALPHA_KEY: 'JRV6HWQ13Q6PHG4C',
+            ORDER: ['yahoo', 'finnhub', 'alphavantage']
         };
 
         function init() {
             chart = LightweightCharts.createChart(document.getElementById('chart'), {
                 layout: { background: { color: '#000' }, textColor: '#6a8da8' },
-                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } }
+                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } },
+                timeScale: { borderColor: '#1c3d64', timeVisible: true }
             });
             series = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744' });
+            window.addEventListener('resize', () => chart.applyOptions({ width: document.getElementById('chart').clientWidth }));
         }
 
-        async function loadMultiSource(tk) {
+        async function executeScan(tk) {
             if(!tk) return;
             const cleanTk = tk.toUpperCase();
-            document.getElementById('data-src').innerText = "正在切換源...";
-            
-            // 優先權 1: 本地 Flask (Yahoo 數據)
-            try {
-                const res = await fetch(`${KEYS.FLASK}?tk=${cleanTk}&tf=15m&bars=100`);
-                const json = await res.json();
-                if(json.data && json.data.length > 0) {
-                    renderChart(json.data, "Yahoo (Local)");
-                    return;
-                }
-            } catch(e) { console.log("Flask Server 未開啟或失敗"); }
+            document.getElementById('top-tk').value = cleanTk;
+            document.getElementById('data-src').innerText = "🔄 尋找最佳數據源...";
 
-            // 優先權 2: Finnhub
-            try {
-                const res = await fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${cleanTk.split('.')[0]}&resolution=15&from=${Math.floor(Date.now()/1000)-259200}&to=${Math.floor(Date.now()/1000)}&token=${KEYS.FINNHUB}`);
-                const d = await res.json();
-                if(d.s === 'ok') {
-                    const df = d.t.map((t, i) => ({ time: t, open: d.o[i], high: d.h[i], low: d.l[i], close: d.c[i] }));
-                    renderChart(df, "Finnhub (Cloud)");
-                    return;
-                }
-            } catch(e) { console.log("Finnhub 失敗"); }
-
-            alert("所有數據源均失敗，請確認代碼或 Flask 狀態。");
+            let success = false;
+            // 按順序執行：Yahoo -> Finnhub -> Alpha Vantage
+            for (let source of CONFIG.ORDER) {
+                if (success) break;
+                try {
+                    if (source === 'yahoo') {
+                        const res = await fetch(`${CONFIG.YAHOO_LOCAL}?tk=${cleanTk}&tf=15m&bars=100`);
+                        const json = await res.json();
+                        if (json.data && json.data.length > 0) {
+                            updateAnalysis(json.data, "Yahoo (Local)");
+                            success = true;
+                        }
+                    } else if (source === 'finnhub') {
+                        const res = await fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${cleanTk.split('.')[0]}&resolution=15&from=${Math.floor(Date.now()/1000)-259200}&to=${Math.floor(Date.now()/1000)}&token=${CONFIG.FINNHUB_KEY}`);
+                        const d = await res.json();
+                        if (d.s === 'ok') {
+                            const df = d.t.map((t, i) => ({ time: t, open: d.o[i], high: d.h[i], low: d.l[i], close: d.c[i] }));
+                            updateAnalysis(df, "Finnhub (Cloud)");
+                            success = true;
+                        }
+                    }
+                } catch(e) { console.log(`${source} 嘗試失敗`); }
+            }
+            if(!success) alert("無法取得數據，請確認 Flask Server 是否開啟或 API 額度。");
         }
 
-        function renderChart(df, srcName) {
+        function updateAnalysis(df, src) {
             series.setData(df);
-            document.getElementById('data-src').innerText = srcName;
-            
-            // 更新風控 (RR 1:2)
+            document.getElementById('data-src').innerText = src;
             const last = df[df.length-1];
             const entry = last.close;
             const stop = Math.min(...df.slice(-10).map(x => x.low));
@@ -122,14 +125,15 @@
             chart.timeScale().fitContent();
         }
 
-        async function startScanner() {
+        async function startGlobalScanner() {
             const list = document.getElementById('watchlist').value.split(',').map(s => s.trim());
             const display = document.getElementById('scanner-list');
             display.innerHTML = "";
             for (let tk of list) {
                 const item = document.createElement('div');
-                item.style.padding = "5px";
-                item.innerHTML = `<span>${tk}</span> <span style="cursor:pointer; color:var(--cyan)" onclick="loadMultiSource('${tk}')">[ 載入 ]</span>`;
+                item.style.cssText = "display:flex; justify-content:space-between; padding:6px; border-bottom:1px solid #1c3d64; cursor:pointer;";
+                item.innerHTML = `<span>${tk}</span> <span class="bull">READY</span>`;
+                item.onclick = () => executeScan(tk);
                 display.appendChild(item);
             }
         }
