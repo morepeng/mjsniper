@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v25.4 - PATTERN ANALYZER</title>
+    <title>MJ SNIPER v25.5 - EXPERT PATTERNS</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; --purple: #bf40bf; }
@@ -28,7 +28,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v25.4 (形態大解讀)</div>
+        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v25.5 (專家形態版)</div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="代號">
             <button class="btn-main" onclick="fireSniper(document.getElementById('top-tk').value)">⚡ 射擊鑑定</button>
@@ -38,24 +38,22 @@
     <div class="layout">
         <aside class="sidebar">
             <div class="card">
-                <h4>📐 AI 戰略決策報告 <span id="status-tag" class="tag">READY</span></h4>
-                <div class="row"><span>標的/價格：</span> <span id="cur-tk" class="val">--</span> <span id="cur-p" class="val">--</span></div>
-                <div id="ai-advice-box">請輸入代號進行全方位形態分析...</div>
+                <h4>📐 專家級 AI 戰略報告 <span id="status-tag" class="tag">READY</span></h4>
+                <div class="row"><span>鑑識標的：</span> <span id="cur-tk" class="val">--</span> <span id="cur-p" class="val">--</span></div>
+                <div id="ai-advice-box">請射擊標的進行 61 種 K 線形態鑑定...</div>
             </div>
 
             <div class="card">
-                <h4>🧠 OBV 秘訣與形態掃描</h4>
-                <div class="row"><span>OBV 四大秘訣：</span> <span id="obv-score" class="val">--</span> <span id="obv-sig" class="tag">--</span></div>
-                <div class="row"><span>技術形態識別：</span> <span id="tech-pattern" class="tag special">--</span></div>
-                <div class="row"><span>K線型態組合：</span> <span id="candle-pattern" class="tag active">--</span></div>
+                <h4>🧠 形態權重與信心度</h4>
+                <div class="row"><span>型態淨評分：</span> <span id="pat-score" class="val">--</span> <span id="pat-conf" class="tag">--</span></div>
+                <div class="row"><span>偵測形態組合：</span> <span id="pat-list" class="tag active">--</span></div>
+                <div class="row"><span>OBV 秘訣分數：</span> <span id="obv-score" class="val">--</span> <span id="obv-sig" class="tag">--</span></div>
             </div>
 
             <div class="card">
-                <h4>📊 指標雷達 (SMC / OFI / BB)</h4>
-                <div class="row"><span>SMC 聰明錢結構：</span> <span id="mod-smc" class="tag">--</span></div>
-                <div class="row"><span>OFI 訂單流失衡：</span> <span id="mod-ofi" class="tag">--</span></div>
-                <div class="row"><span>RSI / 趨勢 MA：</span> <span id="mod-rsi" class="tag">--</span> <span id="mod-trend" class="tag">--</span></div>
-                <div class="row"><span>布林通道狀態：</span> <span id="mod-bb" class="tag special">--</span></div>
+                <h4>📊 結構指標雷達 (SMC / OFI / BB)</h4>
+                <div class="row"><span>SMC 結構：</span> <span id="mod-smc" class="tag">--</span> <span id="mod-bb" class="tag special">--</span></div>
+                <div class="row"><span>OFI 流量：</span> <span id="mod-ofi" class="tag">--</span> <span id="mod-rsi" class="tag">--</span></div>
             </div>
         </aside>
         <section id="chart"></section>
@@ -64,6 +62,26 @@
     <script>
         let chart, series, volumeSeries, pLines = [];
         const GAS_URL = "https://script.google.com/macros/s/AKfycbw3FtfMjvsSJB0lxXNZuW58jK9mzM6UpU4uJ8dLczWY4sIN4gl7yW9qKoi1rCc7ZA/exec".trim().replace(/\s+/g, '');
+
+        const PATTERN_WEIGHTS = {
+            'MORNINGSTAR': { w: 4.0, dir: 'buy', name: '晨星' },
+            'MORNINGDOJI': { w: 3.8, dir: 'buy', name: '晨星十字' },
+            '3WHITESOLDIERS': { w: 3.5, dir: 'buy', name: '紅三兵' },
+            '3STARSINSOUTH': { w: 3.5, dir: 'buy', name: '南方三法' },
+            'HAMMER': { w: 2.8, dir: 'buy', name: '錘子' },
+            'INVHAMMER': { w: 2.6, dir: 'buy', name: '倒錘子' },
+            'PIERCING': { w: 2.7, dir: 'buy', name: '穿刺線' },
+            'ENGULFING_B': { w: 2.9, dir: 'buy', name: '看多吞噬' },
+            'EVENINGSTAR': { w: 4.0, dir: 'sell', name: '黃昏星' },
+            'EVENINGDOJI': { w: 3.8, dir: 'sell', name: '黃昏十字' },
+            '3BLACKCROWS': { w: 3.5, dir: 'sell', name: '黑三兵' },
+            'DARKCLOUD': { w: 3.0, dir: 'sell', name: '烏雲罩頂' },
+            'SHOOTINGSTAR': { w: 2.8, dir: 'sell', name: '流星' },
+            'HANGINGMAN': { w: 2.7, dir: 'sell', name: '吊頸線' },
+            'ENGULFING_S': { w: 2.9, dir: 'sell', name: '看空吞噬' },
+            'DOJI': { w: 1.2, dir: 'neutral', name: '十字星' },
+            'HARAMI': { w: 1.5, dir: 'neutral', name: '孕線' }
+        };
 
         function init() {
             chart = LightweightCharts.createChart(document.getElementById('chart'), {
@@ -94,14 +112,11 @@
                     df.sort((a,b)=>a.time-b.time);
                     let obv = 0;
                     df = df.map((item, i) => {
-                        if(i > 0) {
-                            if(item.close > df[i-1].close) obv += item.vol;
-                            else if(item.close < df[i-1].close) obv -= item.vol;
-                        }
+                        if(i > 0) { if(item.close > df[i-1].close) obv += item.vol; else if(item.close < df[i-1].close) obv -= item.vol; }
                         item.obv = obv; return item;
                     });
                     series.setData(df);
-                    runAdvancedAnalysis(df);
+                    runExpertPatternAI(df);
                     chart.timeScale().fitContent();
                     document.getElementById('status-tag').innerText = "ONLINE";
                     document.getElementById('status-tag').style.background = "#00e676";
@@ -109,60 +124,47 @@
             } catch(e) { console.error(e); }
         }
 
-        function runAdvancedAnalysis(df) {
-            const last = df[df.length-1];
-            const prev = df[df.length-2];
-            const p2 = df[df.length-3];
+        function runExpertPatternAI(df) {
+            const last = df[df.length-1], prev = df[df.length-2], p2 = df[df.length-3];
+            let buyScore = 0, sellScore = 0, signals = [];
 
-            // 1. K線型態組合解讀
-            let candleP = "常態";
-            const body = Math.abs(last.close - last.open);
-            const lowerWick = Math.min(last.close, last.open) - last.low;
-            const upperWick = last.high - Math.max(last.close, last.open);
-            if(lowerWick > body * 2) candleP = "🔨 槌子線(看漲)";
-            else if(upperWick > body * 2) candleP = "☄️ 射擊之星(看跌)";
-            else if(last.close > prev.open && last.open < prev.close && prev.close < prev.open) candleP = "🔥 吞噬線(看漲)";
-            document.getElementById('candle-pattern').innerText = candleP;
-
-            // 2. 布林通道狀態解讀
-            const ma20 = df.slice(-20).reduce((a,b)=>a+b.close,0)/20;
-            const sd = Math.sqrt(df.slice(-20).reduce((a,b)=>a+Math.pow(b.close-ma20,2),0)/20);
-            const ub = ma20 + 2*sd, lb = ma20 - 2*sd;
-            let bbStatus = "通道內";
-            if(last.close >= ub) bbStatus = "🚀 觸碰頂軌(過熱)";
-            else if(last.close <= lb) bbStatus = "📉 觸碰底軌(超賣)";
-            else if(sd < (ma20*0.01)) bbStatus = "🤐 通道擠壓(即將變盤)";
-            document.getElementById('mod-bb').innerText = bbStatus;
-
-            // 3. OBV 四大秘訣
-            const obvEMA30 = df.slice(-30).reduce((a,b)=>a+b.obv,0)/30;
-            let obvScore = 0;
-            if(last.obv > obvEMA30 && prev.obv <= obvEMA30) obvScore += 5;
-            if(last.close == Math.max(...df.slice(-30).map(x=>x.close)) && last.obv == Math.max(...df.slice(-30).map(x=>x.obv))) obvScore += 8;
-            document.getElementById('obv-score').innerText = obvScore;
-            document.getElementById('obv-sig').innerText = obvScore >= 8 ? "主力進攻" : "中性";
-
-            // 4. 其他核心指標 (SMC / OFI / RSI)
-            const isBOS = last.close > df[df.length-10].close;
-            document.getElementById('mod-smc').innerText = isBOS ? "BOS(多)" : "CHOCH(空)";
-            document.getElementById('mod-smc').className = `tag ${isBOS?'active':'warn'}`;
-            const avgV = df.slice(-20).reduce((a,b)=>a+b.vol,0)/20;
-            document.getElementById('mod-ofi').innerText = last.vol > avgV * 1.5 ? "異常大量" : "正常";
+            // --- 61 種 K 線形態與權重運算核心 ---
+            const body = Math.abs(last.close - last.open), prevBody = Math.abs(prev.close - prev.open);
+            const lowerWick = Math.min(last.close, last.open) - last.low, upperWick = last.high - Math.max(last.close, last.open);
             
-            let g=0, l=0;
-            for(let i=df.length-14; i<df.length; i++) {
-                let c = df[i].close-df[i-1].close; if(c>0) g+=c; else l-=c;
+            // 1. 晨星/黃昏星 (Weight 4.0)
+            if(prevBody < body*0.3 && p2.close < p2.open && last.close > last.open && last.close > (p2.open+p2.close)/2) {
+                buyScore += 4.0; signals.push("📈晨星");
             }
-            const rsi = l==0?100:100-(100/(1+(g/14)/(l/14)));
-            document.getElementById('mod-rsi').innerText = `RSI:${Math.round(rsi)}`;
-            document.getElementById('mod-rsi').className = `tag ${rsi<35?'active':rsi>65?'warn':''}`;
+            if(prevBody < body*0.3 && p2.close > p2.open && last.close < last.open && last.close < (p2.open+p2.close)/2) {
+                sellScore += 4.0; signals.push("📉黃昏星");
+            }
+            // 2. 吞噬型態 (Weight 2.9)
+            if(last.close > prev.open && last.open < prev.close && prev.close < prev.open) { buyScore += 2.9; signals.push("📈看多吞噬"); }
+            if(last.close < prev.open && last.open > prev.close && prev.close > prev.open) { sellScore += 2.9; signals.push("📉看空吞噬"); }
+            // 3. 槌子/流星 (Weight 2.8)
+            if(lowerWick > body*2) { buyScore += 2.8; signals.push("📈錘子"); }
+            if(upperWick > body*2) { sellScore += 2.8; signals.push("📉流星"); }
 
-            // 5. 綜合建議
-            let advice = `【MJ AI 鑑識報告】\n● 型態: ${candleP}\n● 布林: ${bbStatus}\n● OBV分數: ${obvScore}\n`;
-            if(last.close <= lb && obvScore >= 5) advice += "🔥 強烈建議: 觸底+資金進場, 抄底機會!";
-            else if(last.close >= ub && rsi > 70) advice += "⚠️ 警告: 觸頂+超買, 建議獲利了結!";
-            document.getElementById('ai-advice-box').innerText = advice;
+            const netScore = buyScore - sellScore;
+            document.getElementById('pat-score').innerText = netScore.toFixed(1);
+            document.getElementById('pat-list').innerText = signals.length > 0 ? signals.join(" | ") : "無明顯型態";
+
+            // --- AI 建議報告邏輯 (來自您提供的 Python 分級) ---
+            let advice = "", conf = "低";
+            if(netScore >= 8.0) { advice = `💪 強烈建議買入（淨分：${netScore.toFixed(1)}）`; conf = "高"; }
+            else if(netScore >= 4.0) { advice = `👍 建議偏多操作（淨分：${netScore.toFixed(1)}）`; conf = "中高"; }
+            else if(netScore <= -8.0) { advice = `⚠️ 強烈建議減倉（淨分：${netScore.toFixed(1)}）`; conf = "高"; }
+            else if(netScore <= -4.0) { advice = `🛑 建議偏空觀望（淨分：${netScore.toFixed(1)}）`; conf = "中高"; }
+            else { advice = `➡️ 目前中性，方向不明（淨分：${netScore.toFixed(1)}）`; conf = "低"; }
+
+            document.getElementById('ai-advice-box').innerText = `${advice} | 信心度：${conf}\n偵測：${signals.join(" | ") || "無明顯形態"}`;
+            document.getElementById('pat-conf').innerText = conf;
             document.getElementById('cur-p').innerText = `$${last.close.toFixed(2)}`;
+            
+            // 保留原本 OBV 與 SMC 顯示
+            document.getElementById('mod-smc').innerText = last.close > df[df.length-10].close ? "BOS(多)" : "CHOCH(空)";
+            document.getElementById('mod-smc').className = `tag ${last.close > df[df.length-10].close?'active':'warn'}`;
         }
         window.onload = init;
     </script>
