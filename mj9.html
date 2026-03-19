@@ -3,36 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v19.0 - MOBILE PRO</title>
+    <title>MJ SNIPER v20.0 - ULTIMATE</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; }
-        body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; }
+        body { background: var(--bg); color: #cfe0ee; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* 手機版 RWD 排版核心修正：圖表在上，面板在下 */
         .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        #chart { flex: 2; min-height: 50vh; background: #000; }
-        .sidebar { flex: 1; background: var(--panel); padding: 10px; overflow-y: auto; border-top: 1px solid var(--border); }
-        
-        @media (min-width: 768px) {
-            .layout { flex-direction: row; }
-            .sidebar { width: 340px; flex: none; border-top: none; border-right: 1px solid var(--border); }
-        }
-
-        .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
+        #chart { flex: 2; background: #000; min-height: 40vh; }
+        .sidebar { flex: 1; background: var(--panel); padding: 15px; overflow-y: auto; border-top: 1px solid var(--border); }
+        .card { background: #0a1525; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .btn-main { background: var(--cyan); color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 14px; }
         input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 8px; border-radius: 4px; width: 100px; }
-        .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; }
         .val { font-weight: bold; color: #ffd700; }
+        @media (min-width: 768px) { .layout { flex-direction: row; } .sidebar { width: 340px; flex: none; border-top: none; border-left: 1px solid var(--border); } }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER v19.0</div>
-        <div style="display:flex; gap:5px;">
+        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER v20.0</div>
+        <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="NVDA">
-            <button class="btn-main" onclick="fetchData(document.getElementById('top-tk').value)">⚡ 射擊</button>
+            <button class="btn-main" style="width:auto; padding:5px 15px;" onclick="fetchData(document.getElementById('top-tk').value)">⚡ 鑑識</button>
         </div>
     </header>
 
@@ -40,33 +32,27 @@
         <section id="chart"></section>
         <aside class="sidebar">
             <div class="card">
-                <h4>📐 雲端即時分析</h4>
-                <div class="row"><span>標的：</span> <span id="cur-tk" class="val">--</span></div>
-                <div class="row"><span>進場 (Entry)：</span> <span id="cur-p">--</span></div>
-                <div class="row"><span>止損 (Stop)：</span> <span id="sl-p" style="color:var(--bear)">--</span></div>
-                <div class="row"><span>獲利 (Target)：</span> <span id="tp-p" style="color:var(--bull)">--</span></div>
+                <h4>📐 雲端分析面板</h4>
+                <div id="stat-msg" style="color:#ffd700; font-size:12px; margin-bottom:8px;">系統就緒</div>
+                <div style="display:flex; justify-content:space-between;"><span>現價：</span><span id="cur-p" class="val">--</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>止損：</span><span id="sl-p" style="color:var(--bear)">--</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>目標：</span><span id="tp-p" style="color:var(--bull)">--</span></div>
             </div>
             <div class="card">
-                <h4>📡 快速載入 (先測 NVDA)</h4>
-                <div id="radar-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                    <button class="btn-main" style="font-size:12px; background:#fff;" onclick="fetchData('NVDA')">NVDA (美)</button>
-                    <button class="btn-main" style="font-size:12px; background:#fff;" onclick="fetchData('AAPL')">AAPL (美)</button>
-                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('2330')">2330 (台)</button>
-                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('2317')">2317 (台)</button>
-                </div>
+                <button class="btn-main" onclick="fetchData('NVDA')">測試 NVDA (美股)</button>
+                <button class="btn-main" style="margin-top:8px; background:#fff;" onclick="fetchData('AAPL')">測試 AAPL (美股)</button>
             </div>
         </aside>
     </div>
 
     <script>
-        let chart, series, pLines = [];
-        const TOKEN = 'cu1i5i1r01qhk69v2s6gcu1i5i1r01qhk69v2s70';
+        let chart, series;
+        const KEY = 'JRV6HWQ13Q6PHG4C'; // Alpha Vantage 專屬金鑰
 
         function init() {
             chart = LightweightCharts.createChart(document.getElementById('chart'), {
                 layout: { background: { color: '#000' }, textColor: '#6a8da8' },
-                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } },
-                timeScale: { borderColor: '#1c3d64', timeVisible: true }
+                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } }
             });
             series = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744' });
         }
@@ -74,43 +60,41 @@
         async function fetchData(tk) {
             if(!tk) return;
             const sym = tk.toUpperCase();
-            document.getElementById('cur-tk').innerText = sym;
+            document.getElementById('stat-msg').innerText = `🔄 正在抓取 ${sym}...`;
             
             try {
-                // 自動處理台股後綴
-                let query = sym;
-                if(!isNaN(sym)) query = sym + ".TW";
-
-                const url = `https://finnhub.io/api/v1/stock/candle?symbol=${query}&resolution=15&from=${Math.floor(Date.now()/1000)-604800}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`;
+                // 使用 Alpha Vantage 獲取 15 分鐘 K 線
+                const url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${sym}&interval=15min&apikey=${KEY}`;
                 const res = await fetch(url);
                 const d = await res.json();
                 
-                if(d.s === 'ok') {
-                    const df = d.t.map((t, i) => ({ time: t, open: d.o[i], high: d.h[i], low: d.l[i], close: d.c[i] }));
-                    render(df);
+                const timeSeries = d["Time Series (15min)"];
+                if(timeSeries) {
+                    const df = Object.keys(timeSeries).map(t => ({
+                        time: new Date(t).getTime() / 1000,
+                        open: parseFloat(timeSeries[t]["1. open"]),
+                        high: parseFloat(timeSeries[t]["2. high"]),
+                        low: parseFloat(timeSeries[t]["3. low"]),
+                        close: parseFloat(timeSeries[t]["4. close"])
+                    })).sort((a,b) => a.time - b.time);
+                    
+                    series.setData(df);
+                    updateRR(df);
+                    chart.timeScale().fitContent();
+                    document.getElementById('stat-msg').innerText = "✅ 載入成功";
                 } else {
-                    alert("雲端查無資料。請先點擊 NVDA 測試連線是否正常。");
+                    document.getElementById('stat-msg').innerText = "❌ 失敗：API 點數耗盡或標的不支援";
                 }
-            } catch(e) { alert("網路連線異常，請檢查手機 4G/5G。"); }
+            } catch(e) { document.getElementById('stat-msg').innerText = "❌ 連線異常"; }
         }
 
-        function render(df) {
-            series.setData(df);
+        function updateRR(df) {
             const last = df[df.length-1];
             const stop = Math.min(...df.slice(-10).map(x => x.low));
             const target = last.close + (last.close - stop) * 1.5;
-            
             document.getElementById('cur-p').innerText = last.close.toFixed(2);
             document.getElementById('sl-p').innerText = stop.toFixed(2);
             document.getElementById('tp-p').innerText = target.toFixed(2);
-
-            pLines.forEach(l => series.removePriceLine(l));
-            pLines = [
-                series.createPriceLine({ price: last.close, color: '#00d4ff', title: 'ENTRY' }),
-                series.createPriceLine({ price: stop, color: '#ff1744', title: 'STOP' }),
-                series.createPriceLine({ price: target, color: '#00e676', title: 'TARGET' })
-            ];
-            chart.timeScale().fitContent();
         }
 
         window.onload = init;
