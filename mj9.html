@@ -2,12 +2,13 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MJ SNIPER AI v17.0 — 終極修正版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MJ SNIPER AI v18.0 — 全球機動版</title>
+    <link rel="manifest" href="manifest.json">
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; }
-        body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
         .layout { flex: 1; display: grid; grid-template-columns: 340px 1fr; gap: 1px; background: var(--border); overflow: hidden; }
         .sidebar { background: var(--panel); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
@@ -16,30 +17,31 @@
         .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
         .btn-main { background: var(--cyan); color: #000; border: none; padding: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
         input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; }
-        .source-tag { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #1c3d64; color: var(--gold); }
+        .status-tag { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: var(--bull); color: #000; font-weight: bold; }
+        @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } #chart { height: 100%; } }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI v17.0</div>
+        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI v18.0</div>
         <div style="display:flex; gap:8px;">
-            <input type="text" id="top-tk" placeholder="NVDA" style="width:100px;">
-            <button class="btn-main" onclick="masterFetch(document.getElementById('top-tk').value)">⚡ 鑑識</button>
+            <input type="text" id="top-tk" placeholder="2330" style="width:80px;">
+            <button class="btn-main" onclick="fetchCloudData(document.getElementById('top-tk').value)">⚡ 射擊</button>
         </div>
     </header>
     <div class="layout">
-        <aside class="sidebar">
+        <aside class="sidebar" id="side-p">
             <div class="card">
-                <h4>📐 實時數據分析</h4>
-                <div class="row"><span>數據源：</span> <span id="data-src" class="source-tag">OFFLINE</span></div>
-                <div class="row"><span>AI 結論：</span> <span id="l6-sig" class="val">--</span></div>
+                <h4>📐 雲端即時鑑識</h4>
+                <div class="row"><span>系統狀態：</span> <span class="status-tag">CLOUD ONLINE</span></div>
+                <div class="row"><span>目前價格：</span> <span id="cur-p" class="val">--</span></div>
                 <div class="row"><span>止損 (SL)：</span> <span id="sl-p" style="color:var(--bear)">--</span></div>
                 <div class="row"><span>目標 (TP)：</span> <span id="tp-p" style="color:var(--bull)">--</span></div>
             </div>
             <div class="card">
-                <h4>📡 快速掃描清單</h4>
-                <textarea id="watchlist" style="width:100%; background:#070e19; color:var(--cyan); height:40px; border:none; font-size:11px;">2330.TW, NVDA, AAPL</textarea>
-                <button class="btn-main" style="width:100%; margin-top:5px;" onclick="startRadar()">⚡ 啟動雷達</button>
+                <h4>📡 全球機動掃描</h4>
+                <textarea id="watchlist" style="width:100%; background:#070e19; color:var(--cyan); height:40px; border:none; font-size:11px;">2330, NVDA, AAPL, TSLA</textarea>
+                <button class="btn-main" style="width:100%; margin-top:5px;" onclick="startMobileScan()">⚡ 啟動掃描</button>
                 <div id="radar-list" style="margin-top:8px;"></div>
             </div>
         </aside>
@@ -48,56 +50,39 @@
 
     <script>
         let chart, series, pLines = [];
-        const API_CONFIG = {
-            YAHOO: 'http://127.0.0.1:5000/api/kline',
-            FINNHUB: 'd4sg251r01qvsjbhhgn0d4sg251r01qvsjbhhgng'
-        };
+        const TOKEN = 'd4sg251r01qvsjbhhgn0d4sg251r01qvsjbhhgng';
 
         function init() {
             chart = LightweightCharts.createChart(document.getElementById('chart'), {
                 layout: { background: { color: '#000' }, textColor: '#6a8da8' },
-                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } }
+                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } },
+                timeScale: { borderColor: '#1c3d64', timeVisible: true }
             });
             series = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744' });
         }
 
-        async function masterFetch(tk) {
+        async function fetchCloudData(tk) {
             if(!tk) return;
-            const target = tk.toUpperCase();
-            document.getElementById('data-src').innerText = "🔄 載入中...";
-
-            // 1. 嘗試本地 Flask (Yahoo)
+            const sym = tk.toUpperCase().split('.')[0]; // 純代碼搜尋
             try {
-                const res = await fetch(`${API_CONFIG.YAHOO}?tk=${target}&tf=15m&bars=100`);
-                const json = await res.json();
-                if(json.data && json.data.length > 0) return render(json.data, "YAHOO (Local)");
-            } catch(e) { console.warn("Yahoo 失敗"); }
-
-            // 2. 嘗試 Finnhub (美股)
-            try {
-                const sym = target.split('.')[0];
-                const res = await fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${sym}&resolution=15&from=${Math.floor(Date.now()/1000)-345600}&to=${Math.floor(Date.now()/1000)}&token=${API_CONFIG.FINNHUB}`);
+                const res = await fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${sym}&resolution=15&from=${Math.floor(Date.now()/1000)-432000}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`);
                 const d = await res.json();
                 if(d.s === 'ok') {
                     const df = d.t.map((t, i) => ({ time: t, open: d.o[i], high: d.h[i], low: d.l[i], close: d.c[i] }));
-                    return render(df, "FINNHUB (Cloud)");
-                }
-            } catch(e) { console.warn("Finnhub 失敗"); }
-
-            document.getElementById('data-src').innerText = "❌ 失敗";
-            alert("目前無法連線。請檢查：\n1. 電腦是否執行 mj_server.py\n2. 瀏覽器是否允許不安全內容 (CORS)");
+                    render(df);
+                } else { alert("查無資料，請確認代碼是否正確。"); }
+            } catch(e) { alert("雲端連線失敗，請檢查手機網路。"); }
         }
 
-        function render(df, src) {
+        function render(df) {
             series.setData(df);
-            document.getElementById('data-src').innerText = src;
             const last = df[df.length-1];
-            const stop = Math.min(...df.slice(-10).map(x => x.low));
-            const target = last.close + (last.close - stop) * 2.0;
+            const stop = Math.min(...df.slice(-12).map(x => x.low));
+            const target = last.close + (last.close - stop) * 1.5;
             
+            document.getElementById('cur-p').innerText = last.close.toFixed(2);
             document.getElementById('sl-p').innerText = stop.toFixed(2);
             document.getElementById('tp-p').innerText = target.toFixed(2);
-            document.getElementById('l6-sig').innerText = last.close > stop ? "🎯 強力買入" : "觀望";
 
             pLines.forEach(l => series.removePriceLine(l));
             pLines = [
@@ -108,15 +93,15 @@
             chart.timeScale().fitContent();
         }
 
-        async function startRadar() {
+        function startMobileScan() {
             const list = document.getElementById('watchlist').value.split(',').map(s => s.trim());
             const div = document.getElementById('radar-list');
             div.innerHTML = "";
             list.forEach(tk => {
                 const el = document.createElement('div');
-                el.style.cssText = "padding:6px; border-bottom:1px solid #1c3d64; cursor:pointer;";
-                el.innerHTML = `<span>${tk}</span> <span style="float:right; color:var(--cyan)">SCAN</span>`;
-                el.onclick = () => masterFetch(tk);
+                el.style.cssText = "padding:8px; border-bottom:1px solid #1c3d64; cursor:pointer; font-size:12px;";
+                el.innerHTML = `<span>${tk}</span> <span style="float:right; color:var(--cyan)">GO</span>`;
+                el.onclick = () => fetchCloudData(tk);
                 div.appendChild(el);
             });
         }
