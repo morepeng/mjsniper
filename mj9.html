@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v20.0 - ULTIMATE</title>
+    <title>MJ SNIPER v21.0 - YAHOO PRO</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #050c14; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; }
@@ -13,18 +13,18 @@
         #chart { flex: 2; background: #000; min-height: 40vh; }
         .sidebar { flex: 1; background: var(--panel); padding: 15px; overflow-y: auto; border-top: 1px solid var(--border); }
         .card { background: #0a1525; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 10px; }
-        .btn-main { background: var(--cyan); color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 14px; }
-        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 8px; border-radius: 4px; width: 100px; }
+        .btn-main { background: var(--cyan); color: #000; border: none; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 13px; margin-top: 5px; }
+        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 8px; border-radius: 4px; width: 80px; }
         .val { font-weight: bold; color: #ffd700; }
         @media (min-width: 768px) { .layout { flex-direction: row; } .sidebar { width: 340px; flex: none; border-top: none; border-left: 1px solid var(--border); } }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER v20.0</div>
+        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER v21.0 (YAHOO)</div>
         <div style="display:flex; gap:8px;">
-            <input type="text" id="top-tk" placeholder="NVDA">
-            <button class="btn-main" style="width:auto; padding:5px 15px;" onclick="fetchData(document.getElementById('top-tk').value)">⚡ 鑑識</button>
+            <input type="text" id="top-tk" placeholder="2330">
+            <button class="btn-main" style="width:auto; padding:5px 15px; margin:0;" onclick="fetchYahoo(document.getElementById('top-tk').value)">⚡ 鑑識</button>
         </div>
     </header>
 
@@ -32,63 +32,86 @@
         <section id="chart"></section>
         <aside class="sidebar">
             <div class="card">
-                <h4>📐 雲端分析面板</h4>
-                <div id="stat-msg" style="color:#ffd700; font-size:12px; margin-bottom:8px;">系統就緒</div>
-                <div style="display:flex; justify-content:space-between;"><span>現價：</span><span id="cur-p" class="val">--</span></div>
+                <h4>📐 無限雲端核心 (Yahoo)</h4>
+                <div id="stat-msg" style="color:#ffd700; font-size:12px; margin-bottom:8px;">系統就緒 - 免金鑰連線</div>
+                <div style="display:flex; justify-content:space-between;"><span>標的：</span><span id="cur-tk" class="val">--</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>現價：</span><span id="cur-p">--</span></div>
                 <div style="display:flex; justify-content:space-between;"><span>止損：</span><span id="sl-p" style="color:var(--bear)">--</span></div>
                 <div style="display:flex; justify-content:space-between;"><span>目標：</span><span id="tp-p" style="color:var(--bull)">--</span></div>
             </div>
             <div class="card">
-                <button class="btn-main" onclick="fetchData('NVDA')">測試 NVDA (美股)</button>
-                <button class="btn-main" style="margin-top:8px; background:#fff;" onclick="fetchData('AAPL')">測試 AAPL (美股)</button>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                    <button class="btn-main" onclick="fetchYahoo('NVDA')">NVDA (美)</button>
+                    <button class="btn-main" onclick="fetchYahoo('TSLA')">TSLA (美)</button>
+                    <button class="btn-main" style="background:#fff;" onclick="fetchYahoo('2330')">2330 (台)</button>
+                    <button class="btn-main" style="background:#fff;" onclick="fetchYahoo('2317')">2317 (台)</button>
+                </div>
             </div>
         </aside>
     </div>
 
     <script>
         let chart, series;
-        const KEY = 'JRV6HWQ13Q6PHG4C'; // Alpha Vantage 專屬金鑰
 
         function init() {
             chart = LightweightCharts.createChart(document.getElementById('chart'), {
                 layout: { background: { color: '#000' }, textColor: '#6a8da8' },
-                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } }
+                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } },
+                timeScale: { borderColor: '#1c3d64', timeVisible: true }
             });
             series = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744' });
         }
 
-        async function fetchData(tk) {
+        async function fetchYahoo(tk) {
             if(!tk) return;
-            const sym = tk.toUpperCase();
-            document.getElementById('stat-msg').innerText = `🔄 正在抓取 ${sym}...`;
+            // 自動補全台股後綴
+            const rawSym = tk.toUpperCase();
+            const sym = isNaN(rawSym) ? rawSym : rawSym + '.TW'; 
+            
+            document.getElementById('stat-msg').innerText = `🔄 正在連線 Yahoo 抓取 ${sym}...`;
+            document.getElementById('cur-tk').innerText = sym;
             
             try {
-                // 使用 Alpha Vantage 獲取 15 分鐘 K 線
-                const url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${sym}&interval=15min&apikey=${KEY}`;
-                const res = await fetch(url);
+                // Yahoo Finance 15分K線目標網址
+                const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=15m&range=5d`;
+                // 透過全域代理繞過 CORS 限制
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                
+                const res = await fetch(proxyUrl);
                 const d = await res.json();
                 
-                const timeSeries = d["Time Series (15min)"];
-                if(timeSeries) {
-                    const df = Object.keys(timeSeries).map(t => ({
-                        time: new Date(t).getTime() / 1000,
-                        open: parseFloat(timeSeries[t]["1. open"]),
-                        high: parseFloat(timeSeries[t]["2. high"]),
-                        low: parseFloat(timeSeries[t]["3. low"]),
-                        close: parseFloat(timeSeries[t]["4. close"])
-                    })).sort((a,b) => a.time - b.time);
+                if(d.chart && d.chart.result && d.chart.result.length > 0) {
+                    const r = d.chart.result[0];
+                    const t = r.timestamp;
+                    const q = r.indicators.quote[0];
+                    const df = [];
+                    
+                    for(let i=0; i<t.length; i++) {
+                        if(q.close[i] !== null) { // 過濾空值
+                            df.push({ 
+                                time: t[i], 
+                                open: q.open[i], 
+                                high: q.high[i], 
+                                low: q.low[i], 
+                                close: q.close[i] 
+                            });
+                        }
+                    }
                     
                     series.setData(df);
-                    updateRR(df);
+                    updateStats(df);
                     chart.timeScale().fitContent();
-                    document.getElementById('stat-msg').innerText = "✅ 載入成功";
+                    document.getElementById('stat-msg').innerText = "✅ 數據載入成功";
                 } else {
-                    document.getElementById('stat-msg').innerText = "❌ 失敗：API 點數耗盡或標的不支援";
+                    document.getElementById('stat-msg').innerText = "❌ 查無此標的";
                 }
-            } catch(e) { document.getElementById('stat-msg').innerText = "❌ 連線異常"; }
+            } catch(e) { 
+                console.error(e);
+                document.getElementById('stat-msg').innerText = "❌ 代理連線異常，請稍後重試"; 
+            }
         }
 
-        function updateRR(df) {
+        function updateStats(df) {
             const last = df[df.length-1];
             const stop = Math.min(...df.slice(-10).map(x => x.low));
             const target = last.close + (last.close - stop) * 1.5;
