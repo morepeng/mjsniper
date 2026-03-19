@@ -52,8 +52,7 @@
 
     <script>
         let chart, series;
-        // 您的專屬 Google 衛星 API
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbw7IU51zMn-Qvl5Bqqcd67GbKjNvQ10xEmzZCvjmMpERSnS0GZawvYLB1b3uM4PhKGPoA/exec";
+        const GAS_URL = "@(https://script.google.com/macros/s/AKfycbw3FtfMjvsSJB0lxXNZuW58jK9mzM6UpU4uJ8dLczWY4sIN4gl7yW9qKoi1rCc7ZA/exec)";
 
         function init() {
             chart = LightweightCharts.createChart(document.getElementById('chart'), {
@@ -70,10 +69,10 @@
             const sym = isNaN(rawSym) ? rawSym : rawSym + '.TW'; 
             
             document.getElementById('stat-msg').innerText = 🔄 呼叫 Google 衛星抓取 \...;
+            document.getElementById('stat-msg').style.color = "#00d4ff";
             document.getElementById('cur-tk').innerText = sym;
             
             try {
-                // 直接透過您的 Google 腳本去抓 Yahoo，完美避開 CORS 與封鎖
                 const url = \?tk=\;
                 const res = await fetch(url);
                 const d = await res.json();
@@ -97,10 +96,11 @@
                     document.getElementById('stat-msg').style.color = "#00e676";
                 } else {
                     document.getElementById('stat-msg').innerText = "❌ 查無標的或非開盤時間";
+                    document.getElementById('stat-msg').style.color = "#ff1744";
                 }
             } catch(e) { 
                 console.error(e);
-                document.getElementById('stat-msg').innerText = "❌ 衛星連線失敗，請檢查網址是否貼對";
+                document.getElementById('stat-msg').innerText = "❌ 連線失敗，請重試";
                 document.getElementById('stat-msg').style.color = "#ff1744";
             }
         }
