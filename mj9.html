@@ -10,9 +10,9 @@
         body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* 手機版 RWD 排版核心修正 */
+        /* 手機版 RWD 排版核心修正：圖表在上，面板在下 */
         .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        #chart { flex: 2; min-height: 300px; background: #000; }
+        #chart { flex: 2; min-height: 50vh; background: #000; }
         .sidebar { flex: 1; background: var(--panel); padding: 10px; overflow-y: auto; border-top: 1px solid var(--border); }
         
         @media (min-width: 768px) {
@@ -37,25 +37,25 @@
     </header>
 
     <div class="layout">
+        <section id="chart"></section>
         <aside class="sidebar">
             <div class="card">
                 <h4>📐 雲端即時分析</h4>
                 <div class="row"><span>標的：</span> <span id="cur-tk" class="val">--</span></div>
-                <div class="row"><span>價格：</span> <span id="cur-p">--</span></div>
-                <div class="row"><span>止損：</span> <span id="sl-p" style="color:var(--bear)">--</span></div>
-                <div class="row"><span>目標：</span> <span id="tp-p" style="color:var(--bull)">--</span></div>
+                <div class="row"><span>進場 (Entry)：</span> <span id="cur-p">--</span></div>
+                <div class="row"><span>止損 (Stop)：</span> <span id="sl-p" style="color:var(--bear)">--</span></div>
+                <div class="row"><span>獲利 (Target)：</span> <span id="tp-p" style="color:var(--bull)">--</span></div>
             </div>
             <div class="card">
-                <h4>📡 快速切換</h4>
+                <h4>📡 快速載入 (先測 NVDA)</h4>
                 <div id="radar-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('NVDA')">NVDA</button>
-                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('AAPL')">AAPL</button>
-                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('TSLA')">TSLA</button>
-                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('2330')">2330</button>
+                    <button class="btn-main" style="font-size:12px; background:#fff;" onclick="fetchData('NVDA')">NVDA (美)</button>
+                    <button class="btn-main" style="font-size:12px; background:#fff;" onclick="fetchData('AAPL')">AAPL (美)</button>
+                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('2330')">2330 (台)</button>
+                    <button class="btn-main" style="font-size:12px;" onclick="fetchData('2317')">2317 (台)</button>
                 </div>
             </div>
         </aside>
-        <section id="chart"></section>
     </div>
 
     <script>
@@ -77,9 +77,9 @@
             document.getElementById('cur-tk').innerText = sym;
             
             try {
-                // 優化台股請求路徑
+                // 自動處理台股後綴
                 let query = sym;
-                if(!isNaN(sym)) query = sym + ".TW"; // 如果是純數字自動補上 .TW
+                if(!isNaN(sym)) query = sym + ".TW";
 
                 const url = `https://finnhub.io/api/v1/stock/candle?symbol=${query}&resolution=15&from=${Math.floor(Date.now()/1000)-604800}&to=${Math.floor(Date.now()/1000)}&token=${TOKEN}`;
                 const res = await fetch(url);
@@ -89,9 +89,9 @@
                     const df = d.t.map((t, i) => ({ time: t, open: d.o[i], high: d.h[i], low: d.l[i], close: d.c[i] }));
                     render(df);
                 } else {
-                    alert("雲端查無資料。提示：Finnhub 免費版對台股支援較弱，請優先測試 NVDA 確認連線是否正常。");
+                    alert("雲端查無資料。請先點擊 NVDA 測試連線是否正常。");
                 }
-            } catch(e) { alert("網路連線異常。"); }
+            } catch(e) { alert("網路連線異常，請檢查手機 4G/5G。"); }
         }
 
         function render(df) {
