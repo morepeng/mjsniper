@@ -3,62 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v28.6 - ULTIMATE RESONANCE</title>
+    <title>MJ SNIPER v28.7 - DECISION STRATEGY</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #03080f; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; --purple: #bf40bf; }
         body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .sidebar { background: var(--panel); padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); max-height: 60vh; }
-        #chart { flex: 1; background: #000; min-height: 30vh; }
+        .sidebar { background: var(--panel); padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); max-height: 62vh; }
+        #chart { flex: 1; background: #000; min-height: 25vh; }
         @media (min-width: 768px) { .layout { flex-direction: row; } .sidebar { width: 420px; border-bottom: none; border-right: 1px solid var(--border); max-height: 100%; } }
         .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
-        .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 4px; display: flex; justify-content: space-between; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; align-items: center;}
-        .val { font-weight: bold; color: var(--gold); }
-        .tag { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #1c3d64; color: #fff; }
-        .tag.active { background: var(--bull); color: #000; font-weight: bold; }
-        .tag.warn { background: var(--bear); color: #fff; font-weight: bold; }
+        .card h4 { margin: 0 0 8px 0; color: var(--cyan); font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+        .decision-header { background: #1a1a00; border: 2px solid var(--gold); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+        .decision-line { font-size: 12px; line-height: 1.6; color: #fff; font-weight: bold; }
         .res-box { font-size: 11px; line-height: 1.5; white-space: pre-wrap; color: #fff; background: #16263d; padding: 10px; border-radius: 4px; border-left: 4px solid var(--cyan); margin-top: 5px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; }
+        .val { font-weight: bold; color: var(--gold); }
+        .tag { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #1c3d64; }
+        .tag.active { background: var(--bull); color: #000; }
+        .tag.warn { background: var(--bear); color: #fff; }
         .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        select, input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v28.6 (智動共振完全體)</div>
+        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v28.7 (交易決策版)</div>
         <div style="display:flex; gap:6px;">
-            <select id="sel-tf"><option value="1d">1D</option><option value="15m">15M</option></select>
-            <input type="text" id="top-tk" placeholder="代號">
+            <select id="sel-tf" style="background:#050c14; color:#fff; border:1px solid var(--cyan); border-radius:4px;"><option value="1d">1D</option><option value="15m">15M</option></select>
+            <input type="text" id="top-tk" placeholder="代號" style="background:#050c14; color:#fff; border:1px solid var(--cyan); border-radius:4px; width:80px;">
             <button class="btn-main" onclick="fireSniper(document.getElementById('top-tk').value)">⚡ 射擊</button>
         </div>
     </header>
 
     <div class="layout">
         <aside class="sidebar">
-            <div class="card" style="border-color: var(--gold);">
-                <h4>🌟 項目三：實戰共振決策 (核心建議)</h4>
-                <div id="res-final" class="res-box" style="border-left-color: var(--gold); background: #1a1a00;">等待全球聯動鑑定...</div>
+            <div class="decision-header">
+                <h4 style="color:var(--gold); border-bottom:1px solid var(--gold);">🏁 AI 交易決策總覽</h4>
+                <div id="decision-summary" class="decision-line">請射擊標的進行鑑定...</div>
+            </div>
+
+            <div class="card" style="border-color: var(--cyan);">
+                <h4>🌟 項目三：實戰共振決策</h4>
+                <div id="res-final" class="res-box" style="border-left-color: var(--gold); background: #142236;">等待全球聯動數據...</div>
             </div>
 
             <div class="card">
-                <h4>📈 項目一：趨勢共振鑑定 (道氏/OFI/SMC)</h4>
-                <div class="row"><span>道氏趨勢：</span> <span id="dow-trend" class="tag">--</span> <span>OFI 評分：</span> <span id="ofi-val" class="val">--</span></div>
-                <div class="row"><span>SMC 結構：</span> <span id="smc-val" class="tag">--</span></div>
-                <div class="res-box" id="res-trend">等待趨勢鑑定...</div>
+                <h4>📈 趨勢與量價共振 (道氏/威科夫)</h4>
+                <div class="row"><span>道氏/SMC：</span> <span id="dow-trend" class="tag">--</span> <span id="smc-val" class="tag">--</span></div>
+                <div class="row"><span>威科夫階段：</span> <span id="wyk-phase" class="tag">--</span> <span>OBV：</span> <span id="obv-val" class="val">--</span></div>
+                <div class="res-box" id="res-trend">鑑定準備中...</div>
             </div>
 
             <div class="card">
-                <h4>💎 項目二：量價共振鑑定 (威科夫/SMC/OBV)</h4>
-                <div class="row"><span>威科夫階段：</span> <span id="wyk-phase" class="tag">--</span> <span>OBV 分數：</span> <span id="obv-val" class="val">--</span></div>
-                <div class="res-box" id="res-vsa" style="border-left-color: var(--purple);">等待量價鑑定...</div>
-            </div>
-
-            <div class="card">
-                <h4>🛡️ VaR 風控建議</h4>
-                <div class="row"><span>建議停損：</span> <span id="var-sl" class="val" style="color:var(--bear)">--</span> <span>目標 T1：</span> <span id="var-t1" class="val" style="color:var(--bull)">--</span></div>
-                <div class="row"><span>RR 比：</span> <span class="val">1:1.25</span> <span>風險 VaR：</span> <span id="var-val" class="tag">--</span></div>
+                <h4>🛡️ VaR 風控數據</h4>
+                <div class="row"><span>現價：</span> <span id="cur-p" class="val">--</span> <span>停損：</span> <span id="var-sl" class="val" style="color:var(--bear)">--</span></div>
+                <div class="row"><span>目標 T1：</span> <span id="var-t1" class="val" style="color:var(--bull)">--</span> <span>RR：</span> <span class="val">1:1.25</span></div>
             </div>
         </aside>
         <section id="chart"></section>
@@ -95,51 +95,44 @@
                     let obv = 0;
                     df = df.map((item, i) => { if(i > 0) { if(item.close > df[i-1].close) obv += item.vol; else if(item.close < df[i-1].close) obv -= item.vol; } item.obv = obv; return item; });
                     series.setData(df);
-                    setTimeout(() => runUltimateResonance(df), 50);
+                    setTimeout(() => runDecisionVersion(df, tf), 50);
                     chart.timeScale().fitContent();
                 }
             } catch(e) { console.error(e); }
         }
 
-        function runUltimateResonance(df) {
+        function runDecisionVersion(df, tf) {
             const last = df[df.length-1], prev = df[df.length-2];
             
-            // --- 基礎運算 ---
+            // --- 基礎分析數據 ---
             const isBOS = last.close > df[df.length-10].close;
             const obvEMA30 = df.slice(-30).reduce((a,b)=>a+b.obv,0)/30;
             const obvScore = (last.obv > obvEMA30 ? 5 : 0) + (last.close == Math.max(...df.slice(-30).map(x=>x.close)) && last.obv == Math.max(...df.slice(-30).map(x=>x.obv)) ? 8 : 0);
             const dowTrend = last.close > df.slice(-60).reduce((a,b)=>a+b.close,0)/60 ? "多頭" : "空頭";
-            const ofiScore = last.vol > df.slice(-20).reduce((a,b)=>a+b.vol,0)/20 * 1.5 ? 10 : 0;
-            const rr = 1.25;
+            
+            const sl = (last.close * 0.934).toFixed(2); // 模擬 -6.6% 停損
+            const t1 = (last.close * 1.082).toFixed(2); // 模擬 +8.2% 目標
+            const totalScore = (isBOS?20:0) + (obvScore*4) + (dowTrend=="多頭"?20:0);
+            const passCount = (isBOS?1:0) + (obvScore>=5?1:0) + (dowTrend=="多頭"?1:0) + 1; // 基礎+指標
 
-            // --- 項目一 & 項目二 UI 更新 (不變) ---
+            // --- 🚀 核心 UI：交易決策摘要展示 ---
+            const action = totalScore >= 60 ? "【買入】" : totalScore >= 40 ? "【觀察】" : "【避開】";
+            const timing = totalScore >= 75 ? "積極進場" : totalScore >= 60 ? "建議等待不急進場" : "觀望為主";
+            const color = totalScore >= 60 ? "var(--bull)" : totalScore >= 40 ? "var(--gold)" : "var(--bear)";
+
+            document.getElementById('decision-summary').innerHTML = 
+                `<span style="color:${color}; font-size:16px;">${action}</span> | ${timing}<br>` +
+                `現價 ${last.close.toFixed(2)} 停損 ${sl}(-6.6%) T1=${t1}(+8.2%) RR=1:1.25<br>` +
+                `<span style="color:var(--cyan);">(${passCount}/4層通過 分數${totalScore}/100)</span>`;
+
+            // --- 其他模組同步更新 ---
             document.getElementById('dow-trend').innerText = dowTrend;
-            document.getElementById('dow-trend').className = `tag ${dowTrend=="多頭"?'active':'warn'}`;
-            document.getElementById('ofi-val').innerText = ofiScore;
             document.getElementById('smc-val').innerText = isBOS ? "BOS" : "CHOCH";
             document.getElementById('obv-val').innerText = obvScore;
-            
-            const support = Math.min(...df.slice(-30, -5).map(x=>x.low));
-            const isSpring = last.low < support && last.close > support;
-            document.getElementById('wyk-phase').innerText = isSpring ? "Phase C" : (last.close > Math.max(...df.slice(-30).map(x=>x.high)) ? "Phase D" : "Phase B");
-
-            // --- 項目三：實戰共振核心邏輯 (重新掛載) ---
-            let finalAdvice = "";
-            const varValue = (last.close * 0.05).toFixed(1);
-
-            if (obvScore >= 10 && isBOS && rr >= 1.25) {
-                finalAdvice = `🌟 發現「黃金共振」勳章！\n● 主力重兵集結 (OBV > 10)\n● 技術結構突破 (BOS 多方)\n● 操作建議：積極佈局，此交易勝率極高。`;
-            } else if (obvScore >= 10 && !isBOS) {
-                finalAdvice = `⚠️ 嚴重警訊：偵測到「資金與結構背離」！\n● OBV 雖高，但結構為空方 (CHOCH)\n● 徵兆：疑似主力誘多或出貨中。\n● 風險：VaR 風險值 $${varValue} 顯著上升中。`;
-            } else {
-                finalAdvice = `● OBV評分: ${obvScore} | 結構: ${isBOS?'BOS':'CHOCH'}\n● 目前狀態：等待「黃金共振」信號對齊。`;
-            }
-            document.getElementById('res-final').innerText = finalAdvice;
-
-            // 風控
-            document.getElementById('var-sl').innerText = (last.close * 0.95).toFixed(2);
-            document.getElementById('var-t1').innerText = (last.close * 1.08).toFixed(2);
-            document.getElementById('var-val').innerText = `$${varValue}`;
+            document.getElementById('res-final').innerText = (totalScore >= 60 && isBOS) ? "🌟 發現「黃金共振」！資金與結構對齊。" : "等待共振信號中...";
+            document.getElementById('cur-p').innerText = last.close.toFixed(2);
+            document.getElementById('var-sl').innerText = sl;
+            document.getElementById('var-t1').innerText = t1;
         }
         window.onload = init;
     </script>
