@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v29.0 - THE TOTALITY</title>
+    <title>MJ SNIPER v29.1 - STABLE FINAL</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #03080f; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; --purple: #bf40bf; }
@@ -30,7 +30,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v29.0 完全體</div>
+        <div style="font-weight: bold; color: var(--cyan); font-size: 14px;">🎯 MJ SNIPER AI v29.1 (除錯穩定版)</div>
         <div style="display:flex; gap:6px;">
             <select id="sel-tf"><option value="1d">1D</option><option value="15m">15M</option></select>
             <input type="text" id="top-tk" placeholder="代號">
@@ -46,9 +46,9 @@
             </div>
 
             <div class="card" style="border-left: 4px solid #5c3fb5;">
-                <h4>🌍 宏觀衛星與 AI 預警 (第零/二/三層)</h4>
+                <h4>🌍 宏觀衛星與 AI 預警</h4>
                 <div class="row"><span>大盤環境：</span> <span id="macro-env" class="tag macro">掃描中</span> <span>倉位上限：</span> <span id="pos-limit" class="val">--</span></div>
-                <div class="row"><span>先行總分：</span> <span id="pre-score" class="val">--</span> <span>預測目標：</span> <span class="bull" id="ai-bull">--</span></div>
+                <div class="row"><span>預測目標：</span> <span class="bull" id="ai-bull">--</span> <span>熊市防線：</span> <span class="bear" id="ai-bear">--</span></div>
                 <div id="macro-warn" class="res-box" style="border-left-color: #5c3fb5; background: #0e1a2b; font-size:10px;">數據同步中...</div>
             </div>
 
@@ -58,14 +58,14 @@
             </div>
 
             <div class="card">
-                <h4>📜 項目一&二：趨勢與量價鑑定 (道氏/威科夫)</h4>
+                <h4>📜 項目一&二：道氏與威科夫鑑定</h4>
                 <div class="row"><span>道氏趨勢：</span> <span id="dow-trend" class="tag">--</span> <span>威科夫：</span> <span id="wyk-phase" class="tag special">--</span></div>
-                <div class="row"><span>2B法則：</span> <span id="dow-2b" class="tag">--</span> <span>測試：</span> <span id="wyk-test" class="tag">--</span></div>
-                <div class="res-box" id="res-trend">等待理論分析數據...</div>
+                <div class="row"><span>2B法則：</span> <span id="dow-2b" class="tag">--</span> <span>VSA測試：</span> <span id="wyk-test" class="tag">--</span></div>
+                <div class="res-box" id="res-trend">等待理論數據...</div>
             </div>
 
             <div class="card">
-                <h4>📊 指標與資金鑑定 (SMC/OBV/OFI/形態)</h4>
+                <h4>📊 指標核心 (SMC/OBV/OFI)</h4>
                 <div class="row"><span>SMC：</span> <span id="smc-val" class="tag">--</span> <span>OBV分數：</span> <span id="obv-val" class="val">--</span></div>
                 <div class="row"><span>OFI評分：</span> <span id="ofi-score" class="val">--</span> <span>形態權重：</span> <span id="pat-score" class="val">--</span></div>
                 <div class="row"><span>偵測形態：</span> <span id="pat-list" class="tag active">--</span></div>
@@ -111,70 +111,58 @@
                     let obv = 0;
                     df = df.map((item, i) => { if(i > 0) { if(item.close > df[i-1].close) obv += item.vol; else if(item.close < df[i-1].close) obv -= item.vol; } item.obv = obv; return item; });
                     series.setData(df);
-                    setTimeout(() => runUltimate totality(df, sym), 50);
+                    // 修正關鍵：確保 setTimeout 的參數正確傳遞
+                    setTimeout(() => { runUltimateAnalysis(df, sym); }, 50);
                     chart.timeScale().fitContent();
                 }
             } catch(e) { console.error(e); }
         }
 
-        function runUltimate totality(df, sym) {
+        function runUltimateAnalysis(df, sym) {
             const last = df[df.length-1], prev = df[df.length-2];
             
-            // --- 核心邏輯運算 (全歸位) ---
+            // --- 核心邏輯 (全歸位) ---
             const ma60 = df.slice(-60).reduce((a,b)=>a+b.close,0)/60;
-            const ma200 = df.slice(-200).reduce((a,b)=>a+b.close,0)/200 || ma60;
-            const dowTrend = last.close > ma60 ? "多頭" : "空頭";
+            const ma200 = df.length >= 200 ? df.slice(-200).reduce((a,b)=>a+b.close,0)/200 : ma60;
             const isBOS = last.close > df[df.length-10].close;
             const obvEMA30 = df.slice(-30).reduce((a,b)=>a+b.obv,0)/30;
             const obvScore = (last.obv > obvEMA30 ? 5 : 0) + (last.close == Math.max(...df.slice(-30).map(x=>x.close)) && last.obv == Math.max(...df.slice(-30).map(x=>x.obv)) ? 8 : 0);
-            const ofiScore = (last.close > prev.close ? 10 : -10);
             
-            // --- 宏觀過濾 (v28.9) ---
+            // --- UI 更新 ---
             document.getElementById('macro-env').innerText = last.close > ma200 ? "WEAK_BULL ✓" : "CAUTION ⚠";
             document.getElementById('pos-limit').innerText = last.close > ma200 ? "50-70%" : "20-30%";
-            document.getElementById('pre-score').innerText = "+13";
             document.getElementById('ai-bull').innerText = (last.close * 1.05).toFixed(2);
-            document.getElementById('macro-warn').innerText = "⚠ 警告：市場廣度背離，板塊廣度僅 33%。\n⚠ 提示：原油通膨壓力升溫中。";
-
-            // --- 項目三：實戰共振 (v28.1, v28.6) ---
-            let varRisk = (last.close * 0.05).toFixed(1);
-            if (obvScore >= 10 && isBOS) {
-                document.getElementById('res-final').innerText = "🌟 發現「黃金共振」！\n● 主力重兵集結 + 結構突破。\n● 建議：積極佈局，勝率極高。";
-            } else if (obvScore >= 10 && !isBOS) {
-                document.getElementById('res-final').innerText = "⚠️ 警訊：資金與結構背離！\n● 疑似主力誘多/出貨中。\n● 風險：VaR 值 $"+varRisk+" 顯著上升。";
-            } else {
-                document.getElementById('res-final').innerText = "⚖️ 目前指標尋求對齊中，等待共振信號。";
-            }
-
-            // --- 項目一&二：道氏與威科夫 (v28.3, v28.4) ---
+            document.getElementById('ai-bear').innerText = (last.close * 0.92).toFixed(2);
+            document.getElementById('dow-trend').innerText = last.close > ma60 ? "多頭" : "空頭";
+            
             const support = Math.min(...df.slice(-30, -5).map(x=>x.low));
             const isSpring = last.low < support && last.close > support;
-            const wykPhase = isSpring ? "C" : (last.close > Math.max(...df.slice(-30).map(x=>x.high)) ? "D" : "B");
-            document.getElementById('dow-trend').innerText = dowTrend;
-            document.getElementById('wyk-phase').innerText = wykPhase;
-            document.getElementById('wyk-test').innerText = isSpring ? "Spring(彈簧)" : "正常";
-            document.getElementById('res-trend').innerText = `【道氏】格局:${dowTrend} | 【威科夫】階段:${wykPhase}`;
-
-            // --- 其他技術數據 ---
+            document.getElementById('wyk-phase').innerText = isSpring ? "Phase C" : (last.close > Math.max(...df.slice(-30).map(x=>x.high)) ? "Phase D" : "Phase B");
             document.getElementById('smc-val').innerText = isBOS ? "BOS" : "CHOCH";
             document.getElementById('obv-val').innerText = obvScore;
-            document.getElementById('ofi-score').innerText = ofiScore;
-            document.getElementById('pat-score').innerText = (isBOS?2.9:0);
-            document.getElementById('pat-list').innerText = isBOS ? "📈趨勢確認" : "常態";
 
-            // --- 最終決策摘要 (v28.7) ---
+            // 項目三：實戰共振
+            if (obvScore >= 10 && isBOS) {
+                document.getElementById('res-final').innerText = "🌟 發現「黃金共振」！\n● 主力重兵集結 + 結構多方突破。";
+            } else if (obvScore >= 10 && !isBOS) {
+                document.getElementById('res-final').innerText = "⚠️ 警訊：資金與結構背離！\n● 疑似主力誘多/出貨中，VaR風險上升。";
+            } else {
+                document.getElementById('res-final').innerText = "⚖️ 目前指標尋求共振中，等待信號對齊。";
+            }
+
+            // 摘要與風控
             const totalScore = (isBOS?20:0) + (obvScore*4) + (last.close > ma200 ? 20 : 0);
             const sl = (last.close * 0.934).toFixed(2);
             const t1 = (last.close * 1.082).toFixed(2);
             document.getElementById('decision-summary').innerHTML = 
-                `<span style="color:${totalScore>=60?'var(--bull)':'var(--gold)'};">${totalScore>=60?'【買入】':'【觀察】'}</span> | ${totalScore>=75?'積極進場':'等待不急進場'}<br>` +
+                `<span style="color:var(--bull);">${totalScore >= 60 ? '【買入】' : '【觀察】'}</span> | 建議等待不急進場<br>` +
                 `現價 ${last.close.toFixed(2)} 停損 ${sl} T1=${t1} RR=1:1.25<br>` +
                 `<span style="color:var(--cyan);">(3/4層通過 分數 ${totalScore}/100)</span>`;
 
             document.getElementById('cur-p').innerText = last.close.toFixed(2);
             document.getElementById('var-sl').innerText = sl;
             document.getElementById('var-t1').innerText = t1;
-            document.getElementById('var-val').innerText = `$${varRisk}`;
+            document.getElementById('var-val').innerText = `$${(last.close * 0.05).toFixed(1)}`;
         }
         window.onload = init;
     </script>
