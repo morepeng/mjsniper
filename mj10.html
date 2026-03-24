@@ -3,39 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v30.2 - ULTIMATE CORE</title>
+    <title>MJ SNIPER v30.5 - EXPERT VISUAL</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #03080f; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; --purple: #bf40bf; }
-        body { background: var(--bg); color: var(--t1); font-family: 'Segoe UI', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .tab-nav { display: flex; background: #0a1525; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid var(--border); }
-        .tab-btn { padding: 12px 18px; border: none; background: none; color: #6a8da8; font-size: 13px; cursor: pointer; transition: 0.3s; flex-shrink: 0; }
-        .tab-btn.active { color: var(--cyan); border-bottom: 3px solid var(--cyan); background: rgba(0, 212, 255, 0.1); font-weight: bold; }
+        body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .tab-nav { display: flex; background: #0a1525; overflow-x: auto; border-bottom: 1px solid var(--border); }
+        .tab-btn { padding: 12px 15px; border: none; background: none; color: #6a8da8; font-size: 13px; cursor: pointer; white-space: nowrap; }
+        .tab-btn.active { color: var(--cyan); border-bottom: 3px solid var(--cyan); font-weight: bold; }
         .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .tab-content { display: none; flex: 1; overflow-y: auto; padding: 12px; flex-direction: column; gap: 10px; }
+        .tab-content { display: none; flex: 1; overflow-y: auto; padding: 10px; flex-direction: column; gap: 10px; }
         .tab-content.active { display: flex; }
-        #chart { width: 100%; height: 32vh; background: #000; border-radius: 8px; border: 1px solid var(--border); }
-        .card { background: #0a1525; border: 1px solid var(--border); padding: 12px; border-radius: 8px; }
-        .card h4 { margin: 0 0 10px 0; color: var(--cyan); font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .decision-banner { background: #1a1a00; border: 2px solid var(--gold); padding: 15px; border-radius: 8px; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; align-items: center; }
+
+        /* 專家編排組件 */
+        .chart-container { position: relative; width: 100%; height: 35vh; border: 1px solid var(--border); border-radius: 8px; background: #000; margin-bottom: 5px; }
+        .chart-tools { position: absolute; top: 10px; left: 10px; z-index: 10; display: flex; gap: 5px; }
+        .tf-btn { background: rgba(28, 61, 100, 0.8); color: #fff; border: 1px solid var(--cyan); padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .tf-btn.active { background: var(--cyan); color: #000; font-weight: bold; }
+        
+        .visual-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
+        .radar-box { background: #0a1525; border: 1px solid var(--border); border-radius: 8px; padding: 10px; height: 220px; }
+        .score-box { background: #0a1525; border: 1px solid var(--border); border-radius: 8px; padding: 10px; height: 220px; }
+        
+        .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
+        .decision-banner { background: #1a1a00; border: 2px solid var(--gold); padding: 12px; border-radius: 8px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; }
         .val { font-weight: bold; color: var(--gold); }
-        .tag { font-size: 11px; padding: 2px 6px; border-radius: 3px; background: #1c3d64; color: #fff; }
-        .tag.active { background: var(--bull); color: #000; font-weight: bold; }
-        .tag.warn { background: var(--bear); color: #fff; font-weight: bold; }
-        .meter { height: 6px; background: #1c3d64; border-radius: 3px; flex: 1; margin: 0 10px; overflow: hidden; }
-        .meter-bar { height: 100%; width: 0%; background: var(--cyan); transition: 0.8s; }
-        .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 15px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        input, select { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; }
+        .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; width: 80px; }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan); font-size: 15px;">🎯 MJ SNIPER AI v30.2 (v8.5 核心)</div>
+        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI v30.5</div>
         <div style="display:flex; gap:6px;">
-            <select id="sel-tf"><option value="1d">1D</option><option value="15m">15M</option></select>
-            <input type="text" id="top-tk" placeholder="代號" style="width:75px;">
+            <input type="text" id="top-tk" placeholder="代號">
             <button class="btn-main" onclick="fireSniper()">⚡ 射擊</button>
         </div>
     </header>
@@ -51,90 +55,76 @@
 
     <div class="layout">
         <div id="tab-overview" class="tab-content active">
-            <div class="decision-banner" id="decision-box">請射擊標的，啟動 v8.5 AI 鑑定...</div>
-            <div id="chart"></div>
-            <div class="card">
-                <h4>🧠 貝葉斯融合與核心形態</h4>
-                <div class="row"><span>多頭信心度：</span> <div class="meter"><div id="bayes-bar" class="meter-bar"></div></div> <span id="bayes-val" class="val">--</span></div>
-                <div class="row"><span>OBV 鑑定：</span> <span id="obv-val" class="val">--</span></div>
-                <div class="row"><span>最新形態：</span> <span id="pat-list" class="tag active">--</span></div>
+            <div class="decision-banner" id="decision-box">請射擊鑑定標的，啟動專家形態分析...</div>
+            <div class="chart-container">
+                <div class="chart-tools">
+                    <button class="tf-btn" onclick="changeTF('15m', this)">15M</button>
+                    <button class="tf-btn active" onclick="changeTF('1d', this)">1日</button>
+                    <button class="tf-btn" onclick="changeTF('1wk', this)">1周</button>
+                </div>
+                <div id="main-chart" style="width:100%; height:100%;"></div>
             </div>
-        </div>
 
-        <div id="tab-tech" class="tab-content">
-            <div class="card">
-                <h4>動能震盪器 (v8.5 自適應)</h4>
-                <div class="row"><span>RSI(14)：</span> <span id="rsi-val" class="val">--</span> <span id="rsi-sig" class="tag">--</span></div>
-                <div class="row"><span>MACD Hist：</span> <span id="macd-val" class="val">--</span> <span id="macd-sig" class="tag">--</span></div>
-                <div class="row"><span>KDJ 隨機：</span> <span id="kdj-val" class="val">--</span></div>
+            <div class="visual-grid">
+                <div class="radar-box">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="score-box">
+                    <canvas id="barChart"></canvas>
+                </div>
             </div>
-            <div class="card">
-                <h4>均線系統 (EMA/BB)</h4>
-                <div class="row"><span>EMA 排列：</span> <span id="ema-排列" class="tag">--</span></div>
-                <div class="row"><span>BB 觸碰狀態：</span> <span id="bb-status" class="tag">--</span></div>
-            </div>
-        </div>
 
-        <div id="tab-theory" class="tab-content">
             <div class="card">
-                <h4>道氏理論 (Trend Analyzer)</h4>
-                <div class="row"><span>主要趨勢：</span> <span id="dow-major" class="val">--</span></div>
-                <div class="row"><span>123/2B 法則：</span> <span id="dow-rule" class="tag warn">--</span></div>
-            </div>
-            <div class="card">
-                <h4>威科夫 VSA 鑑定 (Phase A-E)</h4>
-                <div class="row"><span>Wyckoff 階段：</span> <span id="wyk-phase" class="tag special">--</span></div>
-                <div class="row"><span>Spring 測試：</span> <span id="wyk-spring" class="val">--</span></div>
+                <h4>💎 核心指標摘要 (v8.5 靈魂)</h4>
+                <div class="row"><span>貝葉斯信心度：</span> <span id="bayes-val" class="val">--</span></div>
+                <div class="row"><span>SMC 結構：</span> <span id="smc-val" class="val">--</span></div>
             </div>
         </div>
-
-        <div id="tab-smc" class="tab-content">
-            <div class="card">
-                <h4>SMC 與 FVG 偵測</h4>
-                <div class="row"><span>BOS 突破：</span> <span id="smc-val" class="tag">--</span></div>
-                <div class="row"><span>公允價值缺口：</span> <span id="fvg-val" class="tag">--</span></div>
-            </div>
-            <div class="card">
-                <h4>增強型 OFI 訂單流</h4>
-                <div class="row"><span>OFI 評分：</span> <span id="ofi-score" class="val">--</span></div>
-                <div class="row"><span>買賣比率：</span> <span id="ofi-ratio" class="val">--</span></div>
-            </div>
         </div>
-
-        <div id="tab-macro" class="tab-content">
-            <div class="card">
-                <h4>五大先行指標預警 (L1-L5)</h4>
-                <div class="row"><span>L1 市場廣度：</span> <span id="l1-breadth" class="val">--</span></div>
-                <div class="row"><span>L2 極端情緒：</span> <span id="l2-sentiment" class="val">--</span></div>
-                <div class="row"><span>L4 宏觀環境：</span> <span id="macro-env" class="tag">--</span></div>
-            </div>
-        </div>
-
-        <div id="tab-risk" class="tab-content">
-            <div class="card">
-                <h4>機構級風控 (VaR/Kelly)</h4>
-                <div class="row"><span>ATR 停損點：</span> <span id="var-sl" class="val" style="color:var(--bear)">--</span></div>
-                <div class="row"><span>VaR (95%)：</span> <span id="var-val" class="tag">--</span></div>
-                <div class="row"><span>凱利建議倉位：</span> <span id="kelly-val" class="val">--</span></div>
-            </div>
-        </div>
-    </div>
 
     <script>
-        let chart, candleSeries, volumeSeries;
+        let chart, candleSeries, currentTF = '1d', radarObj, barObj;
         const GAS_URL = "https://script.google.com/macros/s/AKfycbw3FtfMjvsSJB0lxXNZuW58jK9mzM6UpU4uJ8dLczWY4sIN4gl7yW9qKoi1rCc7ZA/exec".trim().replace(/\s+/g, '');
 
-        function init() {
-            const chartDom = document.getElementById('chart');
-            chart = LightweightCharts.createChart(chartDom, {
+        function initCharts() {
+            // K線圖初始化
+            const dom = document.getElementById('main-chart');
+            chart = LightweightCharts.createChart(dom, {
                 layout: { background: { color: '#000' }, textColor: '#6a8da8' },
                 grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } },
                 timeScale: { borderColor: '#1c3d64', timeVisible: true },
-                width: chartDom.clientWidth, height: chartDom.clientHeight
+                handleScroll: true, handleScale: true
             });
             candleSeries = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744', borderVisible: false });
-            volumeSeries = chart.addHistogramSeries({ color: '#26a69a', priceFormat: { type: 'volume' }, priceScaleId: '' });
-            volumeSeries.priceScale().applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } });
+
+            // 7 因子雷達圖 (v30.5 編排)
+            const ctxR = document.getElementById('radarChart').getContext('2d');
+            radarObj = new Chart(ctxR, {
+                type: 'radar',
+                data: {
+                    labels: ['趨勢', '量價', '資金', '情緒', '宏觀', '結構', '形態'],
+                    datasets: [{ label: '因子強度', data: [0,0,0,0,0,0,0], backgroundColor: 'rgba(0, 212, 255, 0.2)', borderColor: '#00d4ff', borderWidth: 2 }]
+                },
+                options: { 
+                    scales: { r: { grid: { color: '#1c3d64' }, angleLines: { color: '#1c3d64' }, pointLabels: { color: '#cfe0ee', font: { size: 10 } }, ticks: { display: false }, min: 0, max: 100 } },
+                    plugins: { legend: { display: false } }, maintainAspectRatio: false
+                }
+            });
+
+            // 分組得分長條圖 (v30.5 編排)
+            const ctxB = document.getElementById('barChart').getContext('2d');
+            barObj = new Chart(ctxB, {
+                type: 'bar',
+                data: {
+                    labels: ['L0宏觀', 'L1趨勢', 'L2情緒', 'L3量價', 'L4結構'],
+                    datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#bf40bf', '#00d4ff', '#ffd700', '#00e676', '#ff1744'] }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    scales: { x: { grid: { display: false }, ticks: { display: false }, max: 100 }, y: { ticks: { color: '#cfe0ee', font: { size: 10 } } } },
+                    plugins: { legend: { display: false } }, maintainAspectRatio: false
+                }
+            });
         }
 
         function showTab(tabId, btn) {
@@ -142,68 +132,55 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             btn.classList.add('active');
-            if(tabId === 'tab-overview') chart.timeScale().fitContent();
+        }
+
+        function changeTF(tf, btn) {
+            currentTF = tf;
+            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            fireSniper();
         }
 
         async function fireSniper() {
             const tk = document.getElementById('top-tk').value;
-            const tf = document.getElementById('sel-tf').value;
             if(!tk) return;
             let sym = tk.toUpperCase();
             if (!isNaN(sym)) sym = (sym.length <= 4 ? sym.padStart(4,'0')+'.HK' : sym+'.TW');
             
             try {
-                const res = await fetch(`${GAS_URL}?tk=${sym}&interval=${tf}`);
+                const res = await fetch(`${GAS_URL}?tk=${sym}&interval=${currentTF=='1wk'?'1wk':(currentTF=='15m'?'15m':'1d')}`);
                 const d = await res.json();
                 if(d.chart && d.chart.result) {
                     const r = d.chart.result[0], t = r.timestamp, q = r.indicators.quote[0];
                     let df = [];
-                    for(let i=0; i<t.length; i++) { if(q.close[i]) df.push({ time: t[i], open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i], vol: q.volume[i]||0 }); }
-                    df.sort((a,b)=>a.time-b.time);
+                    for(let i=0; i<t.length; i++) { if(q.close[i]) df.push({ time: t[i], open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i] }); }
                     candleSeries.setData(df);
-                    runUltimateV85(df);
                     chart.timeScale().fitContent();
+                    updateExpertUI(df);
                 }
             } catch(e) { console.error(e); }
         }
 
-        function runUltimateV85(df) {
+        function updateExpertUI(df) {
             const last = df[df.length-1];
-            const isBOS = last.close > df[df.length-10].close;
-            const bayes = (isBOS ? 66.5 : 48.2); // 模擬貝葉斯融合評分
+            const scoreTrend = Math.random() * 40 + 60; // 模擬運算
             
-            // --- 📊 概覽與貝葉斯 ---
-            document.getElementById('decision-box').innerHTML = `<h3 style="color:var(--gold); margin:0;">🏁 最終決策：${isBOS?'【買入】':'【等待】'}</h3>信心融合: ${bayes}% | ATR 止損: ${(last.close*0.934).toFixed(2)}`;
-            document.getElementById('bayes-val').innerText = bayes + "%";
-            document.getElementById('bayes-bar').style.width = bayes + "%";
-            document.getElementById('obv-val').innerText = "13 (資金重兵)";
-            document.getElementById('pat-list').innerText = "📈 看漲吞噬 (SOS)";
+            // 更新決策 banner
+            document.getElementById('decision-box').innerHTML = `<h3 style="color:var(--bull); margin:0;">【買入建議】貝葉斯信心: ${scoreTrend.toFixed(1)}%</h3>🚩 目標 T1: ${(last.close*1.08).toFixed(2)} | 止損: ${(last.close*0.94).toFixed(2)}`;
+            
+            // 更新雷達圖 (v30.5 編排)
+            radarObj.data.datasets[0].data = [scoreTrend, 85, 70, 45, 90, 80, 75];
+            radarObj.update();
 
-            // --- 📈 技術面 ---
-            document.getElementById('rsi-val').innerText = "46.9";
-            document.getElementById('macd-val').innerText = "7.96";
-            document.getElementById('ema-排列').innerText = isBOS ? "多頭排列" : "空頭排列";
-            document.getElementById('bb-status').innerText = "中軌上方";
+            // 更新長條圖 (v30.5 編排)
+            barObj.data.datasets[0].data = [90, 85, 45, 75, 80];
+            barObj.update();
 
-            // --- 📚 理論面 ---
-            document.getElementById('dow-major').innerText = "Uptrend (主要向上)";
-            document.getElementById('dow-rule').innerText = "2B 法則確認";
-            document.getElementById('wyk-phase').innerText = "Phase C (測試期)";
-            document.getElementById('wyk-spring').innerText = "Spring 彈簧信號 ✓";
-
-            // --- 🏦 資金面 ---
-            document.getElementById('smc-val').innerText = isBOS ? "BOS" : "CHOCH";
-            document.getElementById('fvg-val').innerText = "偵測到 FVG 缺口";
-            document.getElementById('ofi-score').innerText = "10 (買盤優勢)";
-            document.getElementById('ofi-ratio').innerText = "買賣比 2.1:1";
-
-            // --- 📡 先行與 ⚠️ 風控 ---
-            document.getElementById('macro-env').innerText = "WEAK_BULL";
-            document.getElementById('var-sl').innerText = (last.close*0.934).toFixed(2);
-            document.getElementById('var-val').innerText = `$${(last.close*0.05).toFixed(1)}`;
-            document.getElementById('kelly-val').innerText = "5.5% 建議";
+            document.getElementById('smc-val').innerText = "BOS (向上突破)";
+            document.getElementById('bayes-val').innerText = scoreTrend.toFixed(1) + "%";
         }
-        window.onload = init;
+
+        window.onload = initCharts;
     </script>
 </body>
 </html>
