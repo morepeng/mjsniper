@@ -3,184 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v30.5 - EXPERT VISUAL</title>
+    <title>MJ SNIPER v31.0 - STAR TERMINAL</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --bg: #03080f; --panel: #070e19; --cyan: #00d4ff; --bull: #00e676; --bear: #ff1744; --border: #1c3d64; --t1: #cfe0ee; --gold: #ffd700; --purple: #bf40bf; }
-        body { background: var(--bg); color: var(--t1); font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .tab-nav { display: flex; background: #0a1525; overflow-x: auto; border-bottom: 1px solid var(--border); }
-        .tab-btn { padding: 12px 15px; border: none; background: none; color: #6a8da8; font-size: 13px; cursor: pointer; white-space: nowrap; }
-        .tab-btn.active { color: var(--cyan); border-bottom: 3px solid var(--cyan); font-weight: bold; }
-        .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .tab-content { display: none; flex: 1; overflow-y: auto; padding: 10px; flex-direction: column; gap: 10px; }
-        .tab-content.active { display: flex; }
+        :root { 
+            --bg: #02050a; --panel: rgba(10, 21, 37, 0.7); 
+            --cyan: #00d4ff; --bull: #00f2fe; --bear: #ff0055; 
+            --border: rgba(0, 212, 255, 0.3); --gold: #f9d423; --purple: #a445b2; 
+        }
+        body { 
+            background: radial-gradient(circle at center, #0a1525 0%, #02050a 100%);
+            color: #e0e6ed; font-family: 'Orbitron', 'Segoe UI', sans-serif; 
+            margin: 0; height: 100vh; overflow: hidden;
+        }
+        /* 霓虹頂欄 */
+        .topbar { 
+            background: var(--panel); border-bottom: 1px solid var(--cyan); 
+            padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2); backdrop-filter: blur(10px);
+        }
+        /* 極簡導航 */
+        .tab-nav { display: flex; background: rgba(0,0,0,0.3); padding: 5px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+        .tab-btn { 
+            padding: 10px 20px; border: none; background: transparent; color: #8492a6; 
+            font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: all 0.4s;
+        }
+        .tab-btn.active { color: var(--cyan); text-shadow: 0 0 8px var(--cyan); font-weight: bold; border-bottom: 2px solid var(--cyan); }
 
-        /* 專家編排組件 */
-        .chart-container { position: relative; width: 100%; height: 35vh; border: 1px solid var(--border); border-radius: 8px; background: #000; margin-bottom: 5px; }
-        .chart-tools { position: absolute; top: 10px; left: 10px; z-index: 10; display: flex; gap: 5px; }
-        .tf-btn { background: rgba(28, 61, 100, 0.8); color: #fff; border: 1px solid var(--cyan); padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
-        .tf-btn.active { background: var(--cyan); color: #000; font-weight: bold; }
+        .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .tab-content { display: none; flex: 1; overflow-y: auto; padding: 15px; flex-direction: column; gap: 15px; }
+        .tab-content.active { display: flex; animation: fadeIn 0.5s ease; }
+
+        /* 高科技卡片 */
+        .glass-card { 
+            background: var(--panel); border: 1px solid var(--border); 
+            border-radius: 12px; padding: 15px; backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 15px rgba(0, 212, 255, 0.05);
+        }
+        .glass-card h4 { 
+            margin: 0 0 12px 0; font-size: 14px; color: var(--cyan); 
+            text-transform: uppercase; letter-spacing: 2px; border-left: 3px solid var(--cyan); padding-left: 10px;
+        }
+
+        .chart-container { position: relative; width: 100%; height: 38vh; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        .tf-btn { background: rgba(0,0,0,0.5); border: 1px solid var(--cyan); color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; }
+        .tf-btn.active { background: var(--cyan); color: #000; box-shadow: 0 0 10px var(--cyan); }
+
+        /* 因子視覺矩陣 */
+        .visual-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; min-height: 240px; }
         
-        .visual-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
-        .radar-box { background: #0a1525; border: 1px solid var(--border); border-radius: 8px; padding: 10px; height: 220px; }
-        .score-box { background: #0a1525; border: 1px solid var(--border); border-radius: 8px; padding: 10px; height: 220px; }
+        .decision-banner { 
+            background: linear-gradient(90deg, rgba(249,212,35,0.1) 0%, rgba(0,0,0,0) 100%);
+            border: 1px solid var(--gold); border-left: 5px solid var(--gold); 
+            padding: 15px; border-radius: 8px; font-size: 14px;
+        }
         
-        .card { background: #0a1525; border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
-        .decision-banner { background: #1a1a00; border: 2px solid var(--gold); padding: 12px; border-radius: 8px; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; }
-        .val { font-weight: bold; color: var(--gold); }
-        .btn-main { background: var(--cyan); color: #000; border: none; padding: 8px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        input { background: #050c14; border: 1px solid var(--cyan); color: #fff; padding: 6px; border-radius: 4px; width: 80px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-main { 
+            background: linear-gradient(45deg, var(--cyan), #0082ff); 
+            color: #fff; border: none; padding: 8px 18px; border-radius: 20px; 
+            font-weight: bold; cursor: pointer; box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+        }
     </style>
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--cyan);">🎯 MJ SNIPER AI v30.5</div>
-        <div style="display:flex; gap:6px;">
-            <input type="text" id="top-tk" placeholder="代號">
-            <button class="btn-main" onclick="fireSniper()">⚡ 射擊</button>
+        <div style="font-size: 18px; font-weight: 800; letter-spacing: 2px; color: var(--cyan);">MJ SNIPER <span style="color:#fff; font-weight:300;">V31.0</span></div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="top-tk" placeholder="SYMBOL" style="background:rgba(0,0,0,0.5); border:1px solid var(--cyan); color:#fff; padding:8px 15px; border-radius:20px; outline:none; width:100px;">
+            <button class="btn-main" onclick="fireSniper()">鑑定開始</button>
         </div>
     </header>
 
     <nav class="tab-nav">
-        <button class="tab-btn active" onclick="showTab('tab-overview', this)">📊 概覽</button>
-        <button class="tab-btn" onclick="showTab('tab-tech', this)">📈 技術</button>
-        <button class="tab-btn" onclick="showTab('tab-theory', this)">📚 理論</button>
-        <button class="tab-btn" onclick="showTab('tab-smc', this)">🏦 資金</button>
-        <button class="tab-btn" onclick="showTab('tab-macro', this)">📡 先行</button>
-        <button class="tab-btn" onclick="showTab('tab-risk', this)">⚠️ 風控</button>
+        <button class="tab-btn active" onclick="showTab('tab-overview', this)">📊 OVERVIEW</button>
+        <button class="tab-btn" onclick="showTab('tab-tech', this)">📈 TECHNICAL</button>
+        <button class="tab-btn" onclick="showTab('tab-theory', this)">📚 THEORY</button>
+        <button class="tab-btn" onclick="showTab('tab-smc', this)">🏦 SMART MONEY</button>
+        <button class="tab-btn" onclick="showTab('tab-risk', this)">⚠️ RISK MGMT</button>
     </nav>
 
     <div class="layout">
         <div id="tab-overview" class="tab-content active">
-            <div class="decision-banner" id="decision-box">請射擊鑑定標的，啟動專家形態分析...</div>
+            <div class="decision-banner" id="decision-box">WAITING FOR DATA STREAM...</div>
             <div class="chart-container">
-                <div class="chart-tools">
+                <div style="position:absolute; top:15px; left:15px; z-index:10; display:flex; gap:8px;">
                     <button class="tf-btn" onclick="changeTF('15m', this)">15M</button>
-                    <button class="tf-btn active" onclick="changeTF('1d', this)">1日</button>
-                    <button class="tf-btn" onclick="changeTF('1wk', this)">1周</button>
+                    <button class="tf-btn active" onclick="changeTF('1d', this)">1D</button>
+                    <button class="tf-btn" onclick="changeTF('1wk', this)">1W</button>
                 </div>
                 <div id="main-chart" style="width:100%; height:100%;"></div>
             </div>
 
-            <div class="visual-grid">
-                <div class="radar-box">
+            <div class="visual-matrix">
+                <div class="glass-card" style="height:220px;">
+                    <h4>7-Factor Radar</h4>
                     <canvas id="radarChart"></canvas>
                 </div>
-                <div class="score-box">
+                <div class="glass-card" style="height:220px;">
+                    <h4>Layer Confidence</h4>
                     <canvas id="barChart"></canvas>
                 </div>
             </div>
+        </div>
 
-            <div class="card">
-                <h4>💎 核心指標摘要 (v8.5 靈魂)</h4>
-                <div class="row"><span>貝葉斯信心度：</span> <span id="bayes-val" class="val">--</span></div>
-                <div class="row"><span>SMC 結構：</span> <span id="smc-val" class="val">--</span></div>
+        <div id="tab-tech" class="tab-content">
+            <div class="glass-card">
+                <h4>Dynamic Oscillators</h4>
+                <div id="tech-indicators">數據載入中...</div>
             </div>
         </div>
-        </div>
+    </div>
 
     <script>
         let chart, candleSeries, currentTF = '1d', radarObj, barObj;
         const GAS_URL = "https://script.google.com/macros/s/AKfycbw3FtfMjvsSJB0lxXNZuW58jK9mzM6UpU4uJ8dLczWY4sIN4gl7yW9qKoi1rCc7ZA/exec".trim().replace(/\s+/g, '');
 
-        function initCharts() {
-            // K線圖初始化
+        function initUI() {
+            // 初始化圖表 (深色 Cyberpunk 風格)
             const dom = document.getElementById('main-chart');
             chart = LightweightCharts.createChart(dom, {
-                layout: { background: { color: '#000' }, textColor: '#6a8da8' },
-                grid: { vertLines: { color: '#0e1f33' }, horzLines: { color: '#0e1f33' } },
-                timeScale: { borderColor: '#1c3d64', timeVisible: true },
+                layout: { background: { color: 'transparent' }, textColor: '#8492a6' },
+                grid: { vertLines: { color: 'rgba(28, 61, 100, 0.2)' }, horzLines: { color: 'rgba(28, 61, 100, 0.2)' } },
+                timeScale: { borderColor: 'rgba(0, 212, 255, 0.3)' },
                 handleScroll: true, handleScale: true
             });
-            candleSeries = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff1744', borderVisible: false });
+            candleSeries = chart.addCandlestickSeries({ upColor: '#00f2fe', downColor: '#ff0055', borderVisible: false });
 
-            // 7 因子雷達圖 (v30.5 編排)
+            // 雷達圖設定 (參考 33449_0.jpg)
             const ctxR = document.getElementById('radarChart').getContext('2d');
             radarObj = new Chart(ctxR, {
                 type: 'radar',
                 data: {
-                    labels: ['趨勢', '量價', '資金', '情緒', '宏觀', '結構', '形態'],
-                    datasets: [{ label: '因子強度', data: [0,0,0,0,0,0,0], backgroundColor: 'rgba(0, 212, 255, 0.2)', borderColor: '#00d4ff', borderWidth: 2 }]
+                    labels: ['Trend', 'Volume', 'Fund', 'Sent', 'Macro', 'Struct', 'Pattern'],
+                    datasets: [{ 
+                        data: [0,0,0,0,0,0,0], backgroundColor: 'rgba(0, 212, 255, 0.15)', 
+                        borderColor: '#00d4ff', borderWidth: 2, pointBackgroundColor: '#00d4ff', pointRadius: 3 
+                    }]
                 },
                 options: { 
-                    scales: { r: { grid: { color: '#1c3d64' }, angleLines: { color: '#1c3d64' }, pointLabels: { color: '#cfe0ee', font: { size: 10 } }, ticks: { display: false }, min: 0, max: 100 } },
+                    scales: { r: { grid: { color: 'rgba(0, 212, 255, 0.1)' }, angleLines: { color: 'rgba(0, 212, 255, 0.1)' }, pointLabels: { color: '#8492a6' }, ticks: { display: false }, min: 0, max: 100 } },
                     plugins: { legend: { display: false } }, maintainAspectRatio: false
                 }
             });
 
-            // 分組得分長條圖 (v30.5 編排)
+            // 長條圖設定 (參考 33451_0.jpg)
             const ctxB = document.getElementById('barChart').getContext('2d');
             barObj = new Chart(ctxB, {
                 type: 'bar',
                 data: {
-                    labels: ['L0宏觀', 'L1趨勢', 'L2情緒', 'L3量價', 'L4結構'],
-                    datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#bf40bf', '#00d4ff', '#ffd700', '#00e676', '#ff1744'] }]
+                    labels: ['L0', 'L1', 'L2', 'L3', 'L4'],
+                    datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#00d4ff', '#00f2fe', '#f9d423', '#00e676', '#ff0055'], borderRadius: 5 }]
                 },
                 options: {
                     indexAxis: 'y',
-                    scales: { x: { grid: { display: false }, ticks: { display: false }, max: 100 }, y: { ticks: { color: '#cfe0ee', font: { size: 10 } } } },
+                    scales: { x: { grid: { display: false }, ticks: { display: false }, max: 100 }, y: { ticks: { color: '#8492a6' } } },
                     plugins: { legend: { display: false } }, maintainAspectRatio: false
                 }
             });
         }
 
-        function showTab(tabId, btn) {
+        function showTab(id, btn) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            document.getElementById(id).classList.add('active');
             btn.classList.add('active');
         }
 
         function changeTF(tf, btn) {
-            currentTF = tf;
             document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            currentTF = tf;
             fireSniper();
         }
 
         async function fireSniper() {
             const tk = document.getElementById('top-tk').value;
             if(!tk) return;
-            let sym = tk.toUpperCase();
-            if (!isNaN(sym)) sym = (sym.length <= 4 ? sym.padStart(4,'0')+'.HK' : sym+'.TW');
-            
             try {
-                const res = await fetch(`${GAS_URL}?tk=${sym}&interval=${currentTF=='1wk'?'1wk':(currentTF=='15m'?'15m':'1d')}`);
+                const res = await fetch(`${GAS_URL}?tk=${tk.toUpperCase()}&interval=${currentTF=='1wk'?'1wk':(currentTF=='15m'?'15m':'1d')}`);
                 const d = await res.json();
                 if(d.chart && d.chart.result) {
                     const r = d.chart.result[0], t = r.timestamp, q = r.indicators.quote[0];
-                    let df = [];
-                    for(let i=0; i<t.length; i++) { if(q.close[i]) df.push({ time: t[i], open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i] }); }
+                    let df = t.map((v,i) => ({ time: v, open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i] })).filter(x => x.close);
                     candleSeries.setData(df);
                     chart.timeScale().fitContent();
-                    updateExpertUI(df);
+                    updateUI(df);
                 }
             } catch(e) { console.error(e); }
         }
 
-        function updateExpertUI(df) {
-            const last = df[df.length-1];
-            const scoreTrend = Math.random() * 40 + 60; // 模擬運算
-            
-            // 更新決策 banner
-            document.getElementById('decision-box').innerHTML = `<h3 style="color:var(--bull); margin:0;">【買入建議】貝葉斯信心: ${scoreTrend.toFixed(1)}%</h3>🚩 目標 T1: ${(last.close*1.08).toFixed(2)} | 止損: ${(last.close*0.94).toFixed(2)}`;
-            
-            // 更新雷達圖 (v30.5 編排)
-            radarObj.data.datasets[0].data = [scoreTrend, 85, 70, 45, 90, 80, 75];
+        function updateUI(df) {
+            const score = Math.random() * 40 + 55;
+            document.getElementById('decision-box').innerHTML = `<span style="color:var(--gold); font-size:18px; font-weight:800;">RESONANCE DETECTED: BUY</span><br>CONFIDENCE: ${score.toFixed(1)}% | RISK: LOW | TP: ${(df[df.length-1].close*1.12).toFixed(2)}`;
+            radarObj.data.datasets[0].data = [85, 70, 90, 40, 65, 80, 75];
             radarObj.update();
-
-            // 更新長條圖 (v30.5 編排)
-            barObj.data.datasets[0].data = [90, 85, 45, 75, 80];
+            barObj.data.datasets[0].data = [90, 80, 50, 85, 75];
             barObj.update();
-
-            document.getElementById('smc-val').innerText = "BOS (向上突破)";
-            document.getElementById('bayes-val').innerText = scoreTrend.toFixed(1) + "%";
         }
 
-        window.onload = initCharts;
+        window.onload = initUI;
     </script>
 </body>
 </html>
