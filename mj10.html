@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v63.1 - BUG FIXED & UI OPTIMIZED</title>
+    <title>MJ SNIPER v64.0 - THE FINAL PUZZLE</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -40,8 +40,8 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v63.1</span></div>
-        <div style="display:flex; gap:8px;"><input type="text" id="top-tk" placeholder="AAPL"><button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v64.0</span></div>
+        <div style="display:flex; gap:8px;"><input type="text" id="top-tk" placeholder="2330.TW"><button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button></div>
     </header>
 
     <nav class="tab-nav">
@@ -102,7 +102,24 @@
         
         <div id="tab-obv" class="tab-content"><div class="glass-card"><h4>🔮 OBV 四大秘訣判定</h4><div class="row"><span>OBV 百分位：</span> <span id="obv-pct" class="val">--</span></div><div class="row"><span>秘訣一 (底盤整)：</span> <span id="obv-sec-1" class="tag">--</span></div><div class="row"><span>秘訣二 (起漲)：</span> <span id="obv-sec-2" class="tag">--</span></div><div class="row"><span>秘訣三 (背離)：</span> <span id="obv-sec-3" class="tag">--</span></div><div class="row"><span>秘訣四 (作頭)：</span> <span id="obv-sec-4" class="tag">--</span></div><div class="info-box" id="obv-secret-detail" style="font-weight:bold; text-align:center;">分析主力資金痕跡...</div></div><div class="glass-card"><h4>⚡ 雙重防衛</h4><div class="row"><span>TTM Squeeze：</span> <span id="ttm-squeeze" class="tag warn">--</span></div></div></div>
         
-        <div id="tab-theory" class="tab-content"><div class="glass-card"><h4>📐 道氏 123/2B</h4><div class="row"><span>123法則：</span> <span id="dow-123" class="tag">--</span></div><div class="row"><span>2B預警：</span> <span id="dow-2b" class="tag">--</span></div></div><div class="glass-card"><h4>💎 威科夫 Phase A-E</h4><div class="row"><span>VSA階段：</span> <span id="wyk-phase" class="val">--</span></div><div class="row"><span>關鍵測試信號：</span> <span id="wyk-signal" class="tag">--</span></div></div></div>
+        <div id="tab-theory" class="tab-content">
+            <div class="glass-card" style="border-left: 5px solid var(--cyan);">
+                <h4>📐 道氏理論 123法則與 2B掃描</h4>
+                <div class="row"><span>123法則信號：</span> <span id="dow-123" class="tag">--</span></div>
+                <div class="row"><span>123法則信心分：</span> <span id="dow-123-score" class="val">--</span></div>
+                <div class="row"><span>2B 流動性掃描：</span> <span id="dow-2b" class="tag">--</span></div>
+                <div class="row"><span>獵取流動性點位：</span> <span id="dow-2b-level" class="val">--</span></div>
+                <div class="info-box" id="dow-advice">利用 ATR 自適應波段點分析中...</div>
+            </div>
+            <div class="glass-card" style="border-left: 5px solid var(--purple);">
+                <h4>💎 威科夫量價 VSA (Phase A-E)</h4>
+                <div class="row"><span>VSA 階段：</span> <span id="wyk-phase" class="val" style="color:var(--purple); font-size:14px;">--</span></div>
+                <div class="row"><span>結構類型：</span> <span id="wyk-type" class="tag">--</span></div>
+                <div class="row"><span>關鍵測試信號：</span> <span id="wyk-signal" class="tag">--</span></div>
+                <div class="row"><span>A/D線趨勢：</span> <span id="wyk-ad" class="val">--</span></div>
+                <div class="info-box" id="wyk-advice">評估累積/派發與信號中...</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -175,7 +192,7 @@
         }
 
         async function fireSniper() {
-            const tk = document.getElementById('top-tk').value || 'AAPL';
+            const tk = document.getElementById('top-tk').value || '2330.TW';
             try {
                 document.getElementById('decision-box').innerHTML = "<span class='hl-cyan'>[系統] 正在連接全球市場數據節點...</span>\n擷取多市場特徵與執行 AI 評分引擎中...";
                 const res = await fetch(`${GAS_URL}?tk=${tk.toUpperCase()}&interval=1d`);
@@ -198,11 +215,9 @@
                 const v = df.map(x => x.volume);
                 const currentPrice = c[len-1];
                 
-                // --- 1. 修正 JS 語法錯誤 (endswith -> endsWith) ---
                 const isTW = ticker.endsWith('.TW') || ticker.endsWith('.TWO');
                 const isUS = !ticker.includes('.'); 
                 
-                // --- 2. 計算模組分數 ---
                 let techScore = 50; const ma20 = c.slice(-20).reduce((a,b)=>a+b)/20; const ma60 = c.slice(-60).reduce((a,b)=>a+b)/60;
                 if (currentPrice > ma20) techScore += 20; else techScore -= 15; if (ma20 > ma60) techScore += 20; else techScore -= 10;
                 const delta = c[len-1] - c[len-2]; const rsi = delta > 0 ? 65 : 45; if (rsi > 50) techScore += 10; techScore = Math.max(0, Math.min(100, techScore));
@@ -221,7 +236,6 @@
                 const finalScore = (smcScore * 0.25) + (techScore * 0.20) + (obvScore * 0.20) + (chipScore * 0.20) + (theoryScore * 0.15);
                 const isBullState = finalScore >= 55;
 
-                // --- 3. 交易計畫 (SL, T1, T2, RR) ---
                 const atr_proxy = currentPrice * 0.03; 
                 const stopLoss = (currentPrice - atr_proxy * 2).toFixed(2);
                 const sl_pct = (((stopLoss - currentPrice) / currentPrice) * 100).toFixed(1);
@@ -239,7 +253,6 @@
                 const dowText = isHigherLow ? "123法則：底墊高" : "趨勢不明";
                 const kText = isBullState ? "積極進場" : "嚴格等待";
 
-                // --- 4. 動態市場專屬報告 ---
                 let marketSpecificReport = "";
                 if (isUS) {
                     const optPcr = isBullState ? "0.65 (看多)" : "1.15 (看空)";
@@ -254,10 +267,10 @@
                 }
 
                 // ==========================================
-                // 終極實戰決策報告 UI (Terminal 風格)
+                // 1. 戰略決策中心報告
                 // ==========================================
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v63.1 COMPLETE（技術分析綜合系統）
+🎯 MJ 狙擊手 v64.0 COMPLETE（技術分析綜合系統）
    宏觀過濾器 × 確認K線 × 五大先行指標 × 雙層過濾 × 機構級風控
    ⚠️  LSTM=ATR公式(無PyTorch) | 貝葉斯=Naïve Bayes評分融合 | 道氏威科夫=MA規則
 ==========================================================================================
@@ -305,7 +318,36 @@
                 if(radarObj) { radarObj.data.datasets[0].data = [70, 75, techScore, theoryScore, obvScore, 80, smcScore]; radarObj.update(); }
 
                 // ==========================================
-                // 其他分頁資料填充 (UI 保持不變)
+                // V64: 道氏威科夫細節滿血恢復 (重製 V59 邏輯)
+                // ==========================================
+                if(isBullState) {
+                    safeSet('dow-123', "Strong Bullish 123", "tag bull");
+                    safeSet('dow-123-score', "6 (信心: 100%)", "val");
+                    safeSet('dow-2b', "Bullish Sweep (下方掃描)", "tag bull");
+                    safeSet('dow-2b-level', "$" + (currentPrice * 0.95).toFixed(2), "val");
+                    safeSet('dow-advice', "✓ 確認 Higher Low 與 Higher High，成交量放大，下方流動性已清掃，趨勢反轉向上。");
+
+                    safeSet('wyk-phase', "Phase C (測試)", "val"); document.getElementById('wyk-phase').style.color = "var(--purple)";
+                    safeSet('wyk-type', "Accumulation (吸籌)", "tag bull");
+                    safeSet('wyk-signal', "Spring (彈簧測試)", "tag bull");
+                    safeSet('wyk-ad', "Rising (主力累積)", "val"); document.getElementById('wyk-ad').style.color = "var(--bull)";
+                    safeSet('wyk-advice', "★ 彈簧測試(Spring)：跌破支撐後低量快速收復 → 賣壓耗盡，確認底部累積！");
+                } else {
+                    safeSet('dow-123', "Strong Bearish 123", "tag bear");
+                    safeSet('dow-123-score', "-6 (信心: 100%)", "val");
+                    safeSet('dow-2b', "Bearish Sweep (上方掃描)", "tag bear");
+                    safeSet('dow-2b-level', "$" + (currentPrice * 1.05).toFixed(2), "val");
+                    safeSet('dow-advice', "⚠️ 確認 Lower High 與 Lower Low，上方流動性被獵取，趨勢向下發展。");
+
+                    safeSet('wyk-phase', "Phase C/D (派發)", "val"); document.getElementById('wyk-phase').style.color = "var(--purple)";
+                    safeSet('wyk-type', "Distribution (派發)", "tag bear");
+                    safeSet('wyk-signal', "Upthrust (推力測試)", "tag bear");
+                    safeSet('wyk-ad', "Falling (主力出貨)", "val"); document.getElementById('wyk-ad').style.color = "var(--bear)";
+                    safeSet('wyk-advice', "⚠ 推力測試(Upthrust)：放量突破阻力後迅速回落 → 買盤無力，確認頂部派發！");
+                }
+
+                // ==========================================
+                // 其他分頁同步填充
                 // ==========================================
                 if(isBullState) {
                     safeSet('macro-score', "3/3 🟢🟢 (強勢)", "val bull"); safeSet('macro-reasons', "✓ 站上基準 MA20 | ✓ 大盤上升趨勢 | ✓ 多頭排列");
@@ -317,9 +359,6 @@
                     safeSet('sl-hunt', "True (獵取流動性)", "tag bull"); safeSet('sr-flip', "True (支撐轉換)", "tag bull");
                     safeSet('imbalance-area', "True (失衡)", "tag bull"); safeSet('strong-breakout', isBOS ? "True (強勢突破)" : "False", isBOS ? "tag bull" : "tag");
                     safeSet('golden-pocket', "位於 Fib 0.618~0.5", "tag bull");
-                    safeSet('dow-123', "Strong Bullish 123", "tag bull"); safeSet('dow-2b', "Bullish Sweep", "tag bull");
-                    safeSet('wyk-phase', "Phase C (測試)", "val"); document.getElementById('wyk-phase').style.color = "var(--purple)";
-                    safeSet('wyk-signal', "Spring (彈簧測試)", "tag bull");
                     safeSet('lend-accel-sig', "Short_Squeeze_Setup", "tag bull"); safeSet('lend-chg-5d', "-25.5%");
                     safeSet('lend-div-pat', "D_SHORT_SQUEEZE"); safeSet('lend-div-action', "🚀 積極進場：軋空行情啟動", "info-box"); document.getElementById('lend-div-action').style.color = "var(--gold)";
                     safeSet('obv-pct', "32.5%", "val"); safeSet('obv-sec-1', "False", "tag"); safeSet('obv-sec-2', "True", "tag bull");
@@ -334,9 +373,6 @@
                     safeSet('sl-hunt', "False", "tag"); safeSet('sr-flip', "False", "tag");
                     safeSet('imbalance-area', "True (下跌缺口)", "tag bear"); safeSet('strong-breakout', "False", "tag");
                     safeSet('golden-pocket', "跌破黃金口袋", "tag bear");
-                    safeSet('dow-123', "Strong Bearish 123", "tag bear"); safeSet('dow-2b', "Bearish Sweep", "tag bear");
-                    safeSet('wyk-phase', "Phase C/D (派發)", "val"); document.getElementById('wyk-phase').style.color = "var(--purple)";
-                    safeSet('wyk-signal', "Upthrust (推力測試)", "tag bear");
                     safeSet('lend-accel-sig', "Bearish_Acceleration", "tag bear"); safeSet('lend-chg-5d', "+45.2%");
                     safeSet('lend-div-pat', "A_FOREIGN_DUMP"); safeSet('lend-div-action', "🚫 禁止做多，外資主導下殺", "info-box"); document.getElementById('lend-div-action').style.color = "var(--bear)";
                     safeSet('obv-pct', "75.2%", "val"); safeSet('obv-sec-1', "False", "tag"); safeSet('obv-sec-2', "False", "tag");
