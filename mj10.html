@@ -136,6 +136,8 @@
         }
 
         let chart, candleSeries, volumeSeries, ma20Series, ma60Series, radarObj, aiChartObj;
+        
+        // ★ 您的專屬 GAS 網址
         const GAS_URL = "https://script.google.com/macros/s/AKfycbx_QHl5C0L8OtWCFTkjv8YOImJOm9m41VaFWEhfjidIPemaca2-WsBFb1mYJj2WAJYI/exec";
 
         window.onload = () => {
@@ -244,7 +246,7 @@
                     if (rg > 0.20) { score += 1.0; details.push(`✓ 營收高成長=${(rg*100).toFixed(1)}%`); }
                     else if (rg > 0) { score += 0.5; details.push(`✓ 營收正成長=${(rg*100).toFixed(1)}%`); }
                 }
-            } catch(e) {}
+            } catch(e) { logDiagnostic("評估基本面發生錯誤: " + e.message); }
 
             let tier = 'D'; let mappedScore = 40; 
             if (!validData) {
@@ -300,7 +302,7 @@
         function executeAI_ScoringEngine(df, ticker, fundData) {
             logDiagnostic("開始執行 AI 評分引擎...");
             
-            // ★ V89: 將所有跨模組變數提升至全域最頂層，徹底解決 ReferenceError 崩潰
+            // ★ V89: 終極變數區提升，徹底消滅 ReferenceError
             let currentPrice=0, ma60=0, len=df.length, c=[], v=[];
             let techScore=50, smcScore=50, obvScore=50, theoryScore=50, chipScore=50, fundScore=50;
             let returns=[], sortedRets=[], var95=0, var99=0, cvar95=0, annVol=0, regime="Normal";
@@ -309,13 +311,10 @@
             let atr_proxy=0, stopLoss=0, target1=0, target2=0, rrValue=0, kellyPct=0;
             let fundResult = { tier: 'C', details: [] };
             
-            // 🚨 這是 V87 漏掉的變數，導致防護艙 5 崩潰的主因！現在已被安全定義。
+            // 🚨 最關鍵的修復：讓這些變數在全域都找得到
             let dailyT = "Neutral", weeklyT = "Neutral", monthlyT = "Neutral";
             let rsi = 50, swingHigh = 0;
 
-            // ==========================================
-            // 防護艙 1：基礎數學運算
-            // ==========================================
             try {
                 c = df.map(x => x.close);
                 v = df.map(x => x.volume);
@@ -355,7 +354,7 @@
                 let cvar95_rets = sortedRets.slice(0, var95_idx);
                 cvar95 = cvar95_rets.length > 0 ? (cvar95_rets.reduce((a,b)=>a+b,0)/cvar95_rets.length)*100 : var95;
                 
-                // 這裡正確賦值，給後面防護艙 5 使用
+                // 這裡賦值給全域變數
                 dailyT = currentPrice > ma20 ? "Bullish" : "Bearish";
                 weeklyT = ma20 > ma60 ? "Bullish" : "Bearish";
                 monthlyT = currentPrice > c[Math.max(0, len-60)] ? "Bullish" : "Bearish";
@@ -402,9 +401,6 @@
                 logDiagnostic("✅ 防護艙1: 數學運算成功完成");
             } catch(e) { logDiagnostic("❌ 防護艙1 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 2：首頁報告渲染
-            // ==========================================
             try {
                 let marketSpecificReport = ticker.includes('.') ? `\n  6. 🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : `\n  6. 🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}`;
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
@@ -458,9 +454,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙2: 報告與雷達圖渲染成功");
             } catch(e) { logDiagnostic("❌ 防護艙2 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 3：K線標記去重處理
-            // ==========================================
             try {
                 let minPrice = Infinity, minIdx = -1, maxPrice = -Infinity, maxIdx = -1;
                 for(let i=Math.max(0, len-60); i<len; i++){
@@ -483,9 +476,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙3: K線安全標記渲染成功");
             } catch(e) { logDiagnostic("❌ 防護艙3 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 4：AI 預測圖表
-            // ==========================================
             try {
                 if(aiChartObj) {
                     const actual = c.slice(-5);
@@ -507,9 +497,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙4: AI 預測圖表渲染成功");
             } catch(e){ logDiagnostic("❌ 防護艙4 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 5：通用資料節點寫入 (修復完成)
-            // ==========================================
             try {
                 safeSet('risk-atr', atr_proxy.toFixed(2)); safeSet('risk-rr', `1 : ${rrValue}`); safeSet('risk-kelly', `${Math.max(0, kellyPct)}%`);
                 safeSet('risk-sl', stopLoss.toFixed(2)); safeSet('risk-targets', `${target1.toFixed(2)} / ${target2.toFixed(2)}`);
@@ -520,7 +507,6 @@ ${fundDetailStr}
                 safeSet('chip-mfi', `${mfiProxy.toFixed(1)} (流入強度)`); safeSet('chip-bigorder', `${dealerAct}% (高活躍度)`);
                 safeSet('chip-deep-sig', isBullState && mfiProxy > 60 ? "Bullish (大戶吸籌)" : "Bearish (資金散出)", isBullState ? "tag bull" : "tag bear");
                 
-                // ★ 這裡使用正確的全域變數
                 safeSet('rsi-val', rsi.toFixed(1) + " (動能)"); 
                 safeSet('pivot-pp', (currentPrice * 0.995).toFixed(2));
                 safeSet('smc-level', swingHigh.toFixed(2));
@@ -528,9 +514,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙5: 共通數據寫入成功");
             } catch(e) { logDiagnostic("❌ 防護艙5 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 6：多空條件節點寫入
-            // ==========================================
             try {
                 if(isBullState) {
                     safeSet('macro-score', "3/3 🟢🟢 (強勢)", "val bull"); safeSet('macro-reasons', "✓ 站上基準 MA20 | ✓ 大盤上升趨勢 | ✓ 多頭排列");
