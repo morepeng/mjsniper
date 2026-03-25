@@ -78,10 +78,10 @@
         </div>
 
         <div id="tab-smc" class="tab-content">
-            <div class="glass-card"><h4>🏦 SMC 結構突破 (BOS/CHoCH)</h4><div class="row"><span>主要結構：</span> <span id="smc-struct" class="tag">--</span></div><div class="row"><span>突破水位：</span> <span id="smc-level" class="val">--</span></div><div class="row"><span>距今根數 (Bars)：</span> <span id="smc-bars" class="val">--</span></div><div class="info-box" id="smc-struct-advice">分析中...</div></div>
+            <div class="glass-card"><h4>🏦 SMC 結構突破 (BOS/CHoCH)</h4><div class="row"><span>主要結構：</span> <span id="smc-struct" class="tag">--</span></div><div class="row"><span>突破水位：</span> <span id="smc-level" class="val">--</span></div><div class="row"><span>距今根數 (Bars)：</span> <span id="smc-bars" class="val">--</span></div><div class="info-box" id="smc-struct-advice">分析結構慣性中...</div></div>
             <div class="glass-card" style="border-left: 5px solid var(--bear);"><h4>🕵️ 機構行為進階偵測 (SMC+)</h4><div class="row"><span>止損狩獵 (Stop Hunt)：</span> <span id="sl-hunt" class="tag">--</span></div><div class="row"><span>支撐阻力轉換 (S/R Flip)：</span> <span id="sr-flip" class="tag">--</span></div><div class="row"><span>不均衡區域 (Imbalance)：</span> <span id="imbalance-area" class="tag">--</span></div><div class="row"><span>強勢突破 (Breakout)：</span> <span id="strong-breakout" class="tag">--</span></div><div class="row"><span>黃金口袋 (Fib 0.618-0.5)：</span> <span id="golden-pocket" class="tag">--</span></div></div>
-            <div class="glass-card"><h4>🛡️ 機構訂單區塊與缺口 (OB/FVG)</h4><div class="row"><span>訂單區塊 (OB)：</span> <span id="smc-ob" class="tag">--</span></div><div class="row"><span>OB 強度 (1-3)：</span> <span id="smc-ob-strength" class="val">--</span></div><div class="row"><span>公允缺口 (FVG)：</span> <span id="smc-fvg" class="tag">--</span></div><div class="row"><span>缺口大小 (%)：</span> <span id="smc-fvg-size" class="val">--</span></div><div class="info-box" id="smc-tactical-advice">分析中...</div></div>
-            <div class="glass-card"><h4>💰 聰明錢流向 (Smart Money Flow)</h4><div class="row"><span>20日資金方向：</span> <span id="smc-flow" class="val">--</span></div><div class="info-box" id="smc-flow-advice">分析中...</div></div>
+            <div class="glass-card"><h4>🛡️ 機構訂單區塊與缺口 (OB/FVG)</h4><div class="row"><span>訂單區塊 (OB)：</span> <span id="smc-ob" class="tag">--</span></div><div class="row"><span>OB 強度 (1-3)：</span> <span id="smc-ob-strength" class="val">--</span></div><div class="row"><span>公允缺口 (FVG)：</span> <span id="smc-fvg" class="tag">--</span></div><div class="row"><span>缺口大小 (%)：</span> <span id="smc-fvg-size" class="val">--</span></div><div class="info-box" id="smc-tactical-advice">分析大戶腳印中...</div></div>
+            <div class="glass-card"><h4>💰 聰明錢流向 (Smart Money Flow)</h4><div class="row"><span>20日資金方向：</span> <span id="smc-flow" class="val">--</span></div><div class="info-box" id="smc-flow-advice">分析量價加權平均流向...</div></div>
         </div>
 
         <div id="tab-ai" class="tab-content">
@@ -111,7 +111,7 @@
     <script>
         let chart, candleSeries, volumeSeries, ma20Series, ma60Series;
         let radarObj, aiChartObj;
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyT0BRLz52kKxaRKJFgUnZ0stvBqCjwCFBT2xyYboiv-d5ExUAQJymqC2RibFHZPBJJ/exec".trim().replace(/\s+/g, '');
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbx_QHl5C0L8OtWCFTkjv8YOImJOm9m41VaFWEhfjidIPemaca2-WsBFb1mYJj2WAJYI/exec".trim().replace(/\s+/g, '');
 
         window.onload = () => {
             initKLine(); initVisuals();
@@ -249,8 +249,8 @@
         async function fireSniper() {
             const tk = document.getElementById('top-tk').value || 'NVDA';
             try {
-                // 🚀 直接呼叫 GAS，再也沒有前端 CORS 阻擋問題！
-                document.getElementById('decision-box').innerHTML = "<span class='hl-cyan'>[系統] 正在呼叫 GAS 後端獲取深度報價...</span>";
+                // 🚀 直接呼叫 GAS，取得完美資料
+                document.getElementById('decision-box').innerHTML = "<span class='hl-cyan'>[系統] 正在呼叫 Google Apps Script 獲取深度資料...</span>";
                 const res = await fetch(`${GAS_URL}?tk=${tk.toUpperCase()}&interval=1d`);
                 const d = await res.json();
                 
@@ -262,6 +262,7 @@
                     const volData = df.map(d => ({ time: d.time, value: d.volume, color: d.close > d.open ? 'rgba(0, 242, 254, 0.4)' : 'rgba(255, 0, 85, 0.4)' }));
                     volumeSeries.setData(volData); chart.timeScale().fitContent();
                     
+                    // 接收 GAS 傳回來的 fundamentals
                     const fundData = d.fundamentals || {};
                     executeAI_ScoringEngine(df, tk.toUpperCase(), fundData);
                 }
@@ -413,7 +414,7 @@ ${fundDetailStr}
                 candleSeries.setMarkers(markers);
 
                 // ==========================================
-                // ★ 100% 寫死 V72 資料填入 (所有分頁，無一遺漏)
+                // ★ 100% 絕對鎖死 V72 資料填入
                 // ==========================================
                 let var99_idx = Math.floor(returns.length * 0.01);
                 let var99 = sortedRets[var99_idx] * 100;
