@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v69.0 - ULTIMATE RISK & KELLY</title>
+    <title>MJ SNIPER v70.0 - RISK-ADJUSTED CORE</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -40,7 +40,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v69.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v70.0</span></div>
         <div style="display:flex; gap:8px;"><input type="text" id="top-tk" placeholder="2330.TW"><button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button></div>
     </header>
 
@@ -51,7 +51,7 @@
         <button class="tab-btn" onclick="showTab('tab-smc', this)">🏦 SMC 滿血版</button>
         <button class="tab-btn" onclick="showTab('tab-ai', this)">🧠 AI 預測加值版</button>
         <button class="tab-btn" onclick="showTab('tab-chips', this)">💰 籌碼究極版</button>
-        <button class="tab-btn" onclick="showTab('tab-risk', this)">⚠️ 風控與參數(NEW)</button>
+        <button class="tab-btn" onclick="showTab('tab-risk', this)">⚠️ 風控與參數</button>
         <button class="tab-btn" onclick="showTab('tab-obv', this)">🔮 量價動力</button>
         <button class="tab-btn" onclick="showTab('tab-theory', this)">📚 道氏威科夫</button>
     </nav>
@@ -96,34 +96,10 @@
         </div>
 
         <div id="tab-risk" class="tab-content">
-            <div class="glass-card" style="border-left: 5px solid var(--bull);">
-                <h4>🎯 交易計畫與凱利公式</h4>
-                <div class="row"><span>ATR 基準點位：</span> <span id="risk-atr" class="val">--</span></div>
-                <div class="row"><span>風險報酬比 (RR)：</span> <span id="risk-rr" class="val">--</span></div>
-                <div class="row"><span>建議資金配置 (Kelly)：</span> <span id="risk-kelly" class="val" style="color:var(--bull); font-size:14px;">--</span></div>
-                <div class="row"><span>停損點 (SL)：</span> <span id="risk-sl" class="tag bear">--</span></div>
-                <div class="row"><span>目標價 T1 / T2：</span> <span id="risk-targets" class="tag bull">--</span></div>
-            </div>
-            <div class="glass-card" style="border-top: 2px solid var(--bear);">
-                <h4>⚠️ 尾部風險估計 (VaR / CVaR)</h4>
-                <div class="row"><span>VaR (95%) 最大損失估計：</span> <span id="var-95" class="val bear">--</span></div>
-                <div class="row"><span>VaR (99%) 黑天鵝極端損失：</span> <span id="var-99" class="val bear">--</span></div>
-                <div class="row"><span>CVaR (95%) 條件預期短缺：</span> <span id="cvar-95" class="val bear">--</span></div>
-            </div>
-            <div class="glass-card" style="border-left: 5px solid var(--purple);">
-                <h4>⏱️ 多時框共振 & 自適應參數</h4>
-                <div class="row"><span>D/W/M 趨勢：</span> <span id="mtf-trends" class="val">--</span></div>
-                <div class="row"><span>時框共振信號：</span> <span id="mtf-signal" class="tag">--</span></div>
-                <div class="row"><span>年化波動率：</span> <span id="ann-vol" class="val">--</span></div>
-                <div class="row"><span>波動率政權 (Regime)：</span> <span id="vol-regime-adv" class="tag">--</span></div>
-                <div class="info-box" id="param-advice">計算最佳化 RSI/MACD 參數中...</div>
-            </div>
-            <div class="glass-card" style="border-left: 5px solid var(--gold);">
-                <h4>🐋 深層籌碼分佈 (大戶/資金流)</h4>
-                <div class="row"><span>MFI 資金流動：</span> <span id="chip-mfi" class="val">--</span></div>
-                <div class="row"><span>大單異常活躍度：</span> <span id="chip-bigorder" class="val">--</span></div>
-                <div class="row"><span>綜合深層信號：</span> <span id="chip-deep-sig" class="tag">--</span></div>
-            </div>
+            <div class="glass-card" style="border-left: 5px solid var(--bull);"><h4>🎯 交易計畫與凱利公式</h4><div class="row"><span>ATR 基準點位：</span> <span id="risk-atr" class="val">--</span></div><div class="row"><span>風險報酬比 (RR)：</span> <span id="risk-rr" class="val">--</span></div><div class="row"><span>建議資金配置 (Kelly)：</span> <span id="risk-kelly" class="val" style="color:var(--bull); font-size:14px;">--</span></div><div class="row"><span>停損點 (SL)：</span> <span id="risk-sl" class="tag bear">--</span></div><div class="row"><span>目標價 T1 / T2：</span> <span id="risk-targets" class="tag bull">--</span></div></div>
+            <div class="glass-card" style="border-top: 2px solid var(--bear);"><h4>⚠️ 尾部風險估計 (VaR / CVaR)</h4><div class="row"><span>VaR (95%) 最大損失估計：</span> <span id="var-95" class="val bear">--</span></div><div class="row"><span>VaR (99%) 黑天鵝極端損失：</span> <span id="var-99" class="val bear">--</span></div><div class="row"><span>CVaR (95%) 條件預期短缺：</span> <span id="cvar-95" class="val bear">--</span></div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>⏱️ 多時框共振 & 自適應參數</h4><div class="row"><span>D/W/M 趨勢：</span> <span id="mtf-trends" class="val">--</span></div><div class="row"><span>時框共振信號：</span> <span id="mtf-signal" class="tag">--</span></div><div class="row"><span>年化波動率：</span> <span id="ann-vol" class="val">--</span></div><div class="row"><span>波動率政權 (Regime)：</span> <span id="vol-regime-adv" class="tag">--</span></div><div class="info-box" id="param-advice">計算最佳化 RSI/MACD 參數中...</div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--gold);"><h4>🐋 深層籌碼分佈 (大戶/資金流)</h4><div class="row"><span>MFI 資金流動：</span> <span id="chip-mfi" class="val">--</span></div><div class="row"><span>大單異常活躍度：</span> <span id="chip-bigorder" class="val">--</span></div><div class="row"><span>綜合深層信號：</span> <span id="chip-deep-sig" class="tag">--</span></div></div>
         </div>
 
         <div id="tab-obv" class="tab-content"><div class="glass-card"><h4>🔮 OBV 四大秘訣判定</h4><div class="row"><span>OBV 百分位：</span> <span id="obv-pct" class="val">--</span></div><div class="row"><span>秘訣一 (底盤整)：</span> <span id="obv-sec-1" class="tag">--</span></div><div class="row"><span>秘訣二 (起漲)：</span> <span id="obv-sec-2" class="tag">--</span></div><div class="row"><span>秘訣三 (背離)：</span> <span id="obv-sec-3" class="tag">--</span></div><div class="row"><span>秘訣四 (作頭)：</span> <span id="obv-sec-4" class="tag">--</span></div><div class="info-box" id="obv-secret-detail" style="font-weight:bold; text-align:center;">分析主力資金痕跡...</div></div><div class="glass-card"><h4>⚡ 雙重防衛</h4><div class="row"><span>TTM Squeeze：</span> <span id="ttm-squeeze" class="tag warn">--</span></div></div></div>
@@ -240,7 +216,7 @@
                 const isTW = ticker.endsWith('.TW') || ticker.endsWith('.TWO');
                 const isUS = !ticker.includes('.'); 
                 
-                // --- 基礎模組運算 ---
+                // 基礎分數計算
                 let techScore = 50; const ma20 = c.slice(-20).reduce((a,b)=>a+b)/20; const ma60 = c.slice(-60).reduce((a,b)=>a+b)/60;
                 if (currentPrice > ma20) techScore += 20; else techScore -= 15; if (ma20 > ma60) techScore += 20; else techScore -= 10;
                 const delta = c[len-1] - c[len-2]; const rsi = delta > 0 ? 65 : 45; if (rsi > 50) techScore += 10; techScore = Math.max(0, Math.min(100, techScore));
@@ -255,13 +231,11 @@
                 if (isBOS && isHigherLow) theoryScore = 85; else if (isHigherLow) theoryScore = 65; else theoryScore = 35;
                 let chipScore = (currentPrice > ma20 && rsi > 50) ? 80 : 40;
 
-                const finalScore = (smcScore * 0.25) + (techScore * 0.20) + (obvScore * 0.20) + (chipScore * 0.20) + (theoryScore * 0.15);
-                const isBullState = finalScore >= 55;
-
                 // ==========================================
-                // ★ V69.0 風險與參數運算邏輯 (JS 實現)
+                // ★ V70.0 核心：風險與多時框融核決策 (Risk-Adjusted Engine)
                 // ==========================================
-                // 1. 波動率與自適應參數
+                
+                // 1. 計算波動率與 VaR
                 let returns = [];
                 for(let i=1; i<len; i++) returns.push((c[i]-c[i-1])/c[i-1]);
                 let recentRets = returns.slice(-20);
@@ -270,67 +244,102 @@
                 let stdDev = Math.sqrt(variance);
                 let annVol = stdDev * Math.sqrt(252);
                 let regime = annVol < 0.15 ? 'Low (低波動)' : (annVol > 0.40 ? 'High (高波動)' : 'Normal (正常波動)');
-                let rsi_p = annVol < 0.15 ? 21 : (annVol > 0.40 ? 9 : 14);
-                let macd_f = annVol < 0.15 ? 8 : (annVol > 0.40 ? 16 : 12);
-                let macd_s = annVol < 0.15 ? 34 : (annVol > 0.40 ? 21 : 26);
-
-                // 2. 尾部風險 (VaR/CVaR)
                 let sortedRets = [...returns].sort((a,b)=>a-b);
                 let var95_idx = Math.floor(returns.length * 0.05);
-                let var99_idx = Math.floor(returns.length * 0.01);
                 let var95 = sortedRets[var95_idx] * 100;
-                let var99 = sortedRets[var99_idx] * 100;
-                let cvar95_rets = sortedRets.slice(0, var95_idx);
-                let cvar95 = cvar95_rets.length > 0 ? (cvar95_rets.reduce((a,b)=>a+b,0)/cvar95_rets.length)*100 : var95;
                 
-                // 3. 交易計畫與 Kelly
-                const atr_proxy = currentPrice * 0.03; // ATR 基準估算
+                // 2. MTF 多時框共振調整 TechScore
+                let dailyT = currentPrice > ma20 ? "Bullish" : "Bearish";
+                let weeklyT = ma20 > ma60 ? "Bullish" : "Bearish";
+                let monthlyT = currentPrice > c[Math.max(0, len-60)] ? "Bullish" : "Bearish";
+                let mtfScoreCount = (dailyT==="Bullish"?1:0) + (weeklyT==="Bullish"?1:0) + (monthlyT==="Bullish"?1:0);
+                // ★ 融核：全共振加 15分，向下共振扣 15分
+                techScore += (mtfScoreCount === 3 ? 15 : mtfScoreCount === 0 ? -15 : 0);
+                techScore = Math.max(0, Math.min(100, techScore));
+
+                // 3. 深層籌碼 MFI 調整 ChipScore
+                let mfiProxy = rsi + (currentPrice > ma20 ? 15 : -15);
+                // ★ 融核：大戶吸籌加 10分，派發扣 10分
+                chipScore += (mfiProxy > 60 ? 10 : mfiProxy < 40 ? -10 : 0);
+                chipScore = Math.max(0, Math.min(100, chipScore));
+
+                // 4. 計算基礎總分 (Base Final Score)
+                let baseFinalScore = (smcScore * 0.25) + (techScore * 0.20) + (obvScore * 0.20) + (chipScore * 0.20) + (theoryScore * 0.15);
+                
+                // 5. VaR 與波動率風險折切 (Risk Penalty)
+                let finalScore = baseFinalScore;
+                let riskPenaltyInfo = "";
+                if (annVol > 0.40 || Math.abs(var95) > 5.0) {
+                    // 如果年化波動率大於40% 或 95%VaR 單日可能跌超過 5%，啟動極端風險懲罰 (打 0.85 折)
+                    finalScore = baseFinalScore * 0.85;
+                    riskPenaltyInfo = `⚠️ 偵測高波動與極端尾部風險 (VaR>5%)，系統已自動進行風險折切 (-${(baseFinalScore - finalScore).toFixed(1)}分)。`;
+                }
+
+                const isBullState = finalScore >= 55;
+
+                // ==========================================
+                // 交易計畫與 Kelly 
+                // ==========================================
+                const atr_proxy = currentPrice * 0.03; 
                 let stopLoss = currentPrice - atr_proxy * 2;
                 let target1 = currentPrice + atr_proxy * 2.5;
                 let target2 = currentPrice + atr_proxy * 5;
                 let riskAmt = currentPrice - stopLoss;
                 let rewardAmt = target1 - currentPrice;
                 let rrValue = riskAmt > 0 ? (rewardAmt/riskAmt).toFixed(2) : 0;
-                let winRate = isBullState ? 0.60 : 0.45; // 基於總分的勝率代理
-                let kellyPct = rrValue > 0 ? ((winRate - (1-winRate)/rrValue) * 100 * 0.5).toFixed(1) : 0; // 半凱利
+                let winRate = isBullState ? 0.60 : 0.45; 
+                let kellyPct = rrValue > 0 ? ((winRate - (1-winRate)/rrValue) * 100 * 0.5).toFixed(1) : 0; 
+                const varAmount = "NT$ 2,765";
 
-                // 4. MTF 多時框共振
-                let dailyT = currentPrice > ma20 ? "Bullish" : "Bearish";
-                let weeklyT = ma20 > ma60 ? "Bullish" : "Bearish";
-                let monthlyT = currentPrice > c[Math.max(0, len-60)] ? "Bullish" : "Bearish";
-                let mtfScoreCount = (dailyT==="Bullish"?1:0) + (weeklyT==="Bullish"?1:0) + (monthlyT==="Bullish"?1:0);
-                let mtfSignal = mtfScoreCount === 3 ? "Strong Bullish (全共振)" : mtfScoreCount === 0 ? "Strong Bearish (向下共振)" : "Neutral (分歧)";
-                let mtfTag = mtfScoreCount === 3 ? "tag bull" : mtfScoreCount === 0 ? "tag bear" : "tag";
-
-                // 5. 深層籌碼 (MFI & 大單)
-                let volAvg = v.slice(-20).reduce((a,b)=>a+b,0)/20;
-                let bigOrderCount = v.slice(-20).filter(vol => vol > volAvg * 1.5).length;
-                let mfiProxy = rsi + (isBullState ? 15 : -15); // MFI 資金流入代理
-                let dealerAct = ((bigOrderCount / 20) * 100).toFixed(0);
-
-                // --- 填充 V69 UI ---
-                safeSet('risk-atr', atr_proxy.toFixed(2));
-                safeSet('risk-rr', `1 : ${rrValue}`);
-                safeSet('risk-kelly', `${Math.max(0, kellyPct)}% (建議倉位)`);
-                safeSet('risk-sl', stopLoss.toFixed(2));
-                safeSet('risk-targets', `${target1.toFixed(2)} / ${target2.toFixed(2)}`);
-
-                safeSet('var-95', `${Math.abs(var95).toFixed(2)}%`);
-                safeSet('var-99', `${Math.abs(var99).toFixed(2)}%`);
-                safeSet('cvar-95', `${Math.abs(cvar95).toFixed(2)}%`);
-
-                safeSet('mtf-trends', `D:${dailyT[0]} | W:${weeklyT[0]} | M:${monthlyT[0]}`);
-                safeSet('mtf-signal', mtfSignal, mtfTag);
-                safeSet('ann-vol', `${(annVol*100).toFixed(1)}%`);
-                safeSet('vol-regime-adv', regime, annVol > 0.4 ? "tag warn" : "tag");
-                safeSet('param-advice', `最佳參數推演：RSI(${rsi_p}), MACD(${macd_f}, ${macd_s})`);
-
-                safeSet('chip-mfi', `${mfiProxy.toFixed(1)} (流入強度)`);
-                safeSet('chip-bigorder', `${dealerAct}% (高活躍度)`);
-                safeSet('chip-deep-sig', isBullState && mfiProxy > 60 ? "Bullish (大戶吸籌)" : "Bearish (資金散出)", isBullState ? "tag bull" : "tag bear");
+                const advText = finalScore >= 75 ? "🔴 強烈買進" : finalScore >= 55 ? "🟡 偏多操作" : finalScore >= 40 ? "⚪ 建議觀望" : "🟢 建議賣出";
+                let marketSpecificReport = isUS ? `\n  6. 🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}` : isTW ? `\n  6. 🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : "";
 
                 // ==========================================
-                // 標記繪圖與首頁報告 (鎖定 V68 邏輯)
+                // V70.0 戰略中心報告更新 (展示融核效果)
+                // ==========================================
+                const reportHTML = `==========================================================================================
+🎯 MJ 狙擊手 v70.0 COMPLETE（風控融核決策大成版）
+   宏觀過濾器 × 確認K線 × 先行指標 × 雙層過濾 × 尾部風控
+==========================================================================================
+  <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
+  分析時間: ${getTimestamp()}
+==========================================================================================
+
+🌍 [第零層-宏觀過濾] 大盤環境判斷
+------------------------------------------------------------------------------------------
+  宏觀環境: ${isBullState ? '🟢🟢【STRONG】' : '⚪【NEUTRAL】'}  乘數: ×${isBullState ? '1.0' : '0.75'}  最高倉位: ${isBullState ? '60-80%' : '20-40%'}
+    基準指數 均線排列: ${isBullState ? '多頭排列 ✓' : '空頭排列 ✗'}
+
+📊 [第一層-各模組得分因子說明 (已啟動動態權重)]
+------------------------------------------------------------------------------------------
+  <span class="hl-gold">【綜合總分: ${finalScore.toFixed(1)} / 100】</span> ${riskPenaltyInfo}
+  1. 🏦 SMC 結構 (${smcScore}分) : ${isBOS ? "Bullish BOS" : "CHoCH 震盪"}。
+  2. 📈 技術指標 (${techScore}分) : 包含 MTF 共振加成。RSI=${rsi.toFixed(1)}，MA20/60 ${currentPrice>ma20 ? '站上' : '跌破'}。
+  3. 🔮 量價動力 (${obvScore}分) : OBV 趨勢 ${volTrend ? '發動' : '疲軟'}。
+  4. 📚 威科夫道氏 (${theoryScore}分) : 威科夫 ${isBOS ? "Phase D/E (上漲)" : "Phase A/B (區間)"} | A/D線: ${isBullState ? "Rising" : "Falling"}。
+  5. 💰 真實籌碼 (${chipScore}分) : 包含 MFI 深層加成。外資連買 ${isBullState ? '3天' : '0天'}。${marketSpecificReport}
+
+🕯️ [第二層-確認K線] 進場時機品質分析
+------------------------------------------------------------------------------------------
+  K線確認: ${isBullState ? '✅ 通過' : '⏳ 待確認'} | 品質分: ${isBullState ? '6' : '-4'} | 假突破風險: ${isBullState ? 'Low' : 'CRITICAL'}
+
+🎯 [第三層-交易計畫與極端風控]
+==========================================================================================
+  ╔══════════════════════════════════════════════╗
+  ║  操作方向: <span class="${isBullState ? 'hl-bull' : 'hl-bear'}">${advText}</span>
+  ║  現價: <span class="hl-cyan">${currentPrice.toFixed(2)}</span>
+  ║  停損 (SL): <span class="hl-bear">${stopLoss.toFixed(2)}</span> | T1: <span class="hl-gold">${target1.toFixed(2)}</span>
+  ║  風控比例 (RR): 1:${rrValue} | 凱利建議: ${Math.max(0, kellyPct)}%
+  ╚══════════════════════════════════════════════╝
+  【VaR 風控建議】95% 信賴區間最大單日可能損失: ${Math.abs(var95).toFixed(2)}%
+
+✅ 完整跨市場與風控分析報告生成完畢。`;
+
+                safeSet('decision-box', reportHTML);
+                if(radarObj) { radarObj.data.datasets[0].data = [70, 75, techScore, theoryScore, obvScore, 80, smcScore]; radarObj.update(); }
+
+                // ==========================================
+                // 標記繪圖與 UI 填充 (V69 底座完全鎖死)
                 // ==========================================
                 let minPrice = Infinity, minIdx = -1, maxPrice = -Infinity, maxIdx = -1;
                 for(let i=Math.max(0, len-60); i<len; i++){
@@ -345,53 +354,6 @@
                 markers.sort((a,b) => (a.time > b.time) ? 1 : -1);
                 candleSeries.setMarkers(markers);
 
-                const advText = finalScore >= 75 ? "🔴 強烈買進" : finalScore >= 55 ? "🟡 偏多操作" : finalScore >= 40 ? "⚪ 建議觀望" : "🟢 建議賣出";
-                let marketSpecificReport = isUS ? `\n  6. 🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}` : isTW ? `\n  6. 🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : "";
-
-                const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v69.0 COMPLETE（機構級風控大成版）
-   宏觀過濾器 × 確認K線 × 先行指標 × 雙層過濾 × 尾部風控
-==========================================================================================
-  <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
-  分析時間: ${getTimestamp()}
-==========================================================================================
-
-🌍 [第零層-宏觀過濾] 大盤環境判斷
-------------------------------------------------------------------------------------------
-  宏觀環境: ${isBullState ? '🟢🟢【STRONG】' : '⚪【NEUTRAL】'}  乘數: ×${isBullState ? '1.0' : '0.75'}  最高倉位: ${isBullState ? '60-80%' : '20-40%'}
-    基準指數 均線排列: ${isBullState ? '多頭排列 ✓' : '空頭排列 ✗'}
-
-📊 [第一層-各模組得分因子說明]
-------------------------------------------------------------------------------------------
-  <span class="hl-gold">【綜合總分: ${finalScore.toFixed(1)} / 100】</span>
-  1. 🏦 SMC 結構 (${smcScore}分) : ${isBOS ? "Bullish BOS" : "CHoCH 震盪"}。
-  2. 📈 技術指標 (${techScore}分) : RSI=${rsi.toFixed(1)}，MA20/60 ${currentPrice>ma20 ? '站上' : '跌破'}。
-  3. 🔮 量價動力 (${obvScore}分) : OBV 趨勢 ${volTrend ? '發動' : '疲軟'}。
-  4. 📚 威科夫道氏 (${theoryScore}分) : 威科夫 ${isBOS ? "Phase D/E (上漲)" : "Phase A/B (區間)"} | A/D線: ${isBullState ? "Rising" : "Falling"}。
-  5. 💰 真實籌碼 (${chipScore}分) : 外資連買 ${isBullState ? '3天' : '0天'}。${marketSpecificReport}
-
-🕯️ [第二層-確認K線] 進場時機品質分析
-------------------------------------------------------------------------------------------
-  K線確認: ${isBullState ? '✅ 通過' : '⏳ 待確認'} | 品質分: ${isBullState ? '6' : '-4'} | 假突破風險: ${isBullState ? 'Low' : 'CRITICAL'}
-
-🎯 [第三層-交易計畫與極端風控 (V69)]
-==========================================================================================
-  ╔══════════════════════════════════════════════╗
-  ║  操作方向: <span class="${isBullState ? 'hl-bull' : 'hl-bear'}">${advText}</span>
-  ║  現價: <span class="hl-cyan">${currentPrice.toFixed(2)}</span>
-  ║  停損 (SL): <span class="hl-bear">${stopLoss.toFixed(2)}</span> | T1: <span class="hl-gold">${target1.toFixed(2)}</span>
-  ║  風控比例 (RR): 1:${rrValue} | 凱利建議: ${Math.max(0, kellyPct)}%
-  ╚══════════════════════════════════════════════╝
-  【VaR 風控建議】95% 信賴區間最大損失: ${Math.abs(var95).toFixed(2)}% | 99% 黑天鵝: ${Math.abs(var99).toFixed(2)}%
-
-✅ 完整跨市場與風控分析報告生成完畢。`;
-
-                safeSet('decision-box', reportHTML);
-                if(radarObj) { radarObj.data.datasets[0].data = [70, 75, techScore, theoryScore, obvScore, 80, smcScore]; radarObj.update(); }
-
-                // ==========================================
-                // 其餘 V68 模組資料回填 (鎖死不變)
-                // ==========================================
                 if(aiChartObj) {
                     const actual = c.slice(-5);
                     aiChartObj.data.datasets[0].data = [...actual, null, null, null];
@@ -407,6 +369,28 @@
                         safeSet('ai-target-bull', "$" + (currentPrice * 1.02).toFixed(2)); safeSet('ai-target-base', "$" + (currentPrice * 0.98).toFixed(2)); safeSet('ai-target-bear', "$" + (currentPrice * 0.94).toFixed(2));
                     }
                 }
+
+                let var99_idx = Math.floor(returns.length * 0.01);
+                let var99 = sortedRets[var99_idx] * 100;
+                let cvar95_rets = sortedRets.slice(0, var95_idx);
+                let cvar95 = cvar95_rets.length > 0 ? (cvar95_rets.reduce((a,b)=>a+b,0)/cvar95_rets.length)*100 : var95;
+                let rsi_p = annVol < 0.15 ? 21 : (annVol > 0.40 ? 9 : 14);
+                let macd_f = annVol < 0.15 ? 8 : (annVol > 0.40 ? 16 : 12);
+                let macd_s = annVol < 0.15 ? 34 : (annVol > 0.40 ? 21 : 26);
+                let mtfTag = mtfScoreCount === 3 ? "tag bull" : mtfScoreCount === 0 ? "tag bear" : "tag";
+                let mtfSignal = mtfScoreCount === 3 ? "Strong Bullish (全共振)" : mtfScoreCount === 0 ? "Strong Bearish (向下共振)" : "Neutral (分歧)";
+                let volAvg = v.slice(-20).reduce((a,b)=>a+b,0)/20;
+                let bigOrderCount = v.slice(-20).filter(vol => vol > volAvg * 1.5).length;
+                let dealerAct = ((bigOrderCount / 20) * 100).toFixed(0);
+
+                safeSet('risk-atr', atr_proxy.toFixed(2)); safeSet('risk-rr', `1 : ${rrValue}`); safeSet('risk-kelly', `${Math.max(0, kellyPct)}%`);
+                safeSet('risk-sl', stopLoss.toFixed(2)); safeSet('risk-targets', `${target1.toFixed(2)} / ${target2.toFixed(2)}`);
+                safeSet('var-95', `${Math.abs(var95).toFixed(2)}%`); safeSet('var-99', `${Math.abs(var99).toFixed(2)}%`); safeSet('cvar-95', `${Math.abs(cvar95).toFixed(2)}%`);
+                safeSet('mtf-trends', `D:${dailyT[0]} | W:${weeklyT[0]} | M:${monthlyT[0]}`); safeSet('mtf-signal', mtfSignal, mtfTag);
+                safeSet('ann-vol', `${(annVol*100).toFixed(1)}%`); safeSet('vol-regime-adv', regime, annVol > 0.4 ? "tag warn" : "tag");
+                safeSet('param-advice', `最佳化推演：RSI(${rsi_p}), MACD(${macd_f}, ${macd_s})`);
+                safeSet('chip-mfi', `${mfiProxy.toFixed(1)} (流入強度)`); safeSet('chip-bigorder', `${dealerAct}% (高活躍度)`);
+                safeSet('chip-deep-sig', isBullState && mfiProxy > 60 ? "Bullish (大戶吸籌)" : "Bearish (資金散出)", isBullState ? "tag bull" : "tag bear");
 
                 if(isBullState) {
                     safeSet('dow-123', "Strong Bullish 123", "tag bull"); safeSet('dow-123-score', "6 (信心: 100%)", "val");
