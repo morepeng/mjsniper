@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v87.0 - TITANIUM ARMOR & DIAGNOSTICS</title>
+    <title>MJ SNIPER v88.0 - DIRECT CONNECTION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -41,7 +41,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v87.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v88.0</span></div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="NVDA">
             <button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button>
@@ -114,7 +114,7 @@
     </div>
 
     <script>
-        // ★ V87: 系統診斷記錄器
+        // 系統診斷記錄器
         window.systemDiagnostics = [];
         function logDiagnostic(msg) {
             window.systemDiagnostics.push(msg);
@@ -130,7 +130,9 @@
 
         let chart, candleSeries, volumeSeries, ma20Series, ma60Series;
         let radarObj, aiChartObj;
-        const GAS_URL = "___GOOGLE_URL___".trim().replace(/\s+/g, '');
+        
+        // ★ 已經為您填入您專屬的 GAS 網址！
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbx_QHl5C0L8OtWCFTkjv8YOImJOm9m41VaFWEhfjidIPemaca2-WsBFb1mYJj2WAJYI/exec";
 
         window.onload = () => {
             initKLine(); initVisuals();
@@ -298,7 +300,6 @@
         function executeAI_ScoringEngine(df, ticker, fundData) {
             logDiagnostic("開始執行 AI 評分引擎...");
             
-            // 獨立變數區，確保所有變數都存在
             let currentPrice=0, ma60=0, len=df.length, c=[], v=[];
             let techScore=50, smcScore=50, obvScore=50, theoryScore=50, chipScore=50, fundScore=50;
             let returns=[], sortedRets=[], var95=0, var99=0, cvar95=0, annVol=0, regime="Normal";
@@ -307,9 +308,6 @@
             let atr_proxy=0, stopLoss=0, target1=0, target2=0, rrValue=0, kellyPct=0;
             let fundResult = { tier: 'C', details: [] };
 
-            // ==========================================
-            // 防護艙 1：基礎數學運算
-            // ==========================================
             try {
                 c = df.map(x => x.close);
                 v = df.map(x => x.volume);
@@ -392,15 +390,12 @@
                 logDiagnostic("✅ 防護艙1: 數學運算成功完成");
             } catch(e) { logDiagnostic("❌ 防護艙1 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 2：首頁報告渲染
-            // ==========================================
             try {
                 let marketSpecificReport = ticker.includes('.') ? `\n  6. 🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : `\n  6. 🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}`;
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
 
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v87.0 COMPLETE（鈦合金全模組防護版）
+🎯 MJ 狙擊手 v88.0 COMPLETE（無腦直連真相大白版）
    基本面 × 宏觀過濾 × 確認K線 × 先行指標 × 雙層過濾 × 尾部風控
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
@@ -448,9 +443,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙2: 報告與雷達圖渲染成功");
             } catch(e) { logDiagnostic("❌ 防護艙2 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 3：K線標記去重處理 (解決圖表崩潰主因)
-            // ==========================================
             try {
                 let minPrice = Infinity, minIdx = -1, maxPrice = -Infinity, maxIdx = -1;
                 for(let i=Math.max(0, len-60); i<len; i++){
@@ -463,7 +455,6 @@ ${fundDetailStr}
                 if (isBullState) rawMarkers.push({ time: df[len-1].time, position: 'belowBar', color: '#f9d423', shape: 'arrowUp', text: 'Buy Signal' });
                 else rawMarkers.push({ time: df[len-1].time, position: 'aboveBar', color: '#a445b2', shape: 'arrowDown', text: 'Sell' });
                 
-                // 去除重複時間點的標記，避免圖表引擎致命崩潰
                 let uniqueMarkers = [];
                 let timeSet = new Set();
                 for(let m of rawMarkers) {
@@ -474,9 +465,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙3: K線安全標記渲染成功");
             } catch(e) { logDiagnostic("❌ 防護艙3 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 4：AI 預測圖表
-            // ==========================================
             try {
                 if(aiChartObj) {
                     const actual = c.slice(-5);
@@ -498,9 +486,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙4: AI 預測圖表渲染成功");
             } catch(e){ logDiagnostic("❌ 防護艙4 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 5：通用資料節點寫入 (絕對不當機)
-            // ==========================================
             try {
                 safeSet('risk-atr', atr_proxy.toFixed(2)); safeSet('risk-rr', `1 : ${rrValue}`); safeSet('risk-kelly', `${Math.max(0, kellyPct)}%`);
                 safeSet('risk-sl', stopLoss.toFixed(2)); safeSet('risk-targets', `${target1.toFixed(2)} / ${target2.toFixed(2)}`);
@@ -515,9 +500,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙5: 共通數據寫入成功");
             } catch(e) { logDiagnostic("❌ 防護艙5 崩潰: " + e.message); }
 
-            // ==========================================
-            // 防護艙 6：多空條件節點寫入
-            // ==========================================
             try {
                 if(isBullState) {
                     safeSet('macro-score', "3/3 🟢🟢 (強勢)", "val bull"); safeSet('macro-reasons', "✓ 站上基準 MA20 | ✓ 大盤上升趨勢 | ✓ 多頭排列");
@@ -570,8 +552,3 @@ ${fundDetailStr}
     </script>
 </body>
 </html>
-'@
-
-$htmlContent = $htmlContent -replace "___GOOGLE_URL___", $YOUR_GOOGLE_URL
-[System.IO.File]::WriteAllText($path, $htmlContent, [System.Text.Encoding]::UTF8)
-Write-Host "✅ MJ Sniper v87.0 鈦合金裝甲版生成！(附帶除錯按鈕)" -ForegroundColor Cyan
