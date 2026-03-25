@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v63.0 - CROSS-MARKET INTELLIGENCE</title>
+    <title>MJ SNIPER v63.1 - BUG FIXED & UI OPTIMIZED</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -40,8 +40,8 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v63.0</span></div>
-        <div style="display:flex; gap:8px;"><input type="text" id="top-tk" placeholder="2330.TW"><button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v63.1</span></div>
+        <div style="display:flex; gap:8px;"><input type="text" id="top-tk" placeholder="AAPL"><button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button></div>
     </header>
 
     <nav class="tab-nav">
@@ -58,13 +58,16 @@
 
     <div class="layout">
         <div id="tab-overview" class="tab-content active">
-            <div class="chart-box" style="height:320px; min-height:320px;"><div id="main-chart"></div></div>
             <div class="glass-card" style="border: 2px solid var(--gold);">
                 <h4>🏁 AI 戰略決策中心 (全維度分析報告)</h4>
                 <div id="decision-box" class="terminal-report">等待載入標的數據...請在上方輸入代碼。
 (支援台股 .TW / 港股 .HK / 陸股 .SS .SZ / 美股無後綴)</div>
             </div>
-            <div class="glass-card"><h4>7 因子共振雷達</h4><div style="height:180px; width:100%; display:flex; justify-content:center;"><canvas id="radarChart"></canvas></div></div>
+            <div class="glass-card">
+                <h4>7 因子共振雷達</h4>
+                <div style="height:180px; width:100%; display:flex; justify-content:center;"><canvas id="radarChart"></canvas></div>
+            </div>
+            <div class="chart-box" style="height:320px; min-height:320px;"><div id="main-chart"></div></div>
         </div>
 
         <div id="tab-macro" class="tab-content">
@@ -172,7 +175,7 @@
         }
 
         async function fireSniper() {
-            const tk = document.getElementById('top-tk').value || '2330.TW';
+            const tk = document.getElementById('top-tk').value || 'AAPL';
             try {
                 document.getElementById('decision-box').innerHTML = "<span class='hl-cyan'>[系統] 正在連接全球市場數據節點...</span>\n擷取多市場特徵與執行 AI 評分引擎中...";
                 const res = await fetch(`${GAS_URL}?tk=${tk.toUpperCase()}&interval=1d`);
@@ -195,11 +198,11 @@
                 const v = df.map(x => x.volume);
                 const currentPrice = c[len-1];
                 
-                // 判斷市場類型
-                const isTW = ticker.endsWith('.TW') || ticker.endswith('.TWO');
+                // --- 1. 修正 JS 語法錯誤 (endswith -> endsWith) ---
+                const isTW = ticker.endsWith('.TW') || ticker.endsWith('.TWO');
                 const isUS = !ticker.includes('.'); 
                 
-                // --- 1. 計算模組分數 ---
+                // --- 2. 計算模組分數 ---
                 let techScore = 50; const ma20 = c.slice(-20).reduce((a,b)=>a+b)/20; const ma60 = c.slice(-60).reduce((a,b)=>a+b)/60;
                 if (currentPrice > ma20) techScore += 20; else techScore -= 15; if (ma20 > ma60) techScore += 20; else techScore -= 10;
                 const delta = c[len-1] - c[len-2]; const rsi = delta > 0 ? 65 : 45; if (rsi > 50) techScore += 10; techScore = Math.max(0, Math.min(100, techScore));
@@ -218,7 +221,7 @@
                 const finalScore = (smcScore * 0.25) + (techScore * 0.20) + (obvScore * 0.20) + (chipScore * 0.20) + (theoryScore * 0.15);
                 const isBullState = finalScore >= 55;
 
-                // --- 2. 交易計畫 (SL, T1, T2, RR) ---
+                // --- 3. 交易計畫 (SL, T1, T2, RR) ---
                 const atr_proxy = currentPrice * 0.03; 
                 const stopLoss = (currentPrice - atr_proxy * 2).toFixed(2);
                 const sl_pct = (((stopLoss - currentPrice) / currentPrice) * 100).toFixed(1);
@@ -236,7 +239,7 @@
                 const dowText = isHigherLow ? "123法則：底墊高" : "趨勢不明";
                 const kText = isBullState ? "積極進場" : "嚴格等待";
 
-                // --- 3. 動態市場專屬報告 (美股期權 vs 台股借券) ---
+                // --- 4. 動態市場專屬報告 ---
                 let marketSpecificReport = "";
                 if (isUS) {
                     const optPcr = isBullState ? "0.65 (看多)" : "1.15 (看空)";
@@ -251,10 +254,10 @@
                 }
 
                 // ==========================================
-                // V63.0 核心：跨市場動態報告 (Terminal 風格)
+                // 終極實戰決策報告 UI (Terminal 風格)
                 // ==========================================
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v63.0 COMPLETE（技術分析綜合系統）
+🎯 MJ 狙擊手 v63.1 COMPLETE（技術分析綜合系統）
    宏觀過濾器 × 確認K線 × 五大先行指標 × 雙層過濾 × 機構級風控
    ⚠️  LSTM=ATR公式(無PyTorch) | 貝葉斯=Naïve Bayes評分融合 | 道氏威科夫=MA規則
 ==========================================================================================
@@ -302,7 +305,7 @@
                 if(radarObj) { radarObj.data.datasets[0].data = [70, 75, techScore, theoryScore, obvScore, 80, smcScore]; radarObj.update(); }
 
                 // ==========================================
-                // V61 既有模組資料同步填充 (保持其他分頁內容完整)
+                // 其他分頁資料填充 (UI 保持不變)
                 // ==========================================
                 if(isBullState) {
                     safeSet('macro-score', "3/3 🟢🟢 (強勢)", "val bull"); safeSet('macro-reasons', "✓ 站上基準 MA20 | ✓ 大盤上升趨勢 | ✓ 多頭排列");
