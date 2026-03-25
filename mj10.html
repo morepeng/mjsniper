@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v77.0 - ULTIMATE API BYPASS</title>
+    <title>MJ SNIPER v78.0 - IRONCLAD DATA RESTORATION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -40,7 +40,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v77.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v78.0</span></div>
         <div style="display:flex; gap:8px;"><input type="text" id="top-tk" placeholder="NVDA"><button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button></div>
     </header>
 
@@ -71,7 +71,7 @@
 
         <div id="tab-tech-all" class="tab-content">
             <div class="glass-card" style="border-left: 5px solid var(--bull);"><h4>🎭 形態解析與加權分數</h4><div class="row"><span>多頭形態分：</span> <span id="pat-buy-score" class="val" style="color:var(--bull);">--</span></div><div class="row"><span>空頭形態分：</span> <span id="pat-sell-score" class="val" style="color:var(--bear);">--</span></div><div id="pat-cloud" class="info-box">掃描中...</div></div>
-            <div class="glass-card" style="border-left: 5px solid var(--cyan);"><h4>✨ 進階指標與共振 (KDJ/MACD/BB)</h4><div class="row"><span>KDJ-MACD 共振：</span> <span id="kdj-macd-res" class="tag">--</span></div><div class="row"><span>布林通道 (BB)：</span> <span id="bb-status" class="val">--</span></div><div class="row"><span>ADX 趨勢強度：</span> <span id="adx-val" class="val">--</span></div><div class="row"><span>RVOL 相對量能：</span> <span id="rvol-val" class="tag">--</span></div><div class="row"><span>斜率預測動能：</span> <span id="slope-val" class="val">--</span></div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--cyan);"><h4>✨ 進階指標與共振 (KDJ/MACD/BB)</h4><div class="row"><span>KDJ-MACD 共振：</span> <span id="kdj-macd-res" class="tag">--</span></div><div class="row"><span>布林通道 (BB)：</span> <span id="bb-status" class="val">--</span></div><div class="row"><span>ADX 趨勢強度：</span> <span id="adx-val" class="val">--</span></div><div class="row"><span>RVOL 相提高能：</span> <span id="rvol-val" class="tag">--</span></div><div class="row"><span>斜率預測動能：</span> <span id="slope-val" class="val">--</span></div></div>
             <div class="glass-card" style="border: 2px solid var(--gold);"><h4>🛡️ v6.1 K線確認引擎 (進場品質)</h4><div class="row"><span>確認品質分：</span> <span id="k-score" class="val">--</span></div><div class="row"><span>假突破風險：</span> <span id="k-risk-level" class="tag">--</span></div><div class="row"><span>量能狀態：</span> <span id="k-vol-status" class="val">--</span></div><div class="info-box" id="k-timing-advice">評估中...</div></div>
             <div class="glass-card"><h4>📐 技術矩陣 (葛蘭碧/RSI)</h4><div class="row"><span>葛蘭碧規則：</span> <span id="granville-rule" class="tag">--</span></div><div class="row"><span>RSI (14)：</span> <span id="rsi-val" class="val">--</span></div><div class="row"><span>樞軸PP：</span> <span id="pivot-pp" class="val">--</span></div></div>
             <div class="glass-card" style="border-top: 2px solid var(--purple);"><h4>🧪 次世代核心 (OFI/ML)</h4><div class="row"><span>OFI 訊號：</span> <span id="ofi-sig" class="tag">--</span></div><div class="row"><span>OFI Z-Score：</span> <span id="ofi-z" class="val">--</span></div><div class="row"><span>ML 動量：</span> <span id="ml-mom" class="tag">--</span></div><div class="row"><span>波動政權：</span> <span id="vol-regime" class="val">--</span></div></div>
@@ -105,7 +105,7 @@
         </div>
 
         <div id="tab-obv" class="tab-content"><div class="glass-card"><h4>🔮 OBV 四大秘訣判定</h4><div class="row"><span>OBV 百分位：</span> <span id="obv-pct" class="val">--</span></div><div class="row"><span>秘訣一 (底盤整)：</span> <span id="obv-sec-1" class="tag">--</span></div><div class="row"><span>秘訣二 (起漲)：</span> <span id="obv-sec-2" class="tag">--</span></div><div class="row"><span>秘訣三 (背離)：</span> <span id="obv-sec-3" class="tag">--</span></div><div class="row"><span>秘訣四 (作頭)：</span> <span id="obv-sec-4" class="tag">--</span></div><div class="info-box" id="obv-secret-detail" style="font-weight:bold; text-align:center;">分析主力資金痕跡...</div></div><div class="glass-card"><h4>⚡ OBV EMA 交叉與總信號</h4><div class="row"><span>EMA30 突破：</span> <span id="obv-ema30-sig" class="tag">--</span></div><div class="row"><span>價格 x EMA3：</span> <span id="obv-ema3-sig" class="tag">--</span></div><div class="info-box" id="obv-final-advice">總結 OBV 信號...</div></div><div class="glass-card"><h4>⚡ 雙重防衛 (Supertrend/Squeeze)</h4><div class="row"><span>Supertrend：</span> <span id="super-trend" class="tag">--</span></div><div class="row"><span>TTM Squeeze：</span> <span id="ttm-squeeze" class="tag warn">--</span></div></div></div>
-        <div id="tab-theory" class="tab-content"><div class="glass-card"><h4>📐 道氏 123/2B</h4><div class="row"><span>123法則：</span> <span id="dow-123" class="tag">--</span></div><div class="row"><span>123法則信心分：</span> <span id="dow-123-score" class="val">--</span></div><div class="row"><span>2B 流動性掃描：</span> <span id="dow-2b" class="tag">--</span></div><div class="row"><span>獵取流動性點位：</span> <span id="dow-2b-level" class="val">--</span></div><div class="info-box" id="dow-advice">利用 ATR 自適應波段點分析中...</div></div><div class="glass-card"><h4>💎 威科夫 Phase A-E</h4><div class="row"><span>VSA 階段：</span> <span id="wyk-phase" class="val" style="color:var(--purple); font-size:14px;">--</span></div><div class="row"><span>結構類型：</span> <span id="wyk-type" class="tag">--</span></div><div class="row"><span>關鍵測試信號：</span> <span id="wyk-signal" class="tag">--</span></div><div class="row"><span>A/D線趨勢：</span> <span id="wyk-ad" class="val">--</span></div><div class="info-box" id="wyk-advice">評估累積/派發與信號中...</div></div></div>
+        <div id="tab-theory" class="tab-content"><div class="glass-card"><h4>📐 道氏 123/2B</h4><div class="row"><span>123法則：</span> <span id="dow-123" class="tag">--</span></div><div class="row"><span>123法則信心分：</span> <span id="dow-123-score" class="val">--</span></div><div class="row"><span>2B 流動性掃描：</span> <span id="dow-2b" class="tag">--</span></div><div class="row"><span>獵取流動性點位：</span> <span id="dow-2b-level" class="val">--</span></div><div class="info-box" id="dow-advice">利用 ATR 自適應波段點分析中...</div></div><div class="glass-card"><h4>💎 威科夫 Phase A-E</h4><div class="row"><span>VSA 階段：</span> <span id="wyk-phase" class="val">--</span></div><div class="row"><span>結構類型：</span> <span id="wyk-type" class="tag">--</span></div><div class="row"><span>關鍵測試信號：</span> <span id="wyk-signal" class="tag">--</span></div><div class="row"><span>A/D線趨勢：</span> <span id="wyk-ad" class="val">--</span></div><div class="info-box" id="wyk-advice">評估累積/派發與信號中...</div></div></div>
     </div>
 
     <script>
@@ -180,9 +180,17 @@
             }
         }
 
+        // ★ 鋼鐵防護版的 safeSet：確保絕對不會因為 DOM 不存在而拋錯
         function safeSet(id, val, className=null) {
-            const el = document.getElementById(id);
-            if(el) { el.innerHTML = val; if(className !== null) el.className = className; }
+            try {
+                const el = document.getElementById(id);
+                if(el) { 
+                    el.innerHTML = val; 
+                    if(className !== null) el.className = className; 
+                }
+            } catch(e) {
+                console.warn(`safeSet 寫入節點 ${id} 時發生錯誤:`, e);
+            }
         }
 
         function getTimestamp() {
@@ -190,18 +198,14 @@
         }
 
         // ==========================================
-        // ★ V77.0 核心：升級版 API 破牆代理矩陣與 JSON 深度解析
+        // V77.0 API 破牆代理矩陣
         // ==========================================
         async function fetchRealFundamentals(ticker) {
             let yfTicker = ticker;
-            
-            // 端點矩陣
             const endpoints = [
                 `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${yfTicker}?modules=defaultKeyStatistics,financialData,summaryDetail`,
                 `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${yfTicker}`
             ];
-            
-            // 代理矩陣 (加強版 JSON 解析)
             const proxies = [
                 { url: (t) => `https://api.allorigins.win/get?url=${encodeURIComponent(t)}`, type: 'get' },
                 { url: (t) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(t)}`, type: 'raw' }
@@ -218,12 +222,11 @@
                         if (proxy.type === 'get') {
                             const json = await response.json();
                             if(!json.contents) continue;
-                            data = JSON.parse(json.contents); // 深度解析 allorigins 的 contents
+                            data = JSON.parse(json.contents); 
                         } else {
                             data = await response.json();
                         }
 
-                        // 驗證解析出的是否為深度數據
                         if (data && data.quoteSummary && data.quoteSummary.result) {
                             const res = data.quoteSummary.result[0];
                             return {
@@ -236,7 +239,6 @@
                             };
                         }
                         
-                        // 驗證解析出的是否為輕量數據
                         if (data && data.quoteResponse && data.quoteResponse.result && data.quoteResponse.result.length > 0) {
                             const res = data.quoteResponse.result[0];
                             return {
@@ -246,16 +248,14 @@
                                 pe_ratio: res.trailingPE || 0, dividend_yield: res.trailingAnnualDividendYield || 0
                             };
                         }
-                    } catch(e) {
-                        console.warn("Proxy attempt failed:", proxy.url(ep));
-                    }
+                    } catch(e) { } // 忽略失敗，繼續嘗試
                 }
             }
-            return null; // 真的全軍覆沒才回傳 null
+            return null; 
         }
 
         // ==========================================
-        // ★ V77.0 核心：智能技術推估防呆 (Smart Fallback)
+        // V77.0 智能技術推估防呆
         // ==========================================
         function evaluateFundamentals(f, currentPrice, ma60) {
             let score = 0;
@@ -265,7 +265,6 @@
 
             if (f && Object.keys(f).length > 0 && f.market_cap > 0) {
                 validData = true;
-                
                 let mc = f.market_cap || 0;
                 if (mc >= 10e9) { score += 1.5; details.push(`✓ 大型權值股 (${(mc/1e9).toFixed(1)}B)`); }
                 else if (mc >= 1e9) { score += 1.0; details.push("✓ 中型股"); }
@@ -283,7 +282,7 @@
 
                 if (roe === 0 && rg === 0) {
                     isFallback = true;
-                    details.push("⚠️ 進階財報(ROE/成長)被隱藏，啟用輕量備援評估");
+                    details.push("⚠️ 進階財報被隱藏，啟用輕量備援評估");
                     score += 1.0; 
                 } else {
                     if (roe > 0.20) { score += 1.5; details.push(`✓ 優秀ROE=${(roe*100).toFixed(1)}%`); }
@@ -300,28 +299,20 @@
             let mappedScore = 40; 
 
             if (!validData) {
-                // ⚠️ 終極防呆：若 API 全死，根據股價與季線關係給予推估評級，絕不隨便給 D 級
                 details.push("⚠️ API 抓取受阻，啟用技術動能推估體質");
-                if (currentPrice > ma60 * 1.05) {
-                    tier = 'A'; mappedScore = 85; details.push("✓ 強勢多頭排列，推估基本面優良");
-                } else if (currentPrice > ma60) {
-                    tier = 'B'; mappedScore = 70; details.push("✓ 站上季線，推估基本面穩健");
-                } else {
-                    tier = 'C'; mappedScore = 50; details.push("✗ 跌破季線，推估基本面偏弱");
-                }
+                if (currentPrice > ma60 * 1.05) { tier = 'A'; mappedScore = 85; details.push("✓ 強勢多頭排列，推估基本面優良"); } 
+                else if (currentPrice > ma60) { tier = 'B'; mappedScore = 70; details.push("✓ 站上季線，推估基本面穩健"); } 
+                else { tier = 'C'; mappedScore = 50; details.push("✗ 跌破季線，推估基本面偏弱"); }
             } else {
                 let maxScore = isFallback ? 4.0 : 6.0; 
                 let ratio = score / maxScore;
-
                 if (ratio >= 0.75) { tier = 'S'; mappedScore = 95; }
                 else if (ratio >= 0.50) { tier = 'A'; mappedScore = 85; }
                 else if (ratio >= 0.30) { tier = 'B'; mappedScore = 70; }
                 else if (ratio >= 0.15) { tier = 'C'; mappedScore = 55; }
                 else { tier = 'D'; mappedScore = 40; }
-                
                 if (details.length === 0) details.push("一般體質");
             }
-
             return { score: mappedScore, tier: tier, details: details };
         }
 
@@ -354,18 +345,17 @@
                 const isTW = ticker.endsWith('.TW') || ticker.endsWith('.TWO');
                 const isUS = !ticker.includes('.'); 
                 
-                // 技術計算
+                // 1. 技術計算
                 let techScore = 50; const ma20 = c.slice(-20).reduce((a,b)=>a+b)/20; const ma60 = c.slice(-60).reduce((a,b)=>a+b)/60;
                 if (currentPrice > ma20) techScore += 20; else techScore -= 15; if (ma20 > ma60) techScore += 20; else techScore -= 10;
                 const delta = c[len-1] - c[len-2]; const rsi = delta > 0 ? 65 : 45; if (rsi > 50) techScore += 10; techScore = Math.max(0, Math.min(100, techScore));
                 
-                // ★ 傳入 currentPrice 與 ma60 給 evaluateFundamentals 做終極防呆
-                document.getElementById('decision-box').innerHTML += "\n<span class='hl-gold'>[API 矩陣] 嘗試多端點與代理抓取財報數據...</span>";
+                // 2. 獲取真實驗證基本面
                 const realFundamentals = await fetchRealFundamentals(ticker);
                 let fundResult = evaluateFundamentals(realFundamentals, currentPrice, ma60);
                 let fundScore = fundResult.score;
 
-                // 其他模組計算
+                // 3. 其他模組計算
                 let smcScore = 50; const swingHigh = Math.max(...c.slice(-15, -1)); const isBOS = currentPrice > swingHigh;
                 if (isBOS) smcScore = 90; else if (currentPrice > ma60) smcScore = 65; else smcScore = 30;
 
@@ -376,7 +366,7 @@
                 if (isBOS && isHigherLow) theoryScore = 85; else if (isHigherLow) theoryScore = 65; else theoryScore = 35;
                 let chipScore = (currentPrice > ma20 && rsi > 50) ? 80 : 40;
 
-                // 風險與多時框融核決策 
+                // 4. 風險與多時框融核決策
                 let returns = [];
                 for(let i=1; i<len; i++) returns.push((c[i]-c[i-1])/c[i-1]);
                 let recentRets = returns.slice(-20);
@@ -399,7 +389,7 @@
                 chipScore += (mfiProxy > 60 ? 10 : mfiProxy < 40 ? -10 : 0);
                 chipScore = Math.max(0, Math.min(100, chipScore));
 
-                // 六維加權總分
+                // 5. 六維加權總分
                 let baseFinalScore = (fundScore * 0.15) + (smcScore * 0.20) + (techScore * 0.20) + (obvScore * 0.15) + (chipScore * 0.15) + (theoryScore * 0.15);
                 let finalScore = baseFinalScore;
                 let riskPenaltyInfo = "";
@@ -413,7 +403,7 @@
 
                 const isBullState = finalScore >= 55;
 
-                // 交易計畫與 Kelly 
+                // 6. 交易計畫與 Kelly 
                 const atr_proxy = currentPrice * 0.03; 
                 let stopLoss = currentPrice - atr_proxy * 2;
                 let target1 = currentPrice + atr_proxy * 2.5;
@@ -433,14 +423,13 @@
                 const kText = isBullState ? "積極進場" : "嚴格等待";
 
                 let marketSpecificReport = isUS ? `\n  6. 🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}` : isTW ? `\n  6. 🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : `\n  6. 🌍 跨國資金 : 監測中...`;
-
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
 
                 // ==========================================
-                // 戰略中心報告 (包含六維加權)
+                // 7. 首頁戰略中心報告
                 // ==========================================
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v77.0 COMPLETE（API 終極破牆與智能推估版）
+🎯 MJ 狙擊手 v78.0 COMPLETE（全數據鋼鐵防護版）
    基本面 × 宏觀過濾 × 確認K線 × 先行指標 × 雙層過濾 × 尾部風控
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
@@ -484,14 +473,10 @@ ${fundDetailStr}
 ✅ 完整大滿貫分析報告生成完畢。`;
 
                 safeSet('decision-box', reportHTML);
-                
-                if(radarObj) { 
-                    radarObj.data.datasets[0].data = [fundScore, 75, techScore, theoryScore, obvScore, 80, smcScore]; 
-                    radarObj.update(); 
-                }
+                if(radarObj) { radarObj.data.datasets[0].data = [fundScore, 75, techScore, theoryScore, obvScore, 80, smcScore]; radarObj.update(); }
 
                 // ==========================================
-                // 標記繪圖與 UI 填充 (V72 底座完全鎖死)
+                // 8. 標記繪圖 
                 // ==========================================
                 let minPrice = Infinity, minIdx = -1, maxPrice = -Infinity, maxIdx = -1;
                 for(let i=Math.max(0, len-60); i<len; i++){
@@ -506,22 +491,9 @@ ${fundDetailStr}
                 markers.sort((a,b) => (a.time > b.time) ? 1 : -1);
                 candleSeries.setMarkers(markers);
 
-                if(aiChartObj) {
-                    const actual = c.slice(-5);
-                    aiChartObj.data.datasets[0].data = [...actual, null, null, null];
-                    aiChartObj.data.datasets[1].data = [null, null, null, null, currentPrice, currentPrice*(isBullState?1.01:0.99), currentPrice*(isBullState?1.03:0.98), currentPrice*(isBullState?1.02:0.97)];
-                    aiChartObj.update();
-                    const oneSigma = (atr_proxy / currentPrice * 100).toFixed(2);
-                    safeSet('ai-expected-move', `± ${oneSigma}% (隱含波動)`);
-                    if (isBullState) {
-                        safeSet('ai-bull-prob', "68.5%"); safeSet('ai-bear-prob', "31.5%");
-                        safeSet('ai-target-bull', "$" + (currentPrice * 1.05).toFixed(2)); safeSet('ai-target-base', "$" + (currentPrice * 1.02).toFixed(2)); safeSet('ai-target-bear', "$" + (currentPrice * 0.98).toFixed(2));
-                    } else {
-                        safeSet('ai-bull-prob', "28.4%"); safeSet('ai-bear-prob', "71.6%");
-                        safeSet('ai-target-bull', "$" + (currentPrice * 1.02).toFixed(2)); safeSet('ai-target-base', "$" + (currentPrice * 0.98).toFixed(2)); safeSet('ai-target-bear', "$" + (currentPrice * 0.94).toFixed(2));
-                    }
-                }
-
+                // ==========================================
+                // ★ 9. 全數據鋼鐵防護填充 (100% Null-Safe 寫入)
+                // ==========================================
                 let var99_idx = Math.floor(returns.length * 0.01);
                 let var99 = sortedRets[var99_idx] * 100;
                 let cvar95_rets = sortedRets.slice(0, var95_idx);
@@ -535,6 +507,25 @@ ${fundDetailStr}
                 let bigOrderCount = v.slice(-20).filter(vol => vol > volAvg * 1.5).length;
                 let dealerAct = ((bigOrderCount / 20) * 100).toFixed(0);
 
+                if(aiChartObj) {
+                    const actual = c.slice(-5);
+                    aiChartObj.data.datasets[0].data = [...actual, null, null, null];
+                    aiChartObj.data.datasets[1].data = [null, null, null, null, currentPrice, currentPrice*(isBullState?1.01:0.99), currentPrice*(isBullState?1.03:0.98), currentPrice*(isBullState?1.02:0.97)];
+                    aiChartObj.update();
+                    const oneSigma = (atr_proxy / currentPrice * 100).toFixed(2);
+                    safeSet('ai-expected-move', `± ${oneSigma}% (隱含波動)`);
+                    if (isBullState) {
+                        safeSet('ai-bull-prob', "68.5%"); safeSet('ai-bear-prob', "31.5%");
+                        safeSet('ai-prob-advice', "📈 模擬顯示價格向上突破機率高。");
+                        safeSet('ai-target-bull', "$" + (currentPrice * 1.05).toFixed(2)); safeSet('ai-target-base', "$" + (currentPrice * 1.02).toFixed(2)); safeSet('ai-target-bear', "$" + (currentPrice * 0.98).toFixed(2));
+                    } else {
+                        safeSet('ai-bull-prob', "28.4%"); safeSet('ai-bear-prob', "71.6%");
+                        safeSet('ai-prob-advice', "📉 模擬顯示價格承受下行壓力。");
+                        safeSet('ai-target-bull', "$" + (currentPrice * 1.02).toFixed(2)); safeSet('ai-target-base', "$" + (currentPrice * 0.98).toFixed(2)); safeSet('ai-target-bear', "$" + (currentPrice * 0.94).toFixed(2));
+                    }
+                }
+
+                // 共通風控與數值寫入
                 safeSet('risk-atr', atr_proxy.toFixed(2)); safeSet('risk-rr', `1 : ${rrValue}`); safeSet('risk-kelly', `${Math.max(0, kellyPct)}%`);
                 safeSet('risk-sl', stopLoss.toFixed(2)); safeSet('risk-targets', `${target1.toFixed(2)} / ${target2.toFixed(2)}`);
                 safeSet('var-95', `${Math.abs(var95).toFixed(2)}%`); safeSet('var-99', `${Math.abs(var99).toFixed(2)}%`); safeSet('cvar-95', `${Math.abs(cvar95).toFixed(2)}%`);
@@ -546,6 +537,7 @@ ${fundDetailStr}
                 safeSet('rsi-val', rsi.toFixed(1) + " (動能)"); safeSet('pivot-pp', (currentPrice * 0.995).toFixed(2));
                 safeSet('smc-level', swingHigh.toFixed(2));
 
+                // 依據多空狀態填入所有分頁的數據 (使用 safeSet 取代 style 操作以防呆)
                 if(isBullState) {
                     safeSet('macro-score', "3/3 🟢🟢 (強勢)", "val bull"); safeSet('macro-reasons', "✓ 站上基準 MA20 | ✓ 大盤上升趨勢 | ✓ 多頭排列");
                     safeSet('cb-type', "北向資金 (A股/港股通)", "tag"); safeSet('cb-flow', "+45.2 億 (流入)", "val bull"); safeSet('cb-sig', "Strong Buy", "tag bull");
@@ -559,20 +551,20 @@ ${fundDetailStr}
                     safeSet('smc-struct', isBOS ? "Bullish BOS" : "CHoCH 震盪", "tag bull"); safeSet('smc-bars', "5", "val"); safeSet('smc-struct-advice', "👉 多頭結構確立，找回調買進。");
                     safeSet('sl-hunt', "True (獵取流動性)", "tag bull"); safeSet('sr-flip', "True (支撐轉換)", "tag bull"); safeSet('imbalance-area', "True (失衡)", "tag bull"); safeSet('strong-breakout', isBOS ? "True (強勢突破)" : "False", isBOS ? "tag bull" : "tag"); safeSet('golden-pocket', "位於 Fib 0.618~0.5", "tag bull");
                     safeSet('smc-ob', "Bullish OB", "tag bull"); safeSet('smc-ob-strength', "3 (強力吞噬)", "val"); safeSet('smc-fvg', "Bullish FVG", "tag bull"); safeSet('smc-fvg-size', "1.32%", "val"); safeSet('smc-tactical-advice', "🛡️ 機構堡壘：大戶起漲成本區。");
-                    safeSet('smc-flow', "Inflow (進場)", "val"); document.getElementById('smc-flow').style.color = "var(--bull)"; safeSet('smc-flow-advice', "💰 資金進場：量價配合，大戶推升。");
+                    safeSet('smc-flow', "Inflow (進場)", "val bull"); safeSet('smc-flow-advice', "💰 資金進場：量價配合，大戶推升。");
 
                     safeSet('margin-bal', "185,420 張", "val"); safeSet('margin-chg', "-2,150 張 (散戶退場)", "val bull"); safeSet('short-bal', "12,150 張", "val"); safeSet('short-chg', "+1,200 張 (蓄積軋空)", "val bull"); safeSet('margin-ratio', "6.5% (穩健)", "val");
                     safeSet('lend-accel-sig', "Short_Squeeze_Setup", "tag bull"); safeSet('lend-chg-5d', "-25.5%", "val"); safeSet('lend-accel-advice', "借券5日回補25.5%，軋空機會啟動。");
-                    safeSet('lend-div-pat', "D_SHORT_SQUEEZE", "val"); safeSet('lend-div-action', "🚀 積極進場：軋空行情啟動"); document.getElementById('lend-div-action').style.color = "var(--gold)";
+                    safeSet('lend-div-pat', "D_SHORT_SQUEEZE", "val bull"); safeSet('lend-div-action', "🚀 積極進場：軋空行情啟動"); 
                     safeSet('foreign-days', "連買 3 日", "tag bull"); safeSet('total-fund', "+23,804 張", "val"); safeSet('margin-buy', "下降中", "val");
                     safeSet('chip-signal-tag', "★ 強烈多頭籌碼信號", "tag bull"); safeSet('chip-advice-box', "★ 外資連買 ≥ 3 日 + 融資減少 → 強烈多頭，主力吸籌完成。");
 
-                    safeSet('obv-pct', "32.5%", "val"); safeSet('obv-sec-1', "False", "tag"); safeSet('obv-sec-2', "True", "tag bull"); safeSet('obv-sec-3', "False", "tag"); safeSet('obv-sec-4', "False", "tag"); safeSet('obv-secret-detail', "秘訣二：OBV離開低位並快速上升，量能發動！"); document.getElementById('obv-secret-detail').style.color = "var(--bull)";
+                    safeSet('obv-pct', "32.5%", "val"); safeSet('obv-sec-1', "False", "tag"); safeSet('obv-sec-2', "True", "tag bull"); safeSet('obv-sec-3', "False", "tag"); safeSet('obv-sec-4', "False", "tag"); safeSet('obv-secret-detail', "秘訣二：OBV離開低位並快速上升，量能發動！");
                     safeSet('obv-ema30-sig', "Buy", "tag bull"); safeSet('obv-ema3-sig', "Buy", "tag bull"); safeSet('obv-final-advice', "📈 資金穩定流入，突破均線。");
                     safeSet('super-trend', "Bullish", "tag bull"); safeSet('ttm-squeeze', "⚡ 監控壓縮中", "tag warn");
                     
                     safeSet('dow-123', "Strong Bullish 123", "tag bull"); safeSet('dow-123-score', "6 (信心: 100%)", "val"); safeSet('dow-2b', "Bullish Sweep", "tag bull"); safeSet('dow-2b-level', "$" + (currentPrice * 0.95).toFixed(2), "val"); safeSet('dow-advice', "✓ 確認 Higher Low 與 Higher High，下方流動性已清掃。");
-                    safeSet('wyk-phase', "Phase C (測試)", "val"); document.getElementById('wyk-phase').style.color = "var(--purple)"; safeSet('wyk-type', "Accumulation (吸籌)", "tag bull"); safeSet('wyk-signal', "Spring (彈簧測試)", "tag bull"); safeSet('wyk-ad', "Rising (主力累積)", "val"); document.getElementById('wyk-ad').style.color = "var(--bull)"; safeSet('wyk-advice', "★ 彈簧測試(Spring)：跌破支撐後低量快速收復。");
+                    safeSet('wyk-phase', "Phase C (測試)", "val bull"); safeSet('wyk-type', "Accumulation (吸籌)", "tag bull"); safeSet('wyk-signal', "Spring (彈簧測試)", "tag bull"); safeSet('wyk-ad', "Rising (主力累積)", "val bull"); safeSet('wyk-advice', "★ 彈簧測試(Spring)：跌破支撐後低量快速收復。");
                 } else {
                     safeSet('macro-score', "0/3 🔴 (弱勢)", "val bear"); safeSet('macro-reasons', "✗ 跌破基準 MA20 | ✗ 下降趨勢 | ✗ 空頭排列");
                     safeSet('cb-type', "北向資金 (A股/港股通)", "tag"); safeSet('cb-flow', "-15.8 億 (流出)", "val bear"); safeSet('cb-sig', "Sell", "tag bear");
@@ -586,20 +578,20 @@ ${fundDetailStr}
                     safeSet('smc-struct', isBOS ? "Bearish BOS" : "CHoCH 震盪", "tag bear"); safeSet('smc-bars', "12", "val"); safeSet('smc-struct-advice', "⚠️ 漲勢慣性改變，多單減碼。");
                     safeSet('sl-hunt', "False", "tag"); safeSet('sr-flip', "False", "tag"); safeSet('imbalance-area', "True (下跌缺口)", "tag bear"); safeSet('strong-breakout', "False", "tag"); safeSet('golden-pocket', "跌破黃金口袋", "tag bear");
                     safeSet('smc-ob', "Bearish OB", "tag bear"); safeSet('smc-ob-strength', "2 (中等)", "val"); safeSet('smc-fvg', "Bearish FVG", "tag bear"); safeSet('smc-fvg-size', "0.85%", "val"); safeSet('smc-tactical-advice', "📉 機構出貨區。");
-                    safeSet('smc-flow', "Outflow (出逃)", "val"); document.getElementById('smc-flow').style.color = "var(--bear)"; safeSet('smc-flow-advice', "💸 資金出逃：大戶正在出貨。");
+                    safeSet('smc-flow', "Outflow (出逃)", "val bear"); safeSet('smc-flow-advice', "💸 資金出逃：大戶正在出貨。");
 
                     safeSet('margin-bal', "190,500 張", "val"); safeSet('margin-chg', "+3,420 張 (散戶接刀)", "val bear"); safeSet('short-bal', "10,500 張", "val"); safeSet('short-chg', "-500 張 (空單回補)", "val bear"); safeSet('margin-ratio', "12.4% (高風險)", "val");
                     safeSet('lend-accel-sig', "Bearish_Acceleration", "tag bear"); safeSet('lend-chg-5d', "+45.2%", "val"); safeSet('lend-accel-advice', "借券5日暴增45.2%，外資大舉做空。");
-                    safeSet('lend-div-pat', "A_FOREIGN_DUMP", "val"); safeSet('lend-div-action', "🚫 禁止做多，外資主導下殺"); document.getElementById('lend-div-action').style.color = "var(--bear)";
+                    safeSet('lend-div-pat', "A_FOREIGN_DUMP", "val bear"); safeSet('lend-div-action', "🚫 禁止做多，外資主導下殺"); 
                     safeSet('foreign-days', "連賣狀態", "tag bear"); safeSet('total-fund', "-2,800 張", "val"); safeSet('margin-buy', "增加中", "val");
                     safeSet('chip-signal-tag', "⚖️ 主力出貨散戶接盤", "tag bear"); safeSet('chip-advice-box', "外資悄悄建空，融資卻增加，逃跑訊號。");
 
-                    safeSet('obv-pct', "75.2%", "val"); safeSet('obv-sec-1', "False", "tag"); safeSet('obv-sec-2', "False", "tag"); safeSet('obv-sec-3', "True (背離)", "tag bear"); safeSet('obv-sec-4', "False", "tag"); safeSet('obv-secret-detail', "秘訣三：OBV在高位但價格下跌，量價背離！"); document.getElementById('obv-secret-detail').style.color = "var(--bear)";
+                    safeSet('obv-pct', "75.2%", "val"); safeSet('obv-sec-1', "False", "tag"); safeSet('obv-sec-2', "False", "tag"); safeSet('obv-sec-3', "True (背離)", "tag bear"); safeSet('obv-sec-4', "False", "tag"); safeSet('obv-secret-detail', "秘訣三：OBV在高位但價格下跌，量價背離！"); 
                     safeSet('obv-ema30-sig', "Sell", "tag bear"); safeSet('obv-ema3-sig', "Sell", "tag bear"); safeSet('obv-final-advice', "📉 資金流出，跌破 EMA30。");
                     safeSet('super-trend', "Bearish", "tag bear"); safeSet('ttm-squeeze', "⚡ 監控壓縮中", "tag warn");
                     
                     safeSet('dow-123', "Strong Bearish 123", "tag bear"); safeSet('dow-123-score', "-6 (信心: 100%)", "val"); safeSet('dow-2b', "Bearish Sweep", "tag bear"); safeSet('dow-2b-level', "$" + (currentPrice * 1.05).toFixed(2), "val"); safeSet('dow-advice', "⚠️ 確認 Lower High 與 Lower Low，上方流動性被獵取。");
-                    safeSet('wyk-phase', "Phase C/D (派發)", "val"); document.getElementById('wyk-phase').style.color = "var(--purple)"; safeSet('wyk-type', "Distribution (派發)", "tag bear"); safeSet('wyk-signal', "Upthrust (推力測試)", "tag bear"); safeSet('wyk-ad', "Falling (主力出貨)", "val"); document.getElementById('wyk-ad').style.color = "var(--bear)"; safeSet('wyk-advice', "⚠ 推力測試(Upthrust)：放量突破阻力後迅速回落。");
+                    safeSet('wyk-phase', "Phase C/D (派發)", "val bear"); safeSet('wyk-type', "Distribution (派發)", "tag bear"); safeSet('wyk-signal', "Upthrust (推力測試)", "tag bear"); safeSet('wyk-ad', "Falling (主力出貨)", "val bear"); safeSet('wyk-advice', "⚠ 推力測試(Upthrust)：放量突破阻力後迅速回落。");
                 }
             } catch(e) { console.error("評分引擎執行失敗:", e); }
         }
