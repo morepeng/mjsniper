@@ -122,6 +122,7 @@
     </div>
 
     <script>
+        // 系統診斷記錄器
         window.systemDiagnostics = [];
         function logDiagnostic(msg) {
             window.systemDiagnostics.push(msg);
@@ -136,8 +137,8 @@
 
         let chart, candleSeries, volumeSeries, ma20Series, ma60Series, radarObj, aiChartObj;
         
-        // 絕對鎖死 GAS_URL 
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbx_QHl5C0L8OtWCFTkjv8YOImJOm9m41VaFWEhfjidIPemaca2-WsBFb1mYJj2WAJYI/exec";
+        // ★ 已經為您綁定好最新的「通行證破解版」GAS 網址！
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzP3rZ_wBBkC2d1hQyZblr5aiKwsUy07PtvCTCD0oVY1Uxyog5mCN8-UWSYkpX6du8/exec";
 
         window.onload = () => {
             initKLine(); initVisuals();
@@ -329,7 +330,7 @@
                 fundResult = evaluateFundamentals(fundData, currentPrice, ma60);
                 fundScore = fundResult.score;
 
-                // ★ 新增：隱含估值計算 (利用 EPS 粗估)
+                // 隱含估值計算 (利用 EPS 粗估)
                 if (fundData.trailing_eps && fundData.trailing_eps > 0) {
                     estVal = fundData.trailing_eps * (8.5 + 2 * 15); // 葛蘭姆成長公式代理 (預設15%成長)
                     valStatus = currentPrice < estVal ? "🟢 目前價位低於隱含價值 (被低估)" : "🔴 目前價位高於隱含價值 (被高估)";
