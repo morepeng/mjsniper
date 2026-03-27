@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v98.0 - ICT/SMC DATA FILLED EDITION</title>
+    <title>MJ SNIPER v99.0 - MORNING CONFIRMATION EDITION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -41,7 +41,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v98.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v99.0</span></div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="NVDA">
             <button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button>
@@ -51,6 +51,7 @@
 
     <nav class="tab-nav">
         <button class="tab-btn active" onclick="showTab('tab-overview', this)">📊 戰略決策</button>
+        <button class="tab-btn" onclick="showTab('tab-morning', this)">🌅 早盤確認</button>
         <button class="tab-btn" onclick="showTab('tab-macro', this)">🌍 宏觀衍生品</button>
         <button class="tab-btn" onclick="showTab('tab-tech-all', this)">📈 技術大滿貫</button>
         <button class="tab-btn" onclick="showTab('tab-smc', this)">🏦 SMC 滿血版</button>
@@ -78,6 +79,37 @@
 
             <div class="glass-card"><h4>9 因子綜合共振雷達</h4><div style="height:150px; width:100%; display:flex; justify-content:center;"><canvas id="radarChart"></canvas></div></div>
             <div class="chart-box" style="height:350px; min-height:350px;"><div id="main-chart"></div></div>
+        </div>
+
+        <div id="tab-morning" class="tab-content">
+            <div class="glass-card" style="border: 2px solid #00f2fe;">
+                <h4>🌅 隔日早盤進場確認掃描</h4>
+                <div class="info-box">
+                    針對昨日出現信號的候選股，判斷今日開盤行為是否滿足進場條件。全部通過才建議重倉。
+                </div>
+                <div class="row" style="margin-top:10px;"><span>A. 開盤不破位 (>昨收*0.995)：</span> <span id="m-cond-a" class="tag">--</span></div>
+                <div class="row"><span>B. 日量能維持 (>均量90%)：</span> <span id="m-cond-b" class="tag">--</span></div>
+                <div class="row"><span>C. 突破昨高 (>昨高*1.001)：</span> <span id="m-cond-c" class="tag">--</span></div>
+                <div class="row"><span>D. RSI 動能偏多 (>50)：</span> <span id="m-cond-d" class="tag">--</span></div>
+                <div class="row"><span>E. 無假突破 (上影線不過長)：</span> <span id="m-cond-e" class="tag">--</span></div>
+                <div class="row" style="margin-top:10px; border-top:1px solid var(--border); padding-top:5px;">
+                    <span>通過條件數：</span> <span id="m-pass-count" class="val" style="font-size:14px;">--/5</span>
+                </div>
+                <div class="row"><span>建議操作：</span> <span id="m-action" class="val">--</span></div>
+                <div class="row"><span>建議首批倉位：</span> <span id="m-size" class="val">--</span></div>
+            </div>
+            <div class="glass-card" style="border-left: 5px solid var(--gold);">
+                <h4>🎯 進場區間與防守設定</h4>
+                <div class="row"><span>建議進場區間：</span> <span id="m-entry-range" class="val">--</span></div>
+                <div class="row"><span>嚴格停損 (SL)：</span> <span id="m-sl" class="val bear">--</span></div>
+                <div class="row"><span>第一目標 (T1)：</span> <span id="m-t1" class="val bull">--</span></div>
+                <div class="info-box">
+                    【進場後操作流程】<br>
+                    1. 首批進場後立刻設定停損單（GTC）。<br>
+                    2. 到達T1後：賣出50%獲利了結，剩餘部位停損上移至成本。<br>
+                    3. 若進場後當日跌破停損 → 立即出場，不等明日。
+                </div>
+            </div>
         </div>
 
         <div id="tab-macro" class="tab-content">
@@ -134,6 +166,7 @@
     </div>
 
     <script>
+        // 系統診斷記錄器
         window.systemDiagnostics = [];
         function logDiagnostic(msg) {
             window.systemDiagnostics.push(msg);
@@ -148,7 +181,7 @@
 
         let chart, candleSeries, volumeSeries, ma20Series, ma60Series, radarObj, aiChartObj;
         
-        // ★ 專屬 GAS 網址
+        // ★ 您的專屬 GAS 網址 (完整保留)
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzP3rZ_wBBkC2d1hQyZblr5aiKwsUy07PtvCTCD0oVY1Uxyog5mCN8-UWSYkpX6du8/exec";
 
         window.onload = () => {
@@ -329,13 +362,16 @@
             let mtfScoreCount = 0, ma20 = 0, kPatternScore = 50; 
             let isBOS = false;
 
-            // SMC 動態陣列
             let tr = [], atr = [], fvg = [], ob_val = [], bos_arr = [], choch_arr = [], po3_arr = [], ote_zone = [];
             let fvg_val_display = "--", ob_val_display = "--", ote_text = "未進入 OTE 區間";
             let last_fvg = 0, last_ob = 0;
             let recent_bos = false, recent_choch = false;
             let bars_since_break = 0;
             let fvgSize = "--";
+
+            // ★ V99.0 早盤確認變數
+            let m_cond_A = false, m_cond_B = false, m_cond_C = false, m_cond_D = false, m_cond_E = false;
+            let m_passCount = 0, m_action = "--", m_size = "--";
 
             // 防護艙 1：ICT/SMC 動態引擎
             try {
@@ -426,7 +462,6 @@
                     }
                 }
 
-                // ★ V98.0 關鍵修復：回溯掃描最新的 FVG 與 OB，而不是只看最後一根
                 for(let i=len-1; i>=Math.max(0, len-30); i--) {
                     if(last_fvg === 0 && fvg[i] !== 0) last_fvg = fvg[i];
                     if(last_ob === 0 && ob_val[i] !== 0) last_ob = ob_val[i];
@@ -438,7 +473,6 @@
                 if (last_ob > 0) { ob_val_display = "Bull OB ($" + last_ob.toFixed(2) + ")"; }
                 else if (last_ob < 0) { ob_val_display = "Bear OB ($" + Math.abs(last_ob).toFixed(2) + ")"; }
 
-                // ★ V98.0 關鍵修復：近期結構掃描 (BOS 與 CHoCH 同時顯示)
                 for(let i=len-1; i>=Math.max(0, len-10); i--) {
                     if (bos_arr[i]) { recent_bos = true; if(bars_since_break===0) bars_since_break = len-1-i; }
                     if (choch_arr[i]) { recent_choch = true; if(bars_since_break===0) bars_since_break = len-1-i; }
@@ -552,7 +586,7 @@
                 kPatternScore = Math.max(0, Math.min(100, kPatternScore));
 
                 let volTrend = v[len-1] > (v.slice(-5).reduce((a,b)=>a+b)/5);
-                if (currentPrice > c[len-2] && volTrend) obvScore = 85; else if (currentPrice < c[len-2] && volTrend) obvScore = 20; else obvScore = 60;
+                if (currentPrice > c[len-2] && volTrend) obvScore = 85; else if (currentPrice < c[len-2] && volTrend) obvScore = 20; else obScore = 60;
 
                 let isHigherLow = Math.min(...c.slice(-5)) > Math.min(...c.slice(-15, -5));
                 if (isBOS && isHigherLow) theoryScore = 85; else if (isHigherLow) theoryScore = 65; else theoryScore = 35;
@@ -614,7 +648,37 @@
                 wykText = isBOS ? "Phase D/E (上漲)" : "Phase A/B (區間)";
                 dowText = isHigherLow ? "123法則：底墊高" : "趨勢不明"; adText = isBullState ? "Rising (主力累積)" : "Falling (主力出貨)"; 
 
-                logDiagnostic("✅ 防護艙1-B: 其餘指標運算成功完成");
+                // ★ V99.0 早盤確認運算
+                let prevCandle = df[len-2];
+                let currCandle = df[len-1];
+
+                let curr_open = currCandle.open;
+                let curr_high = currCandle.high;
+                let curr_vol = currCandle.volume || 0;
+                let prev_close = prevCandle.close;
+                let prev_high = prevCandle.high;
+
+                let avg_vol_20 = v.slice(Math.max(0, len-21), len-1).reduce((a,b)=>a+b,0)/20;
+                let vol_ratio = avg_vol_20 > 0 ? curr_vol / avg_vol_20 : 1;
+
+                m_cond_A = curr_open >= prev_close * 0.995;
+                m_cond_B = vol_ratio >= 0.9; 
+                m_cond_C = curr_high >= prev_high * 1.001;
+                m_cond_D = rsi >= 50;
+                m_cond_E = bodySize > 0.01 ? (upperShadow <= bodySize * 1.5) : true;
+
+                m_passCount = [m_cond_A, m_cond_B, m_cond_C, m_cond_D, m_cond_E].filter(Boolean).length;
+
+                if (m_passCount === 5) { m_action = "🚀 積極進場"; m_size = "首批 50%"; }
+                else if (m_passCount === 4) { m_action = "🟢 標準進場"; m_size = "首批 33%"; }
+                else if (m_passCount === 3) { m_action = "🟡 保守試探"; m_size = "首批 20%"; }
+                else { m_action = "⏳ 條件不足"; m_size = "0% (觀望)"; }
+
+                if (!isBullState && m_passCount < 4) {
+                    m_action = "⚠ 大盤/總分偏弱，需 4/5 才能進場"; m_size = "0%";
+                }
+
+                logDiagnostic("✅ 防護艙1-B: 其餘指標與早盤確認運算成功");
             } catch(e) { logDiagnostic("❌ 防護艙1-B 崩潰: " + e.message); }
 
             // 防護艙 2：首頁報告渲染
@@ -623,7 +687,7 @@
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
 
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v98.0 COMPLETE（ICT/SMC 完美資料回填版）
+🎯 MJ 狙擊手 v99.0 COMPLETE（早盤確認微觀進場版）
    基本面 × 宏觀過濾 × 確認K線 × 先行指標 × 雙層過濾 × 尾部風控
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
@@ -720,7 +784,7 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙4: AI 預測圖表渲染成功");
             } catch(e){ logDiagnostic("❌ 防護艙4 崩潰: " + e.message); }
 
-            // 防護艙 6：全分頁變數寫入總控 (★ V98.0 修復回填與顏色)
+            // 防護艙 6：全分頁變數寫入總控
             try {
                 safeSet('macro-score', isBullState ? "3/3 🟢🟢 (強勢)" : "0/3 🔴 (弱勢)", isBullState ? "val bull" : "val bear");
                 safeSet('macro-reasons', isBullState ? "✓ 站上基準 MA20 | ✓ 大盤上升趨勢 | ✓ 多頭排列" : "✗ 跌破基準 MA20 | ✗ 下降趨勢 | ✗ 空頭排列");
@@ -751,7 +815,6 @@ ${fundDetailStr}
                 safeSet('ofi-z', ofiZ.toFixed(2), "val " + (ofiZ > 0 ? "bull" : "bear"));
                 safeSet('ofi-sig', ofiText, "tag " + (ofiZ > 1.5 ? "bull" : (ofiZ < -1.5 ? "bear" : "")));
 
-                // SMC 分頁資料回填
                 safeSet('smc-struct', smcText, "tag " + (recent_bos && !recent_choch ? "bull" : (recent_choch ? "warn" : "")));
                 safeSet('smc-level', swingHigh.toFixed(2), "val");
                 safeSet('smc-bars', bars_since_break > 0 ? bars_since_break : "--", "val");
@@ -822,6 +885,23 @@ ${fundDetailStr}
                 safeSet('wyk-signal', isBullState ? "Spring (彈簧測試)" : "Upthrust (推力測試)", isBullState ? "tag bull" : "tag bear");
                 safeSet('wyk-ad', isBullState ? "Rising (主力累積)" : "Falling (主力出貨)", isBullState ? "val bull" : "val bear", isBullState ? "var(--bull)" : "var(--bear)");
                 safeSet('wyk-advice', isBullState ? "★ 彈簧測試(Spring)：跌破支撐後低量快速收復。" : "⚠ 推力測試(Upthrust)：放量突破阻力後迅速回落。");
+
+                // ★ V99.0 寫入早盤確認 UI
+                safeSet('m-cond-a', m_cond_A ? "✅ 通過" : "❌ 未通過", m_cond_A ? "tag bull" : "tag bear");
+                safeSet('m-cond-b', m_cond_B ? "✅ 通過" : "❌ 未通過", m_cond_B ? "tag bull" : "tag bear");
+                safeSet('m-cond-c', m_cond_C ? "✅ 通過" : "❌ 未通過", m_cond_C ? "tag bull" : "tag bear");
+                safeSet('m-cond-d', m_cond_D ? "✅ 通過" : "❌ 未通過", m_cond_D ? "tag bull" : "tag bear");
+                safeSet('m-cond-e', m_cond_E ? "✅ 通過" : "❌ 未通過", m_cond_E ? "tag bull" : "tag bear");
+
+                safeSet('m-pass-count', `${m_passCount}/5`, m_passCount >=3 ? "val bull" : "val bear");
+                safeSet('m-action', m_action, m_passCount >=3 ? "val bull" : "val bear");
+                safeSet('m-size', m_size, "val");
+
+                let entry_lo = (currentPrice * 0.997).toFixed(2);
+                let entry_hi = (currentPrice * 1.003).toFixed(2);
+                safeSet('m-entry-range', `$${entry_lo} ~ $${entry_hi}`);
+                safeSet('m-sl', "$" + stopLoss.toFixed(2));
+                safeSet('m-t1', "$" + target1.toFixed(2));
 
                 logDiagnostic("✅ 防護艙6: 所有模組數據寫入成功！");
             } catch(e) { logDiagnostic("❌ 防護艙6 崩潰: " + e.message); }
