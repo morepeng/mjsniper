@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v97.0 - ICT/SMC WEIGHTED EDITION</title>
+    <title>MJ SNIPER v98.0 - ICT/SMC DATA FILLED EDITION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -41,7 +41,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v97.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v98.0</span></div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="NVDA">
             <button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button>
@@ -134,7 +134,6 @@
     </div>
 
     <script>
-        // 系統診斷記錄器
         window.systemDiagnostics = [];
         function logDiagnostic(msg) {
             window.systemDiagnostics.push(msg);
@@ -149,7 +148,7 @@
 
         let chart, candleSeries, volumeSeries, ma20Series, ma60Series, radarObj, aiChartObj;
         
-        // ★ 專屬 GAS 網址保留
+        // ★ 專屬 GAS 網址
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzP3rZ_wBBkC2d1hQyZblr5aiKwsUy07PtvCTCD0oVY1Uxyog5mCN8-UWSYkpX6du8/exec";
 
         window.onload = () => {
@@ -314,7 +313,6 @@
         function executeAI_ScoringEngine(df, ticker, fundData) {
             logDiagnostic("開始執行 AI 評分引擎...");
             
-            // ★ 頂層變數區，確保全域宣告避免錯誤
             let currentPrice=0, ma60=0, len=df.length, c=[], v=[];
             let techScore=50, smcScore=50, obvScore=50, theoryScore=50, chipScore=50, fundScore=50;
             let returns=[], sortedRets=[], var95=0, var99=0, cvar95=0, annVol=0, regime="Normal";
@@ -334,6 +332,10 @@
             // SMC 動態陣列
             let tr = [], atr = [], fvg = [], ob_val = [], bos_arr = [], choch_arr = [], po3_arr = [], ote_zone = [];
             let fvg_val_display = "--", ob_val_display = "--", ote_text = "未進入 OTE 區間";
+            let last_fvg = 0, last_ob = 0;
+            let recent_bos = false, recent_choch = false;
+            let bars_since_break = 0;
+            let fvgSize = "--";
 
             // 防護艙 1：ICT/SMC 動態引擎
             try {
@@ -369,7 +371,7 @@
                     if (df[i].close > df[i-3].close && df[i-1].close < df[i-1].open) {
                         if (Math.abs(df[i-1].close - df[i-1].open) > 0.5 * atr[i-1]) ob_val[i-1] = df[i-1].high;
                     } else if (df[i].close < df[i-3].close && df[i-1].close > df[i-1].open) {
-                        if (Math.abs(df[i-1].close - df[i-1].open) > 0.5 * atr[i-1]) ob_val[i-1] = df[i-1].low;
+                        if (Math.abs(df[i-1].close - df[i-1].open) > 0.5 * atr[i-1]) ob_val[i-1] = -df[i-1].low;
                     }
                 }
 
@@ -392,7 +394,7 @@
                     let vol_ma = v.slice(i-20, i).reduce((a,b)=>a+b)/20;
                     let hl_diff = Math.abs(df[i].high - df[i].low);
                     if (hl_diff < 0.008 * df[i].close && df[i].volume < 0.8 * vol_ma) po3_arr[i] = 'Accumulation';
-                    else if (Math.abs(df[i].high - ob_val[i]) < 0.005 * df[i].close || Math.abs(df[i].low - ob_val[i]) < 0.005 * df[i].close) po3_arr[i] = 'Manipulation';
+                    else if (Math.abs(df[i].high - Math.abs(ob_val[i])) < 0.005 * df[i].close || Math.abs(df[i].low - Math.abs(ob_val[i])) < 0.005 * df[i].close) po3_arr[i] = 'Manipulation';
                     else if (fvg[i] !== 0 && df[i].volume > 1.5 * vol_ma) po3_arr[i] = 'Distribution';
                 }
 
@@ -424,17 +426,35 @@
                     }
                 }
 
-                let smc_dynamic = 0;
-                if (fvg[len-1] !== 0) { smc_dynamic += 20; fvg_val_display = (fvg[len-1]>0?"Bullish ":"Bearish ") + "FVG"; }
-                if (ob_val[len-1] !== 0) { smc_dynamic += 20; ob_val_display = ob_val[len-1].toFixed(2); }
+                // ★ V98.0 關鍵修復：回溯掃描最新的 FVG 與 OB，而不是只看最後一根
+                for(let i=len-1; i>=Math.max(0, len-30); i--) {
+                    if(last_fvg === 0 && fvg[i] !== 0) last_fvg = fvg[i];
+                    if(last_ob === 0 && ob_val[i] !== 0) last_ob = ob_val[i];
+                }
+
+                if (last_fvg > 0) { fvg_val_display = "Bullish FVG"; fvgSize = (last_fvg / currentPrice * 100).toFixed(2) + "%"; }
+                else if (last_fvg < 0) { fvg_val_display = "Bearish FVG"; fvgSize = (Math.abs(last_fvg) / currentPrice * 100).toFixed(2) + "%"; }
+
+                if (last_ob > 0) { ob_val_display = "Bull OB ($" + last_ob.toFixed(2) + ")"; }
+                else if (last_ob < 0) { ob_val_display = "Bear OB ($" + Math.abs(last_ob).toFixed(2) + ")"; }
+
+                // ★ V98.0 關鍵修復：近期結構掃描 (BOS 與 CHoCH 同時顯示)
+                for(let i=len-1; i>=Math.max(0, len-10); i--) {
+                    if (bos_arr[i]) { recent_bos = true; if(bars_since_break===0) bars_since_break = len-1-i; }
+                    if (choch_arr[i]) { recent_choch = true; if(bars_since_break===0) bars_since_break = len-1-i; }
+                }
                 
                 swingHigh = Math.max(...c.slice(-15, -1)); 
                 isBOS = currentPrice > swingHigh;
+                if (isBOS) recent_bos = true;
 
-                // ★ V97.0: BOS 與 CHoCH 同時顯示與雙重加分
+                let smc_dynamic = 0;
+                if (last_fvg !== 0) smc_dynamic += 20; 
+                if (last_ob !== 0) smc_dynamic += 20; 
+
                 let structTexts = [];
-                if (bos_arr[len-1] || isBOS) { smc_dynamic += 15; structTexts.push("BOS(延續)"); }
-                if (choch_arr[len-1]) { smc_dynamic += 15; structTexts.push("CHoCH(反轉)"); }
+                if (recent_bos) { smc_dynamic += 15; structTexts.push("BOS(延續)"); }
+                if (recent_choch) { smc_dynamic += 15; structTexts.push("CHoCH(反轉)"); }
                 
                 if (structTexts.length > 0) {
                     smcText = structTexts.join(" + ") + " 觸發";
@@ -449,6 +469,7 @@
                 
                 let vol_ma_last = v.slice(Math.max(0, len-20)).reduce((a,b)=>a+b)/20;
                 if (df[len-1].volume > 1.5 * vol_ma_last) smc_dynamic += 10;
+                
                 smcScore = Math.max(0, Math.min(100, smc_dynamic));
                 logDiagnostic("✅ 防護艙1(SMC): ICT/SMC 動態引擎計算完成");
             } catch(e) { logDiagnostic("❌ 防護艙1(SMC) 崩潰: " + e.message); }
@@ -571,7 +592,6 @@
                 let bigOrderCount = v.slice(-20).filter(vol => vol > volAvg * 1.5).length;
                 dealerAct = ((bigOrderCount / 20) * 100).toFixed(0);
 
-                // ★ V97.0: 權重強化洗牌 (SMC 升級為 20%)
                 let baseFinalScore = (fundScore * 0.10) + (smcScore * 0.20) + (techScore * 0.10) + (obvScore * 0.10) + (chipScore * 0.05) + (theoryScore * 0.05) + (ofiScore * 0.10) + (retestScore * 0.15) + (kPatternScore * 0.15);
                 finalScore = baseFinalScore;
                 
@@ -597,13 +617,13 @@
                 logDiagnostic("✅ 防護艙1-B: 其餘指標運算成功完成");
             } catch(e) { logDiagnostic("❌ 防護艙1-B 崩潰: " + e.message); }
 
-            // 防護艙 2：首頁報告渲染 (★ V97.0 更新 SMC 權重與文字)
+            // 防護艙 2：首頁報告渲染
             try {
                 let marketSpecificReport = ticker.includes('.') ? `🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : `🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}`;
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
 
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v97.0 COMPLETE（ICT/SMC 權重強化版）
+🎯 MJ 狙擊手 v98.0 COMPLETE（ICT/SMC 完美資料回填版）
    基本面 × 宏觀過濾 × 確認K線 × 先行指標 × 雙層過濾 × 尾部風控
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
@@ -700,9 +720,8 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙4: AI 預測圖表渲染成功");
             } catch(e){ logDiagnostic("❌ 防護艙4 崩潰: " + e.message); }
 
-            // 防護艙 6：全分頁變數寫入總控 (取代原防護艙 5+6)
+            // 防護艙 6：全分頁變數寫入總控 (★ V98.0 修復回填與顏色)
             try {
-                // 1. 宏觀分頁
                 safeSet('macro-score', isBullState ? "3/3 🟢🟢 (強勢)" : "0/3 🔴 (弱勢)", isBullState ? "val bull" : "val bear");
                 safeSet('macro-reasons', isBullState ? "✓ 站上基準 MA20 | ✓ 大盤上升趨勢 | ✓ 多頭排列" : "✗ 跌破基準 MA20 | ✗ 下降趨勢 | ✗ 空頭排列");
                 safeSet('cb-type', "北向資金 (A股/港股通)", "tag");
@@ -712,7 +731,6 @@ ${fundDetailStr}
                 safeSet('opt-unusual', isBullState ? "🔥 大單 Call 進場" : "⚠️ 大單 Put 避險", isBullState ? "tag bull" : "tag bear");
                 safeSet('opt-vol', isBullState ? "125,430 口" : "85,200 口", "val");
 
-                // 2. 技術大滿貫分頁
                 safeSet('pat-buy-score', isBullState ? "+4.5" : "0.0", isBullState ? "val bull" : "val");
                 safeSet('pat-sell-score', isBullState ? "0.0" : "-3.5", isBullState ? "val" : "val bear");
                 safeSet('pat-cloud', isBullState ? "🚀Breakout Up(2.5), 📈Engulfing(2)" : "🔻Double Top(-3.5), 📉Shooting Star");
@@ -733,33 +751,30 @@ ${fundDetailStr}
                 safeSet('ofi-z', ofiZ.toFixed(2), "val " + (ofiZ > 0 ? "bull" : "bear"));
                 safeSet('ofi-sig', ofiText, "tag " + (ofiZ > 1.5 ? "bull" : (ofiZ < -1.5 ? "bear" : "")));
 
-                // 3. SMC 滿血版分頁 (真實動態資料)
-                safeSet('smc-struct', smcText, "tag " + (isBullState ? "bull" : "bear"));
+                // SMC 分頁資料回填
+                safeSet('smc-struct', smcText, "tag " + (recent_bos && !recent_choch ? "bull" : (recent_choch ? "warn" : "")));
                 safeSet('smc-level', swingHigh.toFixed(2), "val");
-                let bars_since_break = 0;
-                for(let i=len-1; i>=0; i--) { if(bos_arr[i] || choch_arr[i]) { bars_since_break = len-1-i; break; } }
                 safeSet('smc-bars', bars_since_break > 0 ? bars_since_break : "--", "val");
                 safeSet('smc-struct-advice', smcScore > 50 ? "👉 結構偏多，找回調買進。" : "⚠️ 結構偏空，注意風險。");
                 safeSet('sl-hunt', choch_arr[len-1] ? "True (獵取流動性)" : "False", choch_arr[len-1] ? "tag bull" : "tag");
                 safeSet('sr-flip', po3_arr[len-1], "tag " + (po3_arr[len-1]==='Distribution'?'bear':(po3_arr[len-1]==='Accumulation'?'bull':'')));
-                safeSet('imbalance-area', fvg[len-1] !== 0 ? "True (失衡)" : "False", fvg[len-1] > 0 ? "tag bull" : (fvg[len-1] < 0 ? "tag bear" : "tag"));
-                safeSet('strong-breakout', bos_arr[len-1] ? "True (強勢突破)" : "False", bos_arr[len-1] ? "tag bull" : "tag");
+                safeSet('imbalance-area', last_fvg !== 0 ? "True (失衡)" : "False", last_fvg > 0 ? "tag bull" : (last_fvg < 0 ? "tag bear" : "tag"));
+                safeSet('strong-breakout', recent_bos ? "True (強勢突破)" : "False", recent_bos ? "tag bull" : "tag");
                 safeSet('golden-pocket', ote_text, "tag " + (ote_zone[len-1] === 1 ? "bull" : (ote_zone[len-1] === -1 ? "bear" : "")));
-                safeSet('smc-ob', ob_val_display, "tag " + (ob_val[len-1]>0?"bull":(ob_val[len-1]<0?"bear":"")));
-                safeSet('smc-ob-strength', ob_val[len-1] !== 0 ? "3 (強)" : "0", "val");
-                safeSet('smc-fvg', fvg_val_display, "tag " + (fvg[len-1]>0?"bull":(fvg[len-1]<0?"bear":"")));
-                let fvgSize = fvg[len-1] !== 0 ? (Math.abs(fvg[len-1]) / currentPrice * 100).toFixed(2) + "%" : "--";
+                
+                safeSet('smc-ob', ob_val_display, "tag " + (last_ob > 0 ? "bull" : (last_ob < 0 ? "bear" : "")));
+                safeSet('smc-ob-strength', last_ob !== 0 ? "3 (強)" : "0", "val");
+                safeSet('smc-fvg', fvg_val_display, "tag " + (last_fvg > 0 ? "bull" : (last_fvg < 0 ? "bear" : "")));
                 safeSet('smc-fvg-size', fvgSize, "val");
-                safeSet('smc-tactical-advice', fvg[len-1] > 0 ? "🛡️ 機構堡壘：大戶起漲成本區。" : (fvg[len-1] < 0 ? "📉 機構出貨區。" : "盤整中"));
+                safeSet('smc-tactical-advice', last_fvg > 0 ? "🛡️ 機構堡壘：大戶起漲成本區。" : (last_fvg < 0 ? "📉 機構出貨區。" : "等待流動性累積"));
+                
                 safeSet('smc-flow', ofiZ > 0 ? "Inflow (進場)" : "Outflow (出逃)", ofiZ > 0 ? "val bull" : "val bear");
                 safeSet('smc-flow-advice', ofiZ > 0 ? "💰 資金進場：量價配合，大戶推升。" : "💸 資金出逃：大戶正在出貨。");
 
-                // 4. 回測分頁 (首頁)
                 safeSet('bt-winrate', winRate.toFixed(1) + "%", "val");
                 safeSet('bt-sharpe', sharpe_bt.toFixed(2), "val");
                 safeSet('bt-status', retestStatus);
 
-                // 5. 籌碼分頁
                 safeSet('margin-bal', "185,420 張", "val");
                 safeSet('margin-chg', isBullState ? "-2,150 張 (散戶退場)" : "+3,420 張 (散戶接刀)", isBullState ? "val bull" : "val bear");
                 safeSet('short-bal', "12,150 張", "val");
@@ -774,9 +789,8 @@ ${fundDetailStr}
                 safeSet('total-fund', isBullState ? "+23,804 張" : "-2,800 張", "val");
                 safeSet('margin-buy', isBullState ? "下降中" : "增加中", "val");
                 safeSet('chip-signal-tag', isBullState ? "★ 強烈多頭籌碼信號" : "⚖️ 主力出貨散戶接盤", isBullState ? "tag bull" : "tag bear");
-                safeSet('chip-advice-box', isBullState ? "★ 外資連買 ≥ 3 日 + 融 প্রাচ → 強烈多頭，主力吸籌完成。" : "外資悄悄建空，融資卻增加，逃跑訊號。");
+                safeSet('chip-advice-box', isBullState ? "★ 外資連買 ≥ 3 日 + 融資減少 → 強烈多頭，主力吸籌完成。" : "外資悄悄建空，融資卻增加，逃跑訊號。");
 
-                // 6. 風控分頁
                 safeSet('risk-atr', atr_proxy.toFixed(2)); safeSet('risk-rr', `1 : ${rrValue}`); safeSet('risk-kelly', `${Math.max(0, kellyPct)}%`);
                 safeSet('risk-sl', stopLoss.toFixed(2)); safeSet('risk-targets', `${target1.toFixed(2)} / ${target2.toFixed(2)}`);
                 safeSet('var-95', `${Math.abs(var95).toFixed(2)}%`); safeSet('var-99', `${Math.abs(var99).toFixed(2)}%`); safeSet('cvar-95', `${Math.abs(cvar95).toFixed(2)}%`);
@@ -786,7 +800,6 @@ ${fundDetailStr}
                 safeSet('chip-mfi', `${mfiProxy.toFixed(1)} (流入強度)`); safeSet('chip-bigorder', `${dealerAct}% (高活躍度)`);
                 safeSet('chip-deep-sig', isBullState && mfiProxy > 60 ? "Bullish (大戶吸籌)" : "Bearish (資金散出)", isBullState ? "tag bull" : "tag bear");
 
-                // 7. OBV分頁
                 safeSet('obv-pct', isBullState ? "32.5%" : "75.2%", "val");
                 safeSet('obv-sec-1', "False", "tag");
                 safeSet('obv-sec-2', isBullState ? "True" : "False", isBullState ? "tag bull" : "tag");
@@ -799,7 +812,6 @@ ${fundDetailStr}
                 safeSet('super-trend', isBullState ? "Bullish" : "Bearish", isBullState ? "tag bull" : "tag bear");
                 safeSet('ttm-squeeze', "⚡ 監控壓縮中", "tag warn");
 
-                // 8. Theory 分頁
                 safeSet('dow-123', isBullState ? "Strong Bullish 123" : "Strong Bearish 123", isBullState ? "tag bull" : "tag bear");
                 safeSet('dow-123-score', isBullState ? "6 (信心: 100%)" : "-6 (信心: 100%)", "val");
                 safeSet('dow-2b', isBullState ? "Bullish Sweep" : "Bearish Sweep", isBullState ? "tag bull" : "tag bear");
