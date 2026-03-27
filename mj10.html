@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v101.0 - MOBILE SCROLL EDITION</title>
+    <title>MJ SNIPER v102.0 - MORNING DECISION EDITION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #02050a; --panel: rgba(10, 21, 37, 0.98); --cyan: #00d4ff; --bull: #00f2fe; --bear: #ff0055; --border: rgba(0, 212, 255, 0.5); --gold: #f9d423; --purple: #a445b2; }
-        /* ★ V101: 修正手機版高度被吃掉的問題，加入 100dvh */
         body { background: #02050a; color: #e0e6ed; font-family: 'Segoe UI', sans-serif; margin: 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         .topbar { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
         
@@ -21,7 +20,6 @@
         .tab-btn { padding: 12px 16px; border: none; background: transparent; color: #8492a6; font-size: 12px; cursor: pointer; flex-shrink: 0; transition: 0.2s; user-select: none; }
         .tab-btn.active { color: var(--cyan); border-bottom: 3px solid var(--cyan); font-weight: bold; background: rgba(0, 212, 255, 0.05); }
         
-        /* ★ V101: 加入底部安全緩衝區 80px，並啟動原生順暢滑動 */
         .layout { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 12px; padding-bottom: 80px; gap: 12px; -webkit-overflow-scrolling: touch; }
         .tab-content { display: none; flex-direction: column; gap: 12px; }
         .tab-content.active { display: flex; animation: fadeIn 0.3s ease; }
@@ -50,7 +48,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v101.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v102.0</span></div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="NVDA">
             <button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button>
@@ -175,7 +173,6 @@
     </div>
 
     <script>
-        // 系統診斷記錄器
         window.systemDiagnostics = [];
         function logDiagnostic(msg) {
             window.systemDiagnostics.push(msg);
@@ -684,7 +681,7 @@
                 wykText = isBOS ? "Phase D/E (上漲)" : "Phase A/B (區間)";
                 dowText = isHigherLow ? "123法則：底墊高" : "趨勢不明"; adText = isBullState ? "Rising (主力累積)" : "Falling (主力出貨)"; 
 
-                // ★ V99.0 早盤確認運算
+                // 早盤確認運算
                 let prevCandle = df[len-2];
                 let currCandle = df[len-1];
 
@@ -717,13 +714,14 @@
                 logDiagnostic("✅ 防護艙1-B: 其餘指標與早盤確認運算成功");
             } catch(e) { logDiagnostic("❌ 防護艙1-B 崩潰: " + e.message); }
 
+            // ★ V102.0: 全新五層架構報告寫入
             try {
                 let marketSpecificReport = ticker.includes('.') ? `🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : `🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}`;
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
 
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v101.0 COMPLETE（行動端完美滑動版）
-   基本面 × 宏觀過濾 × 確認K線 × 先行指標 × 雙層過濾 × 尾部風控
+🎯 MJ 狙擊手 v102.0 COMPLETE（早盤決策融合版）
+   基本面 × 宏觀過濾 × 確認K線 × 早盤掃描 × 尾部風控
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
   分析時間: ${getTimestamp()}
@@ -757,10 +755,18 @@ ${fundDetailStr}
 ------------------------------------------------------------------------------------------
   K線確認: ${isBullState ? '✅ 通過' : '⏳ 待確認'} | 假突破風險: ${isBullState ? 'Low' : 'CRITICAL'}
 
-🎯 [第四層-交易計畫與極端風控]
+🌅 [第四層-隔日早盤確認掃描] (微觀進場防護)
+------------------------------------------------------------------------------------------
+  通過條件數: ${m_passCount}/5
+  [A.開盤不破位: ${m_cond_A ? "✅" : "❌"}] [B.量能維持: ${m_cond_B ? "✅" : "❌"}] [C.突破昨高: ${m_cond_C ? "✅" : "❌"}]
+  [D.RSI>50: ${m_cond_D ? "✅" : "❌"}] [E.無假突破: ${m_cond_E ? "✅" : "❌"}]
+  => 早盤操作建議: ${m_action} | ${m_size}
+  => 建議進場區間: $${(currentPrice * 0.997).toFixed(2)} ~ $${(currentPrice * 1.003).toFixed(2)}
+
+🎯 [第五層-交易計畫與極端風控]
 ==========================================================================================
   ╔══════════════════════════════════════════════╗
-  ║  操作方向: <span class="${isBullState ? 'hl-bull' : 'hl-bear'}">${advText}</span>
+  ║  總分操作方向: <span class="${isBullState ? 'hl-bull' : 'hl-bear'}">${advText}</span>
   ║  現價: <span class="hl-cyan">${currentPrice.toFixed(2)}</span>
   ║  停損 (SL): <span class="hl-bear">${stopLoss.toFixed(2)}</span> | T1: <span class="hl-gold">${target1.toFixed(2)}</span>
   ║  風控比例 (RR): 1:${rrValue} | 凱利建議: ${Math.max(0, kellyPct)}%
