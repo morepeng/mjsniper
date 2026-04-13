@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v102.0 - MORNING DECISION EDITION</title>
+    <title>MJ SNIPER v103.0 - QUEEN LIAN EDITION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -32,6 +32,7 @@
         .tag.bull { background: var(--bull); color: #000; font-weight: bold; }
         .tag.bear { background: var(--bear); color: #fff; font-weight: bold; }
         .tag.warn { background: #ff9800; color: #000; font-weight: bold; }
+        .tag.purple { background: var(--purple); color: #fff; font-weight: bold; }
         .info-box { font-size: 11px; line-height: 1.6; color: #cfe0ee; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid var(--cyan); margin-top: 5px; }
         .chart-box { width: 100%; height: 380px; min-height: 380px; background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; }
         #main-chart { width: 100%; height: 100%; }
@@ -48,7 +49,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v102.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v103.0</span></div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="NVDA">
             <button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button>
@@ -58,6 +59,7 @@
 
     <nav class="tab-nav" id="scroll-nav">
         <button class="tab-btn active" onclick="showTab('tab-overview', this)">📊 戰略決策</button>
+        <button class="tab-btn" onclick="showTab('tab-queen', this)">👑 Queen怜技巧</button>
         <button class="tab-btn" onclick="showTab('tab-morning', this)">🌅 早盤確認</button>
         <button class="tab-btn" onclick="showTab('tab-macro', this)">🌍 宏觀衍生品</button>
         <button class="tab-btn" onclick="showTab('tab-tech-all', this)">📈 技術大滿貫</button>
@@ -86,6 +88,25 @@
 
             <div class="glass-card"><h4>9 因子綜合共振雷達</h4><div style="height:150px; width:100%; display:flex; justify-content:center;"><canvas id="radarChart"></canvas></div></div>
             <div class="chart-box" style="height:350px; min-height:350px;"><div id="main-chart"></div></div>
+        </div>
+
+        <div id="tab-queen" class="tab-content">
+            <div class="glass-card" style="border: 2px solid var(--purple);">
+                <h4>🔥 AI 買進／賣出建議（Queen怜六大技巧融合版）</h4>
+                <div class="row"><span>均線排列：</span> <span id="q-ma-status" class="val">--</span></div>
+                <div class="row"><span>型態偵測：</span> <span id="q-pattern-status" class="tag">--</span></div>
+                <div id="q-ai-advice" class="terminal-report" style="margin-top: 10px; font-size: 11px;">等待分析...</div>
+            </div>
+            <div class="glass-card" style="border-left: 5px solid var(--cyan);">
+                <h4>📐 N字法與缺口掃描</h4>
+                <div class="row"><span>近期跳空上漲缺口：</span> <span id="q-gap-up" class="val bull">--</span></div>
+                <div class="row"><span>近期跳空下跌缺口：</span> <span id="q-gap-down" class="val bear">--</span></div>
+                <div class="row"><span>ZigZag (5%) 轉折點數：</span> <span id="q-zz-count" class="val">--</span></div>
+                <div class="info-box">
+                    💡 N字法 (ZigZag) 波段已自動繪製於主圖表上的「紫色線」。<br>
+                    若出現頭肩頂型態，亦會以黃色箭頭標記於主圖表中。
+                </div>
+            </div>
         </div>
 
         <div id="tab-morning" class="tab-content">
@@ -185,7 +206,7 @@
             alert("🐞 系統診斷日誌 (最新8筆)：\n\n" + window.systemDiagnostics.slice(-8).join("\n"));
         }
 
-        let chart, candleSeries, volumeSeries, ma20Series, ma60Series, radarObj, aiChartObj;
+        let chart, candleSeries, volumeSeries, ma20Series, ma60Series, radarObj, aiChartObj, zzSeries;
         
         // ★ 專屬 GAS 網址保留
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzP3rZ_wBBkC2d1hQyZblr5aiKwsUy07PtvCTCD0oVY1Uxyog5mCN8-UWSYkpX6du8/exec";
@@ -240,6 +261,8 @@
             candleSeries = chart.addCandlestickSeries({ upColor: '#00f2fe', downColor: '#ff0055', borderVisible: false, wickUpColor: '#00f2fe', wickDownColor: '#ff0055' });
             ma20Series = chart.addLineSeries({ color: '#f9d423', lineWidth: 1, title: 'MA20' });
             ma60Series = chart.addLineSeries({ color: '#a445b2', lineWidth: 1, title: 'MA60' });
+            // ★ V103: 新增 ZigZag 線條序列
+            zzSeries = chart.addLineSeries({ color: 'rgba(164, 69, 178, 0.8)', lineWidth: 2, title: 'N字法(ZZ)' });
             volumeSeries = chart.addHistogramSeries({ color: '#26a69a', priceFormat: { type: 'volume' }, priceScaleId: '', scaleMargins: { top: 0.8, bottom: 0 } });
         }
 
@@ -407,6 +430,9 @@
 
             let m_cond_A = false, m_cond_B = false, m_cond_C = false, m_cond_D = false, m_cond_E = false;
             let m_passCount = 0, m_action = "--", m_size = "--";
+
+            // ★ V103.0 全域宣告安全標記陣列
+            let uniqueMarkers = [];
 
             try {
                 c = df.map(x => x.close); v = df.map(x => x.volume); currentPrice = c[len-1];
@@ -681,7 +707,6 @@
                 wykText = isBOS ? "Phase D/E (上漲)" : "Phase A/B (區間)";
                 dowText = isHigherLow ? "123法則：底墊高" : "趨勢不明"; adText = isBullState ? "Rising (主力累積)" : "Falling (主力出貨)"; 
 
-                // 早盤確認運算
                 let prevCandle = df[len-2];
                 let currCandle = df[len-1];
 
@@ -714,13 +739,122 @@
                 logDiagnostic("✅ 防護艙1-B: 其餘指標與早盤確認運算成功");
             } catch(e) { logDiagnostic("❌ 防護艙1-B 崩潰: " + e.message); }
 
-            // ★ V102.0: 全新五層架構報告寫入
+            // ★ V103.0: 防護艙 7 (Queen怜六大技巧獨立運算)
+            try {
+                let q_ma5 = c.slice(-5).reduce((a,b)=>a+b)/5;
+                let q_ma_status = `MA5(${q_ma5.toFixed(1)}) > MA20(${ma20.toFixed(1)}) > MA60(${ma60.toFixed(1)})`;
+                if (q_ma5 > ma20 && ma20 > ma60) q_ma_status += " (多頭排列)";
+                else if (q_ma5 < ma20 && ma20 < ma60) q_ma_status += " (空頭排列)";
+                else q_ma_status = `MA5(${q_ma5.toFixed(1)}) | MA20(${ma20.toFixed(1)}) | MA60(${ma60.toFixed(1)}) (震盪糾結)`;
+
+                // ZigZag 5%
+                let zz = [];
+                let dev = 5;
+                let last_pivot = df[0].close;
+                let last_pivot_idx = 0;
+                let dir = 0;
+                for (let i = 1; i < len; i++) {
+                    if (dir >= 0) {
+                        if (df[i].high > last_pivot * (1 + dev / 100)) {
+                            last_pivot = df[i].high; last_pivot_idx = i; dir = 1;
+                        } else if (df[i].low < last_pivot * (1 - dev / 100)) {
+                            zz.push({ idx: last_pivot_idx, val: last_pivot, type: dir === 1 ? 'high' : 'low' });
+                            last_pivot = df[i].low; last_pivot_idx = i; dir = -1;
+                        }
+                    } else {
+                        if (df[i].low < last_pivot * (1 - dev / 100)) {
+                            last_pivot = df[i].low; last_pivot_idx = i; dir = -1;
+                        } else if (df[i].high > last_pivot * (1 + dev / 100)) {
+                            zz.push({ idx: last_pivot_idx, val: last_pivot, type: 'low' });
+                            last_pivot = df[i].high; last_pivot_idx = i; dir = 1;
+                        }
+                    }
+                }
+                zz.push({ idx: last_pivot_idx, val: last_pivot, type: dir >= 0 ? 'high' : 'low' });
+
+                // 更新圖表 ZigZag 軌跡
+                if (zzSeries) {
+                    let zzData = zz.map(p => ({ time: df[p.idx].time, value: p.val }));
+                    zzSeries.setData(zzData);
+                }
+
+                // 頭肩頂偵測
+                let hs_pattern = null;
+                for (let i = 0; i < zz.length - 4; i++) {
+                    let p1 = zz[i], p2 = zz[i+1], p3 = zz[i+2], p4 = zz[i+3], p5 = zz[i+4];
+                    if (p1.type==='high' && p3.type==='high' && p5.type==='high' && p2.type==='low' && p4.type==='low') {
+                        if (p3.val > p1.val && p3.val > p5.val) {
+                            if (Math.abs(p1.val - p5.val) / ((p1.val + p5.val)/2) <= 0.10) {
+                                let neck_slope = (p4.val - p2.val) / (p4.idx - p2.idx);
+                                let neck_now = p4.val + neck_slope * (len - 1 - p4.idx);
+                                let breakout = currentPrice < neck_now;
+                                hs_pattern = { p1, p2, p3, p4, p5, neck_now, breakout };
+                            }
+                        }
+                    }
+                }
+
+                // 缺口掃描 (近60日)
+                let gap_ups = 0, gap_downs = 0;
+                for(let i=Math.max(1, len-60); i<len; i++){
+                    if(df[i].open > df[i-1].high && df[i].close > df[i].open) gap_ups++;
+                    if(df[i].open < df[i-1].low && df[i].close < df[i].open) gap_downs++;
+                }
+
+                safeSet('q-gap-up', `${gap_ups} 次`);
+                safeSet('q-gap-down', `${gap_downs} 次`);
+                safeSet('q-zz-count', `${zz.length} 個轉折點`);
+                safeSet('q-ma-status', q_ma_status);
+
+                let q_ai_text = "";
+                if (hs_pattern) {
+                    safeSet('q-pattern-status', hs_pattern.breakout ? "🚨 頸線突破 (做空訊號確認)" : "✅ 偵測到頭肩頂 (右肩誘多區)", hs_pattern.breakout ? "tag bear" : "tag warn");
+                    q_ai_text = `【AI 動態操作建議】
+情境      | 買進建議                           | 賣出／反手建議
+-------------------------------------------------------------------------
+${hs_pattern.breakout ? 
+`持有部位  | 不要加碼                           | 全出場 + 立即反手做空
+空手觀望  | 等待回檔至 MA60 附近低接           | 直接布局空單` : 
+`持有部位  | 不要加碼                           | 優先減碼或全出場 (右肩誘多區)
+空手觀望  | 等待右肩失敗或回檔 MA60 再低接     | 右肩高點出現長黑K → 立即反手`}
+風險控制  | 單筆 ≤ 總資金 5~10%                | 停損設右肩低點下方2%
+
+💡 Queen怜核心提醒：
+   右肩 = 資金出貨區 → 型態完成前提早布局反手
+   現在不是追高的時候，而是提早出場或做空的時機！
+   交易就像坐錯高鐵，先下車停損再等下一班順勢的車`;
+
+                    // 記錄標記，等防護艙3統一繪製
+                    uniqueMarkers.push({ time: df[hs_pattern.p1.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '左肩' });
+                    uniqueMarkers.push({ time: df[hs_pattern.p3.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '頭' });
+                    uniqueMarkers.push({ time: df[hs_pattern.p5.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '右肩' });
+                    if (hs_pattern.breakout) {
+                        uniqueMarkers.push({ time: df[len-1].time, position: 'aboveBar', color: '#ff0055', shape: 'arrowDown', text: '🚨 跌破頸線' });
+                    }
+                } else {
+                    safeSet('q-pattern-status', "未偵測到頭肩頂 (持續觀察)", "tag");
+                    q_ai_text = `目前未偵測到完整頭肩頂 → 仍處於多頭趨勢，但需持續觀察右肩是否成型
+
+📋 AI 建議：
+   • 短線可小量做多 (N字法出現新高轉折 + 跳空上漲時)
+   • 嚴格停損，勿凹單追高
+   • 持續監控右肩誘多區，一旦出現立即減碼
+
+⚠️ 重要提醒：以上為AI根據六大技巧的技術分析建議。
+   交易有風險，請搭配個人紀律與資金管理操作。`;
+                }
+                safeSet('q-ai-advice', q_ai_text);
+
+                logDiagnostic("✅ 防護艙7: Queen怜六大技巧運算完成");
+            } catch(e) { logDiagnostic("❌ 防護艙7 崩潰: " + e.message); }
+
+            // 防護艙 2：首頁報告渲染
             try {
                 let marketSpecificReport = ticker.includes('.') ? `🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : `🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}`;
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
 
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v102.0 COMPLETE（早盤決策融合版）
+🎯 MJ 狙擊手 v103.0 COMPLETE（Queen怜六大技巧融合版）
    基本面 × 宏觀過濾 × 確認K線 × 早盤掃描 × 尾部風控
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
@@ -780,25 +914,28 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙2: 報告與雷達圖渲染成功");
             } catch(e) { logDiagnostic("❌ 防護艙2 崩潰: " + e.message); }
 
+            // 防護艙 3：K線標記 (綜合 SMC 與 Queen怜)
             try {
                 let minPrice = Infinity, minIdx = -1, maxPrice = -Infinity, maxIdx = -1;
                 for(let i=Math.max(0, len-60); i<len; i++){
                     if(df[i].low < minPrice){ minPrice = df[i].low; minIdx = i; }
                     if(df[i].high > maxPrice){ maxPrice = df[i].high; maxIdx = i; }
                 }
-                let rawMarkers = [];
-                if(minIdx !== -1 && minIdx < len-2) rawMarkers.push({ time: df[minIdx].time, position: 'belowBar', color: '#00f2fe', shape: 'arrowUp', text: 'Spring/Sweep' });
-                if(maxIdx !== -1 && maxIdx !== minIdx && maxIdx < len-2) rawMarkers.push({ time: df[maxIdx].time, position: 'aboveBar', color: '#ff0055', shape: 'arrowDown', text: 'Upthrust/OB' });
-                if (isBullState) rawMarkers.push({ time: df[len-1].time, position: 'belowBar', color: '#f9d423', shape: 'arrowUp', text: 'Buy Signal' });
-                else rawMarkers.push({ time: df[len-1].time, position: 'aboveBar', color: '#a445b2', shape: 'arrowDown', text: 'Sell' });
                 
-                let uniqueMarkers = [];
+                if(minIdx !== -1 && minIdx < len-2) uniqueMarkers.push({ time: df[minIdx].time, position: 'belowBar', color: '#00f2fe', shape: 'arrowUp', text: 'Spring/Sweep' });
+                if(maxIdx !== -1 && maxIdx !== minIdx && maxIdx < len-2) uniqueMarkers.push({ time: df[maxIdx].time, position: 'aboveBar', color: '#ff0055', shape: 'arrowDown', text: 'Upthrust/OB' });
+                if (isBullState) uniqueMarkers.push({ time: df[len-1].time, position: 'belowBar', color: '#f9d423', shape: 'arrowUp', text: 'Buy Signal' });
+                else uniqueMarkers.push({ time: df[len-1].time, position: 'aboveBar', color: '#a445b2', shape: 'arrowDown', text: 'Sell' });
+                
+                // 去重與排序
+                let finalMarkers = [];
                 let timeSet = new Set();
-                for(let m of rawMarkers) {
-                    if(!timeSet.has(m.time)) { uniqueMarkers.push(m); timeSet.add(m.time); }
+                for(let m of uniqueMarkers) {
+                    let key = m.time + m.text; // 避免同時同字重疊
+                    if(!timeSet.has(key)) { finalMarkers.push(m); timeSet.add(key); }
                 }
-                uniqueMarkers.sort((a,b) => (a.time > b.time) ? 1 : -1);
-                candleSeries.setMarkers(uniqueMarkers);
+                finalMarkers.sort((a,b) => (a.time > b.time) ? 1 : -1);
+                candleSeries.setMarkers(finalMarkers);
                 logDiagnostic("✅ 防護艙3: K線安全標記渲染成功");
             } catch(e) { logDiagnostic("❌ 防護艙3 崩潰: " + e.message); }
 
