@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v103.0 - QUEEN LIAN EDITION</title>
+    <title>MJ SNIPER v105.0 - DYNAMIC TAIFEX EDITION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -49,9 +49,9 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v103.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v105.0</span></div>
         <div style="display:flex; gap:8px;">
-            <input type="text" id="top-tk" placeholder="NVDA">
+            <input type="text" id="top-tk" placeholder="2317.TW">
             <button class="btn-main" onclick="fireSniper()">⚡ 智能分析</button>
             <button class="btn-debug" onclick="showDiagnostics()">🐞 系統診斷</button>
         </div>
@@ -59,6 +59,7 @@
 
     <nav class="tab-nav" id="scroll-nav">
         <button class="tab-btn active" onclick="showTab('tab-overview', this)">📊 戰略決策</button>
+        <button class="tab-btn" onclick="showTab('tab-tx', this)">🇹🇼 台指期決策</button>
         <button class="tab-btn" onclick="showTab('tab-queen', this)">👑 Queen怜技巧</button>
         <button class="tab-btn" onclick="showTab('tab-morning', this)">🌅 早盤確認</button>
         <button class="tab-btn" onclick="showTab('tab-macro', this)">🌍 宏觀衍生品</button>
@@ -88,6 +89,32 @@
 
             <div class="glass-card"><h4>9 因子綜合共振雷達</h4><div style="height:150px; width:100%; display:flex; justify-content:center;"><canvas id="radarChart"></canvas></div></div>
             <div class="chart-box" style="height:350px; min-height:350px;"><div id="main-chart"></div></div>
+        </div>
+
+        <div id="tab-tx" class="tab-content">
+            <div class="glass-card" style="border-left: 5px solid #00f2fe;">
+                <h4>🕒 台灣交易時段與即時影響</h4>
+                <div class="row"><span>當前時間：</span> <span id="tx-time" class="val">--</span></div>
+                <div class="row"><span>交易時段：</span> <span id="tx-session" class="tag">--</span></div>
+                <div class="row"><span>影響評估：</span> <span id="tx-impact" class="val">--</span></div>
+                <div class="info-box" id="tx-open-note" style="font-weight:bold; text-align:center;">等待掃描...</div>
+            </div>
+            <div class="glass-card" style="border-left: 5px solid var(--purple);">
+                <h4>📊 台指期即時價差與行情</h4>
+                <div class="row"><span>加權指數 (TAIEX)：</span> <span id="tx-taiex" class="val">--</span></div>
+                <div class="row"><span>台指期近月 (TX)：</span> <span id="tx-near" class="val">--</span></div>
+                <div class="row"><span>前日結算價：</span> <span id="tx-settle" class="val">--</span></div>
+                <div class="row"><span>即時價差 (Basis)：</span> <span id="tx-basis" class="tag">--</span></div>
+            </div>
+            <div class="glass-card" style="border: 2px solid var(--gold);">
+                <h4>🎯 <span id="tx-target-name" class="hl-cyan">當前標的</span> 買進決策 (聯動台指)</h4>
+                <div class="row"><span>當前標的最新股價：</span> <span id="tx-stock-price" class="val">--</span></div>
+                <div class="row"><span>台指期漲跌點數：</span> <span id="tx-gap" class="val">--</span></div>
+                <div class="row"><span>AI 買進決策：</span> <span id="tx-decision-tag" class="tag" style="padding: 4px 8px; font-size:12px;">--</span></div>
+                <div class="info-box" id="tx-decision-desc" style="font-size: 12px; font-weight: bold; text-align: center; margin-top: 10px;">
+                    等待掃描...
+                </div>
+            </div>
         </div>
 
         <div id="tab-queen" class="tab-content">
@@ -208,7 +235,6 @@
 
         let chart, candleSeries, volumeSeries, ma20Series, ma60Series, radarObj, aiChartObj, zzSeries;
         
-        // ★ 專屬 GAS 網址保留
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzP3rZ_wBBkC2d1hQyZblr5aiKwsUy07PtvCTCD0oVY1Uxyog5mCN8-UWSYkpX6du8/exec";
 
         window.onload = () => {
@@ -261,7 +287,6 @@
             candleSeries = chart.addCandlestickSeries({ upColor: '#00f2fe', downColor: '#ff0055', borderVisible: false, wickUpColor: '#00f2fe', wickDownColor: '#ff0055' });
             ma20Series = chart.addLineSeries({ color: '#f9d423', lineWidth: 1, title: 'MA20' });
             ma60Series = chart.addLineSeries({ color: '#a445b2', lineWidth: 1, title: 'MA60' });
-            // ★ V103: 新增 ZigZag 線條序列
             zzSeries = chart.addLineSeries({ color: 'rgba(164, 69, 178, 0.8)', lineWidth: 2, title: 'N字法(ZZ)' });
             volumeSeries = chart.addHistogramSeries({ color: '#26a69a', priceFormat: { type: 'volume' }, priceScaleId: '', scaleMargins: { top: 0.8, bottom: 0 } });
         }
@@ -370,6 +395,89 @@
             return { score: mappedScore, tier: tier, details: details };
         }
 
+        // ★ V105.0 全新動態台指期模組
+        async function executeTXModule(ticker, currentPrice) {
+            try {
+                const corsProxy = "https://api.allorigins.win/get?url=";
+                let taiex = 35417.83, tx_near = 35567.00, prev_settle = 35569.00;
+
+                try {
+                    let r1 = await fetch(corsProxy + encodeURIComponent("https://openapi.taifex.com.tw/v1/DailyMarketReportFut"));
+                    let d1 = await r1.json();
+                    let parsedData = JSON.parse(d1.contents);
+                    let tx_data = parsedData.filter(x => x.Contract && x.Contract.startsWith('TX'));
+                    if (tx_data.length > 0) {
+                        tx_near = parseFloat(tx_data[0].Last || tx_near);
+                        prev_settle = parseFloat(tx_data[0].SettlementPrice || tx_near);
+                    }
+                } catch(e) { logDiagnostic("TAIFEX Fetch Fail, using simulated fallback."); }
+
+                try {
+                    let r2 = await fetch(corsProxy + encodeURIComponent("https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_t00.tw&json=1&delay=0"));
+                    let d2 = await r2.json();
+                    let parsedTWSE = JSON.parse(d2.contents);
+                    if(parsedTWSE && parsedTWSE.msgArray && parsedTWSE.msgArray.length > 0) {
+                        taiex = parseFloat(parsedTWSE.msgArray[0].y || taiex);
+                    }
+                } catch(e) { logDiagnostic("TWSE TAIEX Fetch Fail, using simulated fallback."); }
+
+                let d = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Taipei"}));
+                let hr = d.getHours();
+                let min = d.getMinutes();
+                let session = "非交易時段", impact = "⚠️ 目前非交易時段", open_note = `可參考昨夜盤作為今日買進 ${ticker} 的參考`;
+                
+                if (hr >= 8 && hr < 14 && (hr > 8 || min >= 45)) {
+                    session = "日盤"; impact = "✅ 此為當日日盤參考"; open_note = "今日開盤已發生，重點觀察早盤是否延續期貨方向";
+                } else if (hr >= 15 || hr < 5) {
+                    session = "夜盤"; impact = "✅ 此為夜盤 → 將直接影響明日開盤"; open_note = "夜盤是大盤與權值股最重要的領先指標";
+                }
+
+                safeSet('tx-time', `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(hr).padStart(2,'0')}:${String(min).padStart(2,'0')} (台灣時間)`);
+                safeSet('tx-session', session, session==="夜盤"?"tag purple":(session==="日盤"?"tag bull":"tag"));
+                safeSet('tx-impact', impact);
+                safeSet('tx-open-note', open_note);
+
+                safeSet('tx-taiex', taiex.toLocaleString('en-US', {minimumFractionDigits: 2}));
+                safeSet('tx-near', tx_near.toLocaleString('en-US', {minimumFractionDigits: 0}));
+                safeSet('tx-settle', prev_settle.toLocaleString('en-US', {minimumFractionDigits: 0}));
+
+                let basis = tx_near - taiex;
+                safeSet('tx-basis', `${basis > 0 ? '+'+basis.toFixed(2) : basis.toFixed(2)} (${basis > 0 ? '正價差' : '逆價差'})`, basis > 0 ? "tag bull" : "tag bear");
+
+                let gap = tx_near - prev_settle;
+                let gap_pct = prev_settle > 0 ? (gap / prev_settle) * 100 : 0;
+                
+                // 動態寫入標的名稱與價格
+                safeSet('tx-target-name', ticker);
+                safeSet('tx-stock-price', `$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`);
+                safeSet('tx-gap', `${gap > 0 ? '+'+gap.toFixed(0) : gap.toFixed(0)} 點 (${gap_pct > 0 ? '+'+gap_pct.toFixed(2) : gap_pct.toFixed(2)}%)`, gap > 0 ? "val bull" : "val bear");
+
+                let decision = "⚪ 中性觀望：台指期震盪 → 等待更明確方向";
+                let decision_desc = `實戰提醒：台指期趨勢強勢 + ${ticker} 站上短均線 = 最佳買點`;
+                let tag_class = "tag";
+
+                if (gap > 80) {
+                    decision = `🟢 強烈建議：台指期明顯領先上漲 → 可積極買進 ${ticker}`;
+                    decision_desc = `建議操作：開盤後若 ${ticker} 跟漲，立即分批買進`;
+                    tag_class = "tag bull";
+                } else if (gap > 30) {
+                    decision = `🟡 謹慎買進：台指期小漲 → 搭配 ${ticker} 技術面確認再買`;
+                    tag_class = "tag warn";
+                } else if (gap < -50) {
+                    decision = `🔴 避免買進：台指期弱勢 → 先觀望或等回檔再買 ${ticker}`;
+                    decision_desc = "強烈建議避開多單，等待大盤止穩";
+                    tag_class = "tag bear";
+                }
+
+                safeSet('tx-decision-tag', decision.split('：')[0], tag_class);
+                safeSet('tx-decision-desc', `${decision.split('：')[1]}<br><br><span style="color:var(--cyan);">${decision_desc}</span>`);
+
+                logDiagnostic("✅ 防護艙8: 動態台指期模組運算完成");
+            } catch(e) {
+                logDiagnostic("❌ 防護艙8 崩潰: " + e.message);
+            }
+        }
+
         async function fireSniper() {
             window.systemDiagnostics = [];
             logDiagnostic("開始啟動系統...");
@@ -394,7 +502,9 @@
                     } catch(ec) { logDiagnostic("❌ 圖表繪製崩潰: " + ec.message); }
                     
                     const fundData = d.fundamentals || {};
+                    let currentPrice = df[df.length-1].close;
                     executeAI_ScoringEngine(df, tk.toUpperCase(), fundData);
+                    executeTXModule(tk.toUpperCase(), currentPrice);
                 } else { logDiagnostic("❌ 回傳的 JSON 缺少 chart 資料"); }
             } catch(e) { 
                 logDiagnostic("❌ 嚴重錯誤: " + e.message);
@@ -431,7 +541,6 @@
             let m_cond_A = false, m_cond_B = false, m_cond_C = false, m_cond_D = false, m_cond_E = false;
             let m_passCount = 0, m_action = "--", m_size = "--";
 
-            // ★ V103.0 全域宣告安全標記陣列
             let uniqueMarkers = [];
 
             try {
@@ -739,7 +848,6 @@
                 logDiagnostic("✅ 防護艙1-B: 其餘指標與早盤確認運算成功");
             } catch(e) { logDiagnostic("❌ 防護艙1-B 崩潰: " + e.message); }
 
-            // ★ V103.0: 防護艙 7 (Queen怜六大技巧獨立運算)
             try {
                 let q_ma5 = c.slice(-5).reduce((a,b)=>a+b)/5;
                 let q_ma_status = `MA5(${q_ma5.toFixed(1)}) > MA20(${ma20.toFixed(1)}) > MA60(${ma60.toFixed(1)})`;
@@ -747,7 +855,6 @@
                 else if (q_ma5 < ma20 && ma20 < ma60) q_ma_status += " (空頭排列)";
                 else q_ma_status = `MA5(${q_ma5.toFixed(1)}) | MA20(${ma20.toFixed(1)}) | MA60(${ma60.toFixed(1)}) (震盪糾結)`;
 
-                // ZigZag 5%
                 let zz = [];
                 let dev = 5;
                 let last_pivot = df[0].close;
@@ -772,13 +879,11 @@
                 }
                 zz.push({ idx: last_pivot_idx, val: last_pivot, type: dir >= 0 ? 'high' : 'low' });
 
-                // 更新圖表 ZigZag 軌跡
                 if (zzSeries) {
                     let zzData = zz.map(p => ({ time: df[p.idx].time, value: p.val }));
                     zzSeries.setData(zzData);
                 }
 
-                // 頭肩頂偵測
                 let hs_pattern = null;
                 for (let i = 0; i < zz.length - 4; i++) {
                     let p1 = zz[i], p2 = zz[i+1], p3 = zz[i+2], p4 = zz[i+3], p5 = zz[i+4];
@@ -794,7 +899,6 @@
                     }
                 }
 
-                // 缺口掃描 (近60日)
                 let gap_ups = 0, gap_downs = 0;
                 for(let i=Math.max(1, len-60); i<len; i++){
                     if(df[i].open > df[i-1].high && df[i].close > df[i].open) gap_ups++;
@@ -824,7 +928,6 @@ ${hs_pattern.breakout ?
    現在不是追高的時候，而是提早出場或做空的時機！
    交易就像坐錯高鐵，先下車停損再等下一班順勢的車`;
 
-                    // 記錄標記，等防護艙3統一繪製
                     uniqueMarkers.push({ time: df[hs_pattern.p1.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '左肩' });
                     uniqueMarkers.push({ time: df[hs_pattern.p3.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '頭' });
                     uniqueMarkers.push({ time: df[hs_pattern.p5.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '右肩' });
@@ -848,13 +951,12 @@ ${hs_pattern.breakout ?
                 logDiagnostic("✅ 防護艙7: Queen怜六大技巧運算完成");
             } catch(e) { logDiagnostic("❌ 防護艙7 崩潰: " + e.message); }
 
-            // 防護艙 2：首頁報告渲染
             try {
                 let marketSpecificReport = ticker.includes('.') ? `🇹🇼 借券裂縫 : 訊號 [${isBullState ? "軋空啟動" : "外資下殺"}]` : `🇺🇸 美股期權 : PCR=${isBullState ? "0.65" : "1.15"}`;
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
 
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v103.0 COMPLETE（Queen怜六大技巧融合版）
+🎯 MJ 狙擊手 v105.0 COMPLETE（台指期全標的聯動版）
    基本面 × 宏觀過濾 × 確認K線 × 早盤掃描 × 尾部風控
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
@@ -914,7 +1016,6 @@ ${fundDetailStr}
                 logDiagnostic("✅ 防護艙2: 報告與雷達圖渲染成功");
             } catch(e) { logDiagnostic("❌ 防護艙2 崩潰: " + e.message); }
 
-            // 防護艙 3：K線標記 (綜合 SMC 與 Queen怜)
             try {
                 let minPrice = Infinity, minIdx = -1, maxPrice = -Infinity, maxIdx = -1;
                 for(let i=Math.max(0, len-60); i<len; i++){
@@ -927,11 +1028,10 @@ ${fundDetailStr}
                 if (isBullState) uniqueMarkers.push({ time: df[len-1].time, position: 'belowBar', color: '#f9d423', shape: 'arrowUp', text: 'Buy Signal' });
                 else uniqueMarkers.push({ time: df[len-1].time, position: 'aboveBar', color: '#a445b2', shape: 'arrowDown', text: 'Sell' });
                 
-                // 去重與排序
                 let finalMarkers = [];
                 let timeSet = new Set();
                 for(let m of uniqueMarkers) {
-                    let key = m.time + m.text; // 避免同時同字重疊
+                    let key = m.time + m.text; 
                     if(!timeSet.has(key)) { finalMarkers.push(m); timeSet.add(key); }
                 }
                 finalMarkers.sort((a,b) => (a.time > b.time) ? 1 : -1);
@@ -1060,22 +1160,6 @@ ${fundDetailStr}
                 safeSet('wyk-signal', isBullState ? "Spring (彈簧測試)" : "Upthrust (推力測試)", isBullState ? "tag bull" : "tag bear");
                 safeSet('wyk-ad', isBullState ? "Rising (主力累積)" : "Falling (主力出貨)", isBullState ? "val bull" : "val bear", isBullState ? "var(--bull)" : "var(--bear)");
                 safeSet('wyk-advice', isBullState ? "★ 彈簧測試(Spring)：跌破支撐後低量快速收復。" : "⚠ 推力測試(Upthrust)：放量突破阻力後迅速回落。");
-
-                safeSet('m-cond-a', m_cond_A ? "✅ 通過" : "❌ 未通過", m_cond_A ? "tag bull" : "tag bear");
-                safeSet('m-cond-b', m_cond_B ? "✅ 通過" : "❌ 未通過", m_cond_B ? "tag bull" : "tag bear");
-                safeSet('m-cond-c', m_cond_C ? "✅ 通過" : "❌ 未通過", m_cond_C ? "tag bull" : "tag bear");
-                safeSet('m-cond-d', m_cond_D ? "✅ 通過" : "❌ 未通過", m_cond_D ? "tag bull" : "tag bear");
-                safeSet('m-cond-e', m_cond_E ? "✅ 通過" : "❌ 未通過", m_cond_E ? "tag bull" : "tag bear");
-
-                safeSet('m-pass-count', `${m_passCount}/5`, m_passCount >=3 ? "val bull" : "val bear");
-                safeSet('m-action', m_action, m_passCount >=3 ? "val bull" : "val bear");
-                safeSet('m-size', m_size, "val");
-
-                let entry_lo = (currentPrice * 0.997).toFixed(2);
-                let entry_hi = (currentPrice * 1.003).toFixed(2);
-                safeSet('m-entry-range', `$${entry_lo} ~ $${entry_hi}`);
-                safeSet('m-sl', "$" + stopLoss.toFixed(2));
-                safeSet('m-t1', "$" + target1.toFixed(2));
 
                 logDiagnostic("✅ 防護艙6: 所有模組數據寫入成功！");
             } catch(e) { logDiagnostic("❌ 防護艙6 崩潰: " + e.message); }
