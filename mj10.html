@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v115.0 - BACKTEST & SMC RESTORED EDITION</title>
+    <title>MJ SNIPER v116.0 - MOBILE CHART RESCUE EDITION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -50,7 +50,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v115.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v116.0</span></div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="2317.TW">
             <button class="btn-main" onclick="fireSniper()">⚡ 分析</button>
@@ -79,7 +79,7 @@
         <div id="tab-overview" class="tab-content active">
             <div class="glass-card" style="border: 2px solid var(--gold);"><h4>🏁 AI 戰略決策中心</h4><div id="decision-box" class="terminal-report">等待載入標的數據...請在上方輸入代碼。</div></div>
             <div class="glass-card" style="border-left: 5px solid #00d4ff;">
-                <h4>🔄 200K線量化回測與突破驗證</h4>
+                <h4>🔄 三過濾策略量化回測 (真實運算)</h4>
                 <div class="row"><span>策略條件：</span> <span class="tag purple">OBV向上 + 站上月線 + 量增1.5倍</span></div>
                 <div class="row"><span>突破回測策略勝率：</span> <span id="bt-winrate" class="val">--</span></div>
                 <div class="row"><span>策略夏普值 (Sharpe)：</span> <span id="bt-sharpe" class="val">--</span></div>
@@ -205,11 +205,11 @@
 
         let chart, candleSeries, volumeSeries, ma20Series, ma60Series, radarObj, rrgChartObj, zzSeries, aiChartObj;
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzP3rZ_wBBkC2d1hQyZblr5aiKwsUy07PtvCTCD0oVY1Uxyog5mCN8-UWSYkpX6du8/exec";
+        
         let globalNotifyData = {};
 
         window.onload = () => {
             initKLine(); initVisuals(); initTabNavScroll(); 
-            window.addEventListener('resize', () => { if(chart && document.getElementById('main-chart').clientWidth > 0) chart.applyOptions({ width: document.getElementById('main-chart').clientWidth }); });
         };
 
         function initTabNavScroll() {
@@ -221,15 +221,36 @@
             slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
         }
 
+        // ★ V116: 重構 K 線圖表初始化，徹底解決手機 Y 軸壓扁問題
         function initKLine() {
             const dom = document.getElementById('main-chart');
             if(!dom) return;
-            chart = LightweightCharts.createChart(dom, { layout: { background: { color: 'transparent' }, textColor: '#8492a6' }, grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } }, timeScale: { borderColor: '#333', timeVisible: true } });
+            chart = LightweightCharts.createChart(dom, { 
+                layout: { background: { color: 'transparent' }, textColor: '#8492a6' }, 
+                grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } }, 
+                timeScale: { borderColor: '#333', timeVisible: true } 
+            });
             candleSeries = chart.addCandlestickSeries({ upColor: '#00f2fe', downColor: '#ff0055', borderVisible: false, wickUpColor: '#00f2fe', wickDownColor: '#ff0055' });
             ma20Series = chart.addLineSeries({ color: '#f9d423', lineWidth: 1, title: 'MA20' });
             ma60Series = chart.addLineSeries({ color: '#a445b2', lineWidth: 1, title: 'MA60' });
             zzSeries = chart.addLineSeries({ color: 'rgba(164, 69, 178, 0.8)', lineWidth: 2, title: 'N字法(ZZ)' });
-            volumeSeries = chart.addHistogramSeries({ color: '#26a69a', priceFormat: { type: 'volume' }, priceScaleId: '', scaleMargins: { top: 0.8, bottom: 0 } });
+            
+            // 獨立的 Volume 軸，強制在底部 20%
+            volumeSeries = chart.addHistogramSeries({ 
+                color: '#26a69a', 
+                priceFormat: { type: 'volume' }, 
+                priceScaleId: '' // 空字串代表分離的 overlay scale
+            });
+            volumeSeries.priceScale().applyOptions({
+                scaleMargins: { top: 0.8, bottom: 0 } // 限定成交量只能顯示在最下方 20%
+            });
+
+            // 加入 ResizeObserver 取代 window resize，手機上更穩定
+            new ResizeObserver(entries => {
+                if (entries.length === 0 || entries[0].target !== dom) return;
+                const newRect = entries[0].contentRect;
+                chart.applyOptions({ width: newRect.width, height: newRect.height });
+            }).observe(dom);
         }
 
         function calculateSMA(data, window) {
@@ -271,7 +292,9 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             const target = document.getElementById(id);
             if (target) { target.style.display = 'flex'; btn.classList.add('active'); }
-            if (id === 'tab-overview' && chart) { setTimeout(() => { chart.applyOptions({ width: document.getElementById('main-chart').clientWidth }); chart.timeScale().fitContent(); }, 10); }
+            if (id === 'tab-overview' && chart) {
+                setTimeout(() => { chart.applyOptions({ width: document.getElementById('main-chart').clientWidth }); chart.timeScale().fitContent(); }, 10);
+            }
         }
 
         function safeSet(id, val, className=null, color=null) {
@@ -436,11 +459,8 @@
             } catch(e) {}
         }
 
-        // ==========================================
-        // ★ V115.0: 全域宣告所有變數，保證絕不崩潰
-        // ==========================================
         function executeAI_ScoringEngine(df, ticker, fundData) {
-            logDiagnostic("開始執行 V115 隔離引擎...");
+            logDiagnostic("開始執行 V116 隔離引擎...");
             if(!df || df.length < 5) { logDiagnostic("K線數量不足"); return; }
             
             let len = df.length;
@@ -659,7 +679,7 @@
                 retestStatus = isTesting ? "🟡 正在回測支撐位 (關鍵時刻)" : (currentPrice > recentMax * 1.05 ? "🟢 突破已確認 (支撐有效)" : "🔴 跌破支撐 (突破失效)");
                 retestScore = (winRate > 50 && isTesting) ? 80 : (winRate > 50 ? 65 : 40);
                 if(currentPrice > recentMax * 1.05) retestScore = 85;
-            } catch(e) {}
+            } catch(e) { logDiagnostic("回測崩潰: " + e.message); }
 
             // D: 早盤
             try {
@@ -703,15 +723,21 @@
             try {
                 q_ma_status = `MA5(${(c.slice(-5).reduce((a,b)=>a+b,0)/5).toFixed(1)}) > MA20(${ma20.toFixed(1)}) > MA60(${ma60.toFixed(1)})`;
                 let dev = 5, last_piv = df[0].close, last_piv_idx = 0, dir = 0;
+                let zzTemp = [];
                 for (let i = 1; i < len; i++) {
-                    if (dir >= 0) { if (df[i].high > last_piv * 1.05) { last_piv = df[i].high; last_piv_idx = i; dir = 1; } else if (df[i].low < last_piv * 0.95) { zz.push({ idx: last_piv_idx, val: last_piv, type: dir === 1 ? 'high' : 'low' }); last_piv = df[i].low; last_piv_idx = i; dir = -1; } } 
-                    else { if (df[i].low < last_piv * 0.95) { last_piv = df[i].low; last_piv_idx = i; dir = -1; } else if (df[i].high > last_piv * 1.05) { zz.push({ idx: last_piv_idx, val: last_piv, type: 'low' }); last_piv = df[i].high; last_piv_idx = i; dir = 1; } }
+                    if (dir >= 0) { if (df[i].high > last_piv * 1.05) { last_piv = df[i].high; last_piv_idx = i; dir = 1; } else if (df[i].low < last_piv * 0.95) { zzTemp.push({ idx: last_piv_idx, val: last_piv, type: dir === 1 ? 'high' : 'low' }); last_piv = df[i].low; last_piv_idx = i; dir = -1; } } 
+                    else { if (df[i].low < last_piv * 0.95) { last_piv = df[i].low; last_piv_idx = i; dir = -1; } else if (df[i].high > last_piv * 1.05) { zzTemp.push({ idx: last_piv_idx, val: last_piv, type: 'low' }); last_piv = df[i].high; last_piv_idx = i; dir = 1; } }
                 }
-                zz.push({ idx: last_piv_idx, val: last_piv, type: dir >= 0 ? 'high' : 'low' });
-                if (zzSeries) zzSeries.setData(zz.map(p => ({ time: df[p.idx].time, value: p.val })));
+                zzTemp.push({ idx: last_piv_idx, val: last_piv, type: dir >= 0 ? 'high' : 'low' });
+                
+                // 去重
+                let zzTimeSet = new Set();
+                for(let p of zzTemp) { let t = df[p.idx].time; if(!zzTimeSet.has(t)) { zz.push({ time: t, value: p.val }); zzTimeSet.add(t); } }
+                zz.sort((a, b) => a.time === b.time ? 0 : (a.time > b.time ? 1 : -1));
+                if (zzSeries) zzSeries.setData(zz);
 
-                for (let i = 0; i < zz.length - 4; i++) {
-                    let p1 = zz[i], p2 = zz[i+1], p3 = zz[i+2], p4 = zz[i+3], p5 = zz[i+4];
+                for (let i = 0; i < zzTemp.length - 4; i++) {
+                    let p1 = zzTemp[i], p2 = zzTemp[i+1], p3 = zzTemp[i+2], p4 = zzTemp[i+3], p5 = zzTemp[i+4];
                     if (p1.type==='high' && p3.type==='high' && p5.type==='high' && p2.type==='low' && p4.type==='low') {
                         if (p3.val > p1.val && p3.val > p5.val && Math.abs(p1.val - p5.val) / ((p1.val + p5.val)/2) <= 0.10) {
                             let neck_now = p4.val + ((p4.val - p2.val) / (p4.idx - p2.idx)) * (len - 1 - p4.idx);
@@ -719,15 +745,16 @@
                         }
                     }
                 }
-            } catch(e) {}
+            } catch(e) { logDiagnostic("Queen 錯誤: " + e.message); }
 
             // ==========================================
-            // 終極防護 UI 渲染區 (保證所有 DOM 100% 更新)
+            // 終極防護 UI 渲染區 (保證所有 DOM 更新)
             // ==========================================
             try {
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
+                
                 const reportHTML = `==========================================================================================
-🎯 MJ 狙擊手 v115.0 COMPLETE（真實回測+SMC補完版）
+🎯 MJ 狙擊手 v116.0 COMPLETE（手機完美適配版）
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 標的名稱: 查詢標的
   分析時間: ${getTimestamp()}
@@ -780,14 +807,12 @@ ${fundDetailStr}
                 safeSet('decision-box', reportHTML);
                 if(radarObj) { radarObj.data.datasets[0].data = [fundScore, smcScore, techScore, obvScore, theoryScore, chipScore, ofiScore, retestScore, kPatternScore]; radarObj.update(); }
 
-                // 回測 UI (V115 真實回測植入)
                 safeSet('bt-winrate', winRate.toFixed(1) + "%", "val");
                 safeSet('bt-sharpe', sharpe_bt.toFixed(2), "val");
                 safeSet('bt-status', retestStatus, (winRate > 50 ? "tag bull" : "tag bear"));
 
                 globalNotifyData = { ticker: ticker, price: currentPrice.toFixed(2), score: finalScore.toFixed(1), advText: advText, smc: smcText, morning_pass: `${m_passCount}/5`, morning_action: m_action, morning_size: m_size, rrg: "可於RRG分頁檢視", sl: stopLoss.toFixed(2), t1: target1.toFixed(2) };
 
-                // 早盤
                 safeSet('m-cond-a', m_cond_A ? "✅ 通過" : "❌ 未通過", m_cond_A ? "tag bull" : "tag bear");
                 safeSet('m-cond-b', m_cond_B ? "✅ 通過" : "❌ 未通過", m_cond_B ? "tag bull" : "tag bear");
                 safeSet('m-cond-c', m_cond_C ? "✅ 通過" : "❌ 未通過", m_cond_C ? "tag bull" : "tag bear");
@@ -800,11 +825,11 @@ ${fundDetailStr}
                 safeSet('m-sl', "$" + stopLoss.toFixed(2));
                 safeSet('m-t1', "$" + target1.toFixed(2));
 
-                // Queen
                 safeSet('q-gap-up', `${df.filter((d,i)=>i>0 && d.open>df[i-1].high && d.close>d.open).length} 次`);
                 safeSet('q-gap-down', `${df.filter((d,i)=>i>0 && d.open<df[i-1].low && d.close<d.open).length} 次`);
                 safeSet('q-zz-count', `${zz.length} 個轉折點`);
                 safeSet('q-ma-status', q_ma_status);
+                
                 if (hs_pattern) {
                     safeSet('q-pattern-status', hs_pattern.breakout ? "🚨 頸線突破 (做空訊號確認)" : "✅ 偵測到頭肩頂 (右肩誘多區)", hs_pattern.breakout ? "tag bear" : "tag warn");
                     safeSet('q-ai-advice', `【AI 動態操作建議】\n若突破頸線 → 全出場 + 立即反手做空。\n若僅在右肩 → 優先減碼 (資金出貨區)。\n💡 提醒：型態完成前提早布局反手。`);
@@ -817,7 +842,7 @@ ${fundDetailStr}
                     safeSet('q-ai-advice', `目前未偵測到完整頭肩頂 → 仍處於多頭趨勢。\n📋 建議：短線可小量做多，嚴格停損勿凹單。`);
                 }
 
-                // ★ V115: SMC 100% 補完回填
+                // SMC 下半部完整寫入
                 safeSet('smc-struct', smcText, "tag " + (recent_bos && !recent_choch ? "bull" : (recent_choch ? "warn" : "")));
                 safeSet('smc-level', swingHigh.toFixed(2), "val");
                 safeSet('smc-bars', bars_since_break > 0 ? bars_since_break : "--", "val");
@@ -846,7 +871,6 @@ ${fundDetailStr}
 
                 safeSet('pat-buy-score', isBullState ? "+4.5" : "0.0", isBullState ? "val bull" : "val");
                 safeSet('pat-sell-score', isBullState ? "0.0" : "-3.5", isBullState ? "val" : "val bear");
-                safeSet('pat-cloud', isBullState ? "🚀Breakout Up(2.5), 📈Engulfing(2)" : "🔻Double Top(-3.5), 📉Shooting Star");
                 safeSet('kdj-macd-res', isBullState ? "Resonance Buy (金叉共振)" : "Resonance Sell (死叉共振)", isBullState ? "tag bull" : "tag bear");
                 safeSet('bb-status', isBullState ? "壓縮突破上軌" : "跌破下軌", "val");
                 safeSet('adx-val', "32.5 (趨勢成型)", "val");
@@ -941,8 +965,11 @@ ${fundDetailStr}
                 uniqueMarkers.push({ time: df[len-1].time, position: isBullState?'belowBar':'aboveBar', color: isBullState?'#f9d423':'#a445b2', shape: isBullState?'arrowUp':'arrowDown', text: isBullState?'Buy':'Sell' });
                 
                 let timeSet = new Set(), finalMarkers = [];
-                for(let m of uniqueMarkers) { let key = m.time + m.text; if(!timeSet.has(key)) { finalMarkers.push(m); timeSet.add(key); } }
-                finalMarkers.sort((a,b) => (a.time > b.time) ? 1 : -1);
+                for(let m of uniqueMarkers) { 
+                    let key = m.time + m.text; 
+                    if(!timeSet.has(key)) { finalMarkers.push(m); timeSet.add(key); } 
+                }
+                finalMarkers.sort((a,b) => (a.time === b.time) ? 0 : ((a.time > b.time) ? 1 : -1));
                 candleSeries.setMarkers(finalMarkers);
 
                 logDiagnostic("✅ UI 渲染與回填全部完成！");
