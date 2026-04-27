@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MJ SNIPER v120.0 - INSTITUTIONAL SMC EDITION</title>
+    <title>MJ SNIPER v122.0 - PURE CODE & MM RESTORED EDITION</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -48,7 +47,7 @@
 </head>
 <body>
     <header class="topbar">
-        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v120.0</span></div>
+        <div style="font-weight: 800; color: var(--cyan);">MJ SNIPER <span style="font-weight:300; color:#fff;">v122.0</span></div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="top-tk" placeholder="2317.TW">
             <button class="btn-main" onclick="fireSniper()">⚡ 分析</button>
@@ -96,10 +95,11 @@
 
         <div id="tab-smc" class="tab-content">
             <div class="glass-card" style="border-left: 5px solid var(--cyan);">
-                <h4>🏦 HTF 大區間與 OTE 甜蜜點</h4>
+                <h4>🏦 HTF 大區間與 OTE 甜蜜點 (62%-79%)</h4>
                 <div class="row"><span>折價/溢價區 (Discount/Premium)：</span> <span id="smc-dp-zone" class="tag">--</span></div>
-                <div class="row"><span>OTE 斐波那契回檔區 (0.618-0.705)：</span> <span id="golden-pocket" class="tag">--</span></div>
-                <div class="info-box">💡 機構金律：HTF 確認大方向。多頭僅在「折價區 (Discount)」或「OTE 甜蜜點」尋找做多機會，避免追高。</div>
+                <div class="row"><span>50% 均衡點狀態 (Equilibrium)：</span> <span id="smc-50-state" class="tag">--</span></div>
+                <div class="row"><span>OTE 黃金區段 (0.62-0.79)：</span> <span id="golden-pocket" class="tag">--</span></div>
+                <div class="info-box" id="ote-tactical-advice">💡 機構金律：必須先穿越 50% 均衡點，進入 OTE 甜蜜點 (70.5%) 才是最佳入場。</div>
             </div>
             <div class="glass-card">
                 <h4>🕵️ 結構轉換與流動性 (BOS/CHoCH)</h4>
@@ -201,21 +201,52 @@
                 <div class="row"><span>建議操作：</span> <span id="m-action" class="val">--</span></div>
                 <div class="row"><span>建議首批倉位：</span> <span id="m-size" class="val">--</span></div>
             </div>
-            <div class="glass-card" style="border-left: 5px solid var(--gold);">
-                <h4>🎯 進場區間與防守設定</h4>
-                <div class="row"><span>建議進場區間：</span> <span id="m-entry-range" class="val">--</span></div>
-                <div class="row"><span>嚴格停損 (SL)：</span> <span id="m-sl" class="val bear">--</span></div>
-                <div class="row"><span>第一目標 (T1)：</span> <span id="m-t1" class="val bull">--</span></div>
-            </div>
         </div>
 
-        <div id="tab-macro" class="tab-content"><div class="glass-card" style="border-left: 5px solid var(--gold);"><h4>🌍 宏觀市場情緒</h4><div class="row"><span>情緒總評分：</span> <span id="macro-score" class="val">--</span></div><div class="info-box" id="macro-reasons" style="text-align:center; font-weight:bold;">掃描中...</div></div><div class="glass-card" style="border-left: 5px solid var(--bear);"><h4>🇨🇳🇭🇰 南北向資金</h4><div class="row"><span>資金類型：</span> <span id="cb-type" class="tag">--</span></div><div class="row"><span>淨流向 (億元)：</span> <span id="cb-flow" class="val">--</span></div><div class="row"><span>資金信號：</span> <span id="cb-sig" class="tag">--</span></div></div><div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>🇺🇸 美股期權分析</h4><div class="row"><span>Put/Call Ratio：</span> <span id="opt-pcr" class="val">--</span></div><div class="row"><span>期權異常活動：</span> <span id="opt-unusual" class="tag">--</span></div><div class="row"><span>總成交量：</span> <span id="opt-vol" class="val">--</span></div></div></div>
-        <div id="tab-tech-all" class="tab-content"><div class="glass-card" style="border-left: 5px solid var(--bull);"><h4>🎭 形態解析與加權分數</h4><div class="row"><span>多頭形態分：</span> <span id="pat-buy-score" class="val">--</span></div><div class="row"><span>空頭形態分：</span> <span id="pat-sell-score" class="val">--</span></div></div><div class="glass-card" style="border-left: 5px solid var(--cyan);"><h4>✨ 進階指標與共振 (KDJ/MACD/BB)</h4><div class="row"><span>KDJ-MACD 共振：</span> <span id="kdj-macd-res" class="tag">--</span></div><div class="row"><span>布林通道 (BB)：</span> <span id="bb-status" class="val">--</span></div><div class="row"><span>ADX 趨勢強度：</span> <span id="adx-val" class="val">--</span></div><div class="row"><span>RVOL 相對量能：</span> <span id="rvol-val" class="tag">--</span></div><div class="row"><span>斜率預測動能：</span> <span id="slope-val" class="val">--</span></div></div><div class="glass-card" style="border: 2px solid var(--gold);"><h4>🛡️ v6.1 K線確認引擎 (進場品質)</h4><div class="row"><span>確認品質分：</span> <span id="k-score" class="val">--</span></div><div class="row"><span>假突破風險：</span> <span id="k-risk-level" class="tag">--</span></div><div class="row"><span>量能狀態：</span> <span id="k-vol-status" class="val">--</span></div><div class="info-box" id="k-timing-advice">評估中...</div></div><div class="glass-card"><h4>📐 技術矩陣 (葛蘭碧/RSI)</h4><div class="row"><span>葛蘭碧規則：</span> <span id="granville-rule" class="tag">--</span></div><div class="row"><span>RSI (14)：</span> <span id="rsi-val" class="val">--</span></div><div class="row"><span>樞軸PP：</span> <span id="pivot-pp" class="val">--</span></div></div><div class="glass-card" style="border-top: 2px solid var(--purple);"><h4>🧪 次世代核心 (OFI/ML)</h4><div class="row"><span>OFI 訊號：</span> <span id="ofi-sig" class="tag">--</span></div><div class="row"><span>OFI Z-Score：</span> <span id="ofi-z" class="val">--</span></div><div class="row"><span>ML 動量：</span> <span id="ml-mom" class="tag">--</span></div><div class="row"><span>波動政權：</span> <span id="vol-regime" class="val">--</span></div></div></div>
+        <div id="tab-macro" class="tab-content">
+            <div class="glass-card" style="border-left: 5px solid var(--gold);"><h4>🌍 宏觀市場情緒</h4><div class="row"><span>情緒總評分：</span> <span id="macro-score" class="val">--</span></div><div class="info-box" id="macro-reasons" style="text-align:center; font-weight:bold;">掃描中...</div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--bear);"><h4>🇨🇳🇭🇰 南北向資金</h4><div class="row"><span>資金類型：</span> <span id="cb-type" class="tag">--</span></div><div class="row"><span>淨流向 (億元)：</span> <span id="cb-flow" class="val">--</span></div><div class="row"><span>資金信號：</span> <span id="cb-sig" class="tag">--</span></div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>🇺🇸 美股期權分析</h4><div class="row"><span>Put/Call Ratio：</span> <span id="opt-pcr" class="val">--</span></div><div class="row"><span>期權異常活動：</span> <span id="opt-unusual" class="tag">--</span></div><div class="row"><span>總成交量：</span> <span id="opt-vol" class="val">--</span></div></div>
+        </div>
         
-        <div id="tab-ai" class="tab-content"><div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>🧠 AI 預測與機率分佈</h4><div class="row"><span>次日預期波動 (1σ)：</span> <span id="ai-expected-move" class="val">--</span></div><div class="row"><span>5日上漲機率：</span> <span id="ai-bull-prob" class="val">--</span></div><div class="row"><span>5日下跌機率：</span> <span id="ai-bear-prob" class="val">--</span></div></div><div class="glass-card"><h4>📈 LSTM 多步預測軌跡 (5 Days)</h4><div style="height:250px; position:relative;"><canvas id="aiPredictChart"></canvas></div></div><div class="glass-card" style="border-top: 2px solid var(--cyan);"><h4>🎯 關鍵價位預測區間 (Scenario Analysis)</h4><div class="row"><span>樂觀情境 (Bull Case)：</span> <span id="ai-target-bull" class="val">--</span></div><div class="row"><span>基準情境 (Base Case)：</span> <span id="ai-target-base" class="val">--</span></div><div class="row"><span>悲觀情境 (Bear Case)：</span> <span id="ai-target-bear" class="val">--</span></div></div></div>
-        <div id="tab-chips" class="tab-content"><div class="glass-card" style="border-top: 2px solid var(--cyan);"><h4>📉 台股/A股 信用交易進階</h4><div class="row"><span>融資餘額 (張)：</span> <span id="margin-bal" class="val">--</span></div><div class="row"><span>融資變化：</span> <span id="margin-chg" class="val">--</span></div><div class="row"><span>融券餘額 (張)：</span> <span id="short-bal" class="val">--</span></div><div class="row"><span>融券變化：</span> <span id="short-chg" class="val">--</span></div><div class="row"><span>券資比：</span> <span id="margin-ratio" class="val">--</span></div></div><div class="glass-card" style="border-left: 5px solid var(--bear);"><h4>📊 借券賣出加速度</h4><div class="row"><span>借券信號：</span> <span id="lend-accel-sig" class="tag">--</span></div><div class="row"><span>5日增減幅度：</span> <span id="lend-chg-5d" class="val">--</span></div></div><div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>⚡ 借券 x K線 裂縫共振</h4><div class="row"><span>共振型態：</span> <span id="lend-div-pat" class="val">--</span></div><div class="info-box" id="lend-div-action" style="font-weight:bold; text-align:center;">等待分析...</div></div><div class="glass-card"><h4>🏦 三大法人與核心信號</h4><div class="row"><span>外資連買：</span> <span id="foreign-days" class="tag">--</span></div><div class="row"><span>三大法人合計：</span> <span id="total-fund" class="val">--</span></div><div class="row"><span>融資餘額：</span> <span id="margin-buy" class="val">--</span></div><div id="chip-signal-tag" class="tag" style="width:100%; text-align:center; padding:12px; margin-top:5px;">等待分析...</div><div class="info-box" id="chip-advice-box">監視外資動向...</div></div></div>
-        <div id="tab-risk" class="tab-content"><div class="glass-card" style="border-left: 5px solid var(--bull);"><h4>🎯 交易計畫與凱利公式</h4><div class="row"><span>風險報酬比 (RR)：</span> <span id="risk-rr" class="val">--</span></div><div class="row"><span>建議資金配置 (Kelly)：</span> <span id="risk-kelly" class="val">--</span></div><div class="row"><span>停損點 (SL)：</span> <span id="risk-sl" class="tag">--</span></div></div><div class="glass-card" style="border-top: 2px solid var(--bear);"><h4>⚠️ 尾部風險估計 (VaR / CVaR)</h4><div class="row"><span>VaR (95%) 最大損失估計：</span> <span id="var-95" class="val">--</span></div><div class="row"><span>VaR (99%) 黑天鵝極端損失：</span> <span id="var-99" class="val">--</span></div><div class="row"><span>CVaR (95%) 條件預期短缺：</span> <span id="cvar-95" class="val">--</span></div></div><div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>⏱️ 多時框共振 & 自適應參數</h4><div class="row"><span>D/W/M 趨勢：</span> <span id="mtf-trends" class="val">--</span></div><div class="row"><span>時框共振信號：</span> <span id="mtf-signal" class="tag">--</span></div><div class="row"><span>年化波動率：</span> <span id="ann-vol" class="val">--</span></div><div class="row"><span>波動率政權 (Regime)：</span> <span id="vol-regime-adv" class="tag">--</span></div></div><div class="glass-card" style="border-left: 5px solid var(--gold);"><h4>🐋 深層籌碼分佈 (大戶/資金流)</h4><div class="row"><span>MFI 資金流動：</span> <span id="chip-mfi" class="val">--</span></div><div class="row"><span>大單異常活躍度：</span> <span id="chip-bigorder" class="val">--</span></div><div class="row"><span>綜合深層信號：</span> <span id="chip-deep-sig" class="tag">--</span></div></div></div>
+        <div id="tab-tech-all" class="tab-content">
+            <div class="glass-card" style="border-left: 5px solid var(--bull);"><h4>🎭 形態解析與加權分數</h4><div class="row"><span>多頭形態分：</span> <span id="pat-buy-score" class="val">--</span></div><div class="row"><span>空頭形態分：</span> <span id="pat-sell-score" class="val">--</span></div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--cyan);"><h4>✨ 進階指標與共振 (KDJ/MACD/BB)</h4><div class="row"><span>KDJ-MACD 共振：</span> <span id="kdj-macd-res" class="tag">--</span></div><div class="row"><span>布林通道 (BB)：</span> <span id="bb-status" class="val">--</span></div><div class="row"><span>ADX 趨勢強度：</span> <span id="adx-val" class="val">--</span></div><div class="row"><span>RVOL 相對量能：</span> <span id="rvol-val" class="tag">--</span></div><div class="row"><span>斜率預測動能：</span> <span id="slope-val" class="val">--</span></div></div>
+            <div class="glass-card" style="border: 2px solid var(--gold);"><h4>🛡️ v6.1 K線確認引擎 (進場品質)</h4><div class="row"><span>確認品質分：</span> <span id="k-score" class="val">--</span></div><div class="row"><span>假突破風險：</span> <span id="k-risk-level" class="tag">--</span></div><div class="row"><span>量能狀態：</span> <span id="k-vol-status" class="val">--</span></div><div class="info-box" id="k-timing-advice">評估中...</div></div>
+            <div class="glass-card"><h4>📐 技術矩陣 (葛蘭碧/RSI)</h4><div class="row"><span>葛蘭碧規則：</span> <span id="granville-rule" class="tag">--</span></div><div class="row"><span>RSI (14)：</span> <span id="rsi-val" class="val">--</span></div><div class="row"><span>樞軸PP：</span> <span id="pivot-pp" class="val">--</span></div></div>
+            <div class="glass-card" style="border-top: 2px solid var(--purple);"><h4>🧪 次世代核心 (OFI/ML)</h4><div class="row"><span>OFI 訊號：</span> <span id="ofi-sig" class="tag">--</span></div><div class="row"><span>OFI Z-Score：</span> <span id="ofi-z" class="val">--</span></div><div class="row"><span>ML 動量：</span> <span id="ml-mom" class="tag">--</span></div><div class="row"><span>波動政權：</span> <span id="vol-regime" class="val">--</span></div></div>
+        </div>
+        
+        <div id="tab-ai" class="tab-content">
+            <div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>🧠 AI 預測與機率分佈</h4><div class="row"><span>次日預期波動 (1σ)：</span> <span id="ai-expected-move" class="val">--</span></div><div class="row"><span>5日上漲機率：</span> <span id="ai-bull-prob" class="val">--</span></div><div class="row"><span>5日下跌機率：</span> <span id="ai-bear-prob" class="val">--</span></div><div class="info-box" id="ai-prob-advice">計算中...</div></div>
+            <div class="glass-card"><h4>📈 LSTM 多步預測軌跡 (5 Days)</h4><div style="height:250px; position:relative;"><canvas id="aiPredictChart"></canvas></div></div>
+            <div class="glass-card" style="border-top: 2px solid var(--cyan);"><h4>🎯 關鍵價位預測區間 (Scenario Analysis)</h4><div class="row"><span>樂觀情境 (Bull Case)：</span> <span id="ai-target-bull" class="val">--</span></div><div class="row"><span>基準情境 (Base Case)：</span> <span id="ai-target-base" class="val">--</span></div><div class="row"><span>悲觀情境 (Bear Case)：</span> <span id="ai-target-bear" class="val">--</span></div></div>
+        </div>
+        
+        <div id="tab-chips" class="tab-content">
+            <div class="glass-card" style="border-top: 2px solid var(--cyan);"><h4>📉 台股/A股 信用交易進階</h4><div class="row"><span>融資餘額 (張)：</span> <span id="margin-bal" class="val">--</span></div><div class="row"><span>融資變化：</span> <span id="margin-chg" class="val">--</span></div><div class="row"><span>融券餘額 (張)：</span> <span id="short-bal" class="val">--</span></div><div class="row"><span>融券變化：</span> <span id="short-chg" class="val">--</span></div><div class="row"><span>券資比：</span> <span id="margin-ratio" class="val">--</span></div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--bear);"><h4>📊 借券賣出加速度</h4><div class="row"><span>借券信號：</span> <span id="lend-accel-sig" class="tag">--</span></div><div class="row"><span>5日增減幅度：</span> <span id="lend-chg-5d" class="val">--</span></div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>⚡ 借券 x K線 裂縫共振</h4><div class="row"><span>共振型態：</span> <span id="lend-div-pat" class="val">--</span></div><div class="info-box" id="lend-div-action" style="font-weight:bold; text-align:center;">等待分析...</div></div>
+            <div class="glass-card"><h4>🏦 三大法人與核心信號</h4><div class="row"><span>外資連買：</span> <span id="foreign-days" class="tag">--</span></div><div class="row"><span>三大法人合計：</span> <span id="total-fund" class="val">--</span></div><div class="row"><span>融資餘額：</span> <span id="margin-buy" class="val">--</span></div><div id="chip-signal-tag" class="tag" style="width:100%; text-align:center; padding:12px; margin-top:5px;">等待分析...</div><div class="info-box" id="chip-advice-box">監視外資動向...</div></div>
+        </div>
+        
+        <div id="tab-risk" class="tab-content">
+            <div class="glass-card" style="border-left: 5px solid var(--bull);">
+                <h4>🎯 交易計畫與停損停利 (機構擴展)</h4>
+                <div class="row"><span>嚴格停損 (SL)：</span> <span id="risk-sl" class="tag">--</span></div>
+                <div class="row"><span>T1 (前高流動性池)：</span> <span id="risk-t1" class="tag">--</span></div>
+                <div class="row"><span>T2 (斐波 -0.5 擴展)：</span> <span id="risk-t2" class="tag">--</span></div>
+                <div class="row"><span>T3 (斐波 -1.0 擴展)：</span> <span id="risk-t3" class="tag">--</span></div>
+                <div class="row"><span>建議資金配置 (Kelly)：</span> <span id="risk-kelly" class="val">--</span></div>
+                <div class="info-box">💡 機構流動性目標：到達 T1 時減倉 50%，剩餘部位將停損上移至成本，追求 T2 (-0.5) 與 T3 (-1.0) 的極致盈虧比。</div>
+            </div>
+            <div class="glass-card" style="border-top: 2px solid var(--bear);"><h4>⚠️ 尾部風險估計 (VaR / CVaR)</h4><div class="row"><span>VaR (95%) 最大損失估計：</span> <span id="var-95" class="val">--</span></div><div class="row"><span>VaR (99%) 黑天鵝極端損失：</span> <span id="var-99" class="val">--</span></div><div class="row"><span>CVaR (95%) 條件預期短缺：</span> <span id="cvar-95" class="val">--</span></div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--purple);"><h4>⏱️ 多時框共振 & 自適應參數</h4><div class="row"><span>D/W/M 趨勢：</span> <span id="mtf-trends" class="val">--</span></div><div class="row"><span>時框共振信號：</span> <span id="mtf-signal" class="tag">--</span></div><div class="row"><span>年化波動率：</span> <span id="ann-vol" class="val">--</span></div><div class="row"><span>波動率政權 (Regime)：</span> <span id="vol-regime-adv" class="tag">--</span></div></div>
+            <div class="glass-card" style="border-left: 5px solid var(--gold);"><h4>🐋 深層籌碼分佈 (大戶/資金流)</h4><div class="row"><span>MFI 資金流動：</span> <span id="chip-mfi" class="val">--</span></div><div class="row"><span>大單異常活躍度：</span> <span id="chip-bigorder" class="val">--</span></div><div class="row"><span>綜合深層信號：</span> <span id="chip-deep-sig" class="tag">--</span></div></div>
+        </div>
+        
         <div id="tab-obv" class="tab-content"><div class="glass-card"><h4>🔮 OBV 四大秘訣判定</h4><div class="row"><span>OBV 百分位：</span> <span id="obv-pct" class="val">--</span></div><div class="row"><span>秘訣一 (底盤整)：</span> <span id="obv-sec-1" class="tag">--</span></div><div class="row"><span>秘訣二 (起漲)：</span> <span id="obv-sec-2" class="tag">--</span></div><div class="row"><span>秘訣三 (背離)：</span> <span id="obv-sec-3" class="tag">--</span></div><div class="row"><span>秘訣四 (作頭)：</span> <span id="obv-sec-4" class="tag">--</span></div></div><div class="glass-card"><h4>⚡ OBV EMA 交叉與總信號</h4><div class="row"><span>EMA30 突破：</span> <span id="obv-ema30-sig" class="tag">--</span></div><div class="row"><span>價格 x EMA3：</span> <span id="obv-ema3-sig" class="tag">--</span></div><div class="info-box" id="obv-final-advice">總結 OBV 信號...</div></div><div class="glass-card"><h4>⚡ 雙重防衛 (Supertrend/Squeeze)</h4><div class="row"><span>Supertrend：</span> <span id="super-trend" class="tag">--</span></div><div class="row"><span>TTM Squeeze：</span> <span id="ttm-squeeze" class="tag warn">--</span></div></div></div>
+        
         <div id="tab-theory" class="tab-content"><div class="glass-card"><h4>📐 道氏 123/2B</h4><div class="row"><span>123法則：</span> <span id="dow-123" class="tag">--</span></div><div class="row"><span>123法則信心分：</span> <span id="dow-123-score" class="val">--</span></div><div class="row"><span>2B 流動性掃描：</span> <span id="dow-2b" class="tag">--</span></div><div class="row"><span>獵取流動性點位：</span> <span id="dow-2b-level" class="val">--</span></div></div><div class="glass-card"><h4>💎 威科夫 Phase A-E</h4><div class="row"><span>VSA 階段：</span> <span id="wyk-phase" class="val">--</span></div><div class="row"><span>結構類型：</span> <span id="wyk-type" class="tag">--</span></div><div class="row"><span>關鍵測試信號：</span> <span id="wyk-signal" class="tag">--</span></div><div class="row"><span>A/D線趨勢：</span> <span id="wyk-ad" class="val">--</span></div><div class="info-box" id="wyk-advice">評估中...</div></div></div>
     </div>
 
@@ -228,7 +259,11 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzP3rZ_wBBkC2d1hQyZblr5aiKwsUy07PtvCTCD0oVY1Uxyog5mCN8-UWSYkpX6du8/exec";
         let globalNotifyData = {};
 
-        window.onload = () => { initKLine(); initVisuals(); initTabNavScroll(); };
+        window.onload = () => { 
+            initKLine(); 
+            initVisuals(); 
+            initTabNavScroll(); 
+        };
 
         function initTabNavScroll() {
             const slider = document.getElementById('scroll-nav');
@@ -242,11 +277,7 @@
         function initKLine() {
             const dom = document.getElementById('main-chart');
             if(!dom) return;
-            chart = LightweightCharts.createChart(dom, { 
-                layout: { background: { color: 'transparent' }, textColor: '#8492a6' }, 
-                grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } }, 
-                timeScale: { borderColor: '#333', timeVisible: true } 
-            });
+            chart = LightweightCharts.createChart(dom, { layout: { background: { color: 'transparent' }, textColor: '#8492a6' }, grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } }, timeScale: { borderColor: '#333', timeVisible: true } });
             candleSeries = chart.addCandlestickSeries({ upColor: '#00f2fe', downColor: '#ff0055', borderVisible: false, wickUpColor: '#00f2fe', wickDownColor: '#ff0055' });
             ma20Series = chart.addLineSeries({ color: '#f9d423', lineWidth: 1, title: 'MA20' });
             ma60Series = chart.addLineSeries({ color: '#a445b2', lineWidth: 1, title: 'MA60' });
@@ -296,7 +327,14 @@
         }
 
         function safeSet(id, val, className=null, color=null) {
-            try { const el = document.getElementById(id); if(el) { el.innerHTML = val; if(className !== null) el.className = className; if(color !== null) el.style.color = color; } } catch(e) {}
+            try { 
+                const el = document.getElementById(id); 
+                if(el) { 
+                    el.innerHTML = val; 
+                    if(className !== null) el.className = className; 
+                    if(color !== null) el.style.color = color; 
+                } 
+            } catch(e) {}
         }
 
         function getTimestamp() {
@@ -307,11 +345,11 @@
             if (!globalNotifyData.ticker) { alert("⚠️ 請先點擊「⚡ 分析」產生數據後再複製！"); return; }
             let d = globalNotifyData;
             let text = `🎯 [MJ SNIPER 實戰推播]\n🔹 標的：${d.ticker}\n🔹 現價：$${d.price}\n🔹 總分：${d.score}/100\n🔹 方向：${d.advText}\n-----------------------\n🛡️ 造市商：${d.mm}\n🏦 SMC：${d.smc}\n🌅 早盤：${d.morning_pass}\n👉 建議：${d.morning_action} (${d.morning_size})\n-----------------------\n🌀 RRG：${d.rrg}\n-----------------------\n🛡️ 停損 (SL)：$${d.sl}\n🏆 目標 (T1)：$${d.t1}\n⏱️ 時間：${getTimestamp()}`;
-            navigator.clipboard.writeText(text).then(() => { alert("✅ 報告已複製！請直接貼上至 Line 或 Telegram 群組！\n\n預覽：\n" + text); }).catch(err => { alert("複製失敗，請手動圈選報表複製。"); });
+            navigator.clipboard.writeText(text).then(() => { alert("✅ 報告已複製！請直接貼上至 Line 或 Telegram 群組！"); }).catch(err => { alert("複製失敗，請手動圈選報表複製。"); });
         }
 
         async function fireSniper() {
-            window.systemDiagnostics = [];
+            window.systemDiagnostics = []; 
             logDiagnostic("開始啟動系統...");
             const tk = document.getElementById('top-tk').value || 'NVDA';
             try {
@@ -338,7 +376,6 @@
                     } catch(ec) {}
                     
                     let currentPrice = df[df.length-1].close;
-                    
                     let txGap = await executeTXModule(tk.toUpperCase(), currentPrice);
                     
                     let dfB = [];
@@ -351,8 +388,6 @@
                     }
                     
                     let rrgQuadrant = executeRRGModule(df, dfB, tk.toUpperCase());
-                    
-                    // 執行 V120 SMC 升級版引擎
                     executeAI_ScoringEngine(df, tk.toUpperCase(), d.fundamentals || {}, rrgQuadrant, txGap);
 
                 } else { document.getElementById('decision-box').innerHTML = `⚠️ 數據擷取失敗。`; }
@@ -485,63 +520,75 @@
         }
 
         // ==========================================
-        // ★ V120.0: 機構級 SMC 滿血進化版 (HTF/LTF, Discount/Premium, Overlap)
+        // ★ V122.0: 全域宣告與純淨邏輯模組
         // ==========================================
         function executeAI_ScoringEngine(df, ticker, fundData, rrgQuadrant, txGap) {
-            logDiagnostic("開始執行 V120 隔離引擎...");
+            logDiagnostic("開始執行 V122 隔離引擎...");
             if(!df || df.length < 5) return;
             
-            // 變數全域提升
-            let len = df.length;
-            let c = df.map(x => x.close), v = df.map(x => x.volume);
-            let currentPrice = c[len-1];
-
+            // --- [1. 全域變數宣告] ---
+            let len = df.length, c = df.map(x => x.close), v = df.map(x => x.volume), currentPrice = c[len-1];
             let techScore=50, smcScore=50, obvScore=50, theoryScore=50, chipScore=50, fundScore=50;
             let ofiScore=50, retestScore=50, kPatternScore=50, baseFinalScore=50, finalScore=50;
             let fundResult = { tier: 'C', details: ["一般體質"] }, valStatus="--", riskPenaltyInfo="";
             let isBullState=false, advText="⚪ 建議觀望", smcText="結構震盪", ote_text="未進入 OTE 區間", ofiText="Neutral";
             let ma20=0, ma60=0, rsi=50, ofiZ=0, winRate=50, sharpe_bt=0, annVol=0, var95=0, var99=0, cvar95=0, regime="Normal", estVal=0;
-            let atr_proxy=0, stopLoss=0, target1=0, target2=0, rrValue=0, kellyPct=0, mfiProxy=50, dealerAct="0", dailyT="Neutral", weeklyT="Neutral", monthlyT="Neutral", mtfScoreCount=0, mtfSignal="--", mtfTag="tag", rsi_p=14, macd_f=12, macd_s=26; 
+            let atr_proxy=0, stopLoss=0, target1=0, target2=0, target3=0, rrValue=0, kellyPct=0, mfiProxy=50, dealerAct="0", dailyT="Neutral", weeklyT="Neutral", monthlyT="Neutral", mtfScoreCount=0;
+            let mtfSignal="--", mtfTag="tag", rsi_p=14, macd_f=12, macd_s=26; 
             
-            // SMC 專屬變數 (V120 擴充)
+            // SMC 專屬變數
             let fvg_val_display="--", fvgSize="--", ob_val_display="--", recent_bos=false, recent_choch=false, last_fvg=0, last_ob=0, bars_since_break=0, swingHigh=0;
             let po3_state="None", sl_hunt_state="False", breakout_state="False", ob_strength="0", tactical_advice="盤整中", smc_flow_text="--", smc_flow_advice="--";
-            let dp_zone_text="--", dp_color="tag", overlap_text="--", overlap_color="tag";
+            let dp_zone_text="--", dp_color="tag", overlap_text="--", overlap_color="tag", eq_state="--", eq_color="tag";
 
             let m_cond_A=false, m_cond_B=false, m_cond_C=false, m_cond_D=false, m_cond_E=false, m_passCount=0, m_action="--", m_size="--", retestStatus="計算中";
             let q_ma_status="--", q_ai_text="--", hs_pattern=null, zz=[], uniqueMarkers = [];
             let zgl=0, gexState="--", gexColor="", hedgingBehavior="--", gexAdvice="--", strategyAdvice="--", winrateBoost="--", dixLevel=0, dixSentiment="--", dixColor="", dixAdvice="--";
+            let rrg_multiplier = 1.0, vetoString = "安全";
 
-            let rrg_multiplier = 1.0;
-            let vetoString = "安全";
-
-            // A: 基本面與 MA
+            // --- [2. A: 基本面與 MA] ---
             try {
-                ma20 = c.slice(-20).reduce((a,b)=>a+b, 0)/Math.min(20, len); ma60 = c.slice(-60).reduce((a,b)=>a+b, 0)/Math.min(60, len);
-                if (currentPrice > ma20) techScore += 20; else techScore -= 15; if (ma20 > ma60) techScore += 20; else techScore -= 10;
-                rsi = len > 1 ? (c[len-1] > c[len-2] ? 65 : 45) : 50; if (rsi > 50) techScore += 10; techScore = Math.max(0, Math.min(100, techScore));
-                let f_score = 0; if(fundData && fundData.market_cap > 1e9) f_score+=1; if(fundData && fundData.trailing_eps > 0) { f_score+=1; estVal = fundData.trailing_eps * 38.5; valStatus = currentPrice < estVal ? "🟢 低於隱含價值" : "🔴 高於隱含價值"; }
-                if (currentPrice > ma60 * 1.05) fundResult.tier = 'A'; else if (currentPrice > ma60) fundResult.tier = 'B'; fundScore = f_score > 1 ? 80 : 50;
+                ma20 = c.slice(-20).reduce((a,b)=>a+b, 0)/Math.min(20, len); 
+                ma60 = c.slice(-60).reduce((a,b)=>a+b, 0)/Math.min(60, len);
+                if (currentPrice > ma20) techScore += 20; else techScore -= 15; 
+                if (ma20 > ma60) techScore += 20; else techScore -= 10;
+                rsi = len > 1 ? (c[len-1] > c[len-2] ? 65 : 45) : 50; 
+                if (rsi > 50) techScore += 10; 
+                techScore = Math.max(0, Math.min(100, techScore));
+                
+                let f_score = 0; 
+                if(fundData && fundData.market_cap > 1e9) f_score+=1; 
+                if(fundData && fundData.trailing_eps > 0) { 
+                    f_score+=1; 
+                    estVal = fundData.trailing_eps * 38.5; 
+                    valStatus = currentPrice < estVal ? "🟢 低於隱含價值" : "🔴 高於隱含價值"; 
+                }
+                if (currentPrice > ma60 * 1.05) fundResult.tier = 'A'; else if (currentPrice > ma60) fundResult.tier = 'B'; 
+                fundScore = f_score > 1 ? 80 : 50;
             } catch(e) {}
 
-            // ★ V120: SMC 機構訂單流滿血版
+            // --- [3. B: SMC 機構訂單流 (V122 精準 OTE 版本)] ---
             try {
-                let tr=[], atr=[]; for(let i=0; i<len; i++) { if(i===0) tr.push(df[i].high - df[i].low); else tr.push(Math.max(df[i].high - df[i].low, Math.abs(df[i].high - df[i-1].close), Math.abs(df[i].low - df[i-1].close))); }
+                let tr=[], atr=[]; 
+                for(let i=0; i<len; i++) { 
+                    if(i===0) tr.push(df[i].high - df[i].low); 
+                    else tr.push(Math.max(df[i].high - df[i].low, Math.abs(df[i].high - df[i-1].close), Math.abs(df[i].low - df[i-1].close))); 
+                }
                 for(let i=0; i<len; i++) { if(i<14) atr.push(tr[i]); else atr.push(tr.slice(i-14, i).reduce((a,b)=>a+b)/14); }
 
-                let fvg_min = 0.004; fvg = new Array(len).fill(0);
+                let fvg_min = 0.004; let fvg = new Array(len).fill(0);
                 for(let i=2; i<len; i++) {
                     if (df[i-1].low > df[i-2].high) { let gap = df[i-1].low - df[i-2].high; if (gap > fvg_min * df[i-2].close) fvg[i] = gap; } 
                     else if (df[i-1].high < df[i-2].low) { let gap = df[i-2].low - df[i-1].high; if (gap > fvg_min * df[i-2].close) fvg[i] = -gap; }
                 }
 
-                ob_val = new Array(len).fill(0);
+                let ob_val = new Array(len).fill(0);
                 for(let i=3; i<len; i++) {
                     if (df[i].close > df[i-3].close && df[i-1].close < df[i-1].open) { if (Math.abs(df[i-1].close - df[i-1].open) > 0.5 * atr[i-1]) ob_val[i-1] = df[i-1].high; } 
                     else if (df[i].close < df[i-3].close && df[i-1].close > df[i-1].open) { if (Math.abs(df[i-1].close - df[i-1].open) > 0.5 * atr[i-1]) ob_val[i-1] = -df[i-1].low; }
                 }
 
-                bos_arr = new Array(len).fill(false); choch_arr = new Array(len).fill(false);
+                let bos_arr = new Array(len).fill(false), choch_arr = new Array(len).fill(false);
                 let sw_high = new Array(len).fill(0), sw_low = new Array(len).fill(0);
                 for(let i=2; i<len-2; i++) {
                     sw_high[i] = Math.max(df[i-2].high, df[i-1].high, df[i].high, df[i+1].high, df[i+2].high);
@@ -553,28 +600,28 @@
                     if ((df[i].close > prev_h && df[i-1].close < prev_l) || (df[i].close < prev_l && df[i-1].close > prev_h)) choch_arr[i] = true;
                 }
 
-                // V120: Premium / Discount Zone Calculation
                 let recent_sw_low = Math.min(...c.slice(Math.max(0, len-30)));
                 let recent_sw_high = Math.max(...c.slice(Math.max(0, len-30)));
                 let mid_price = (recent_sw_high + recent_sw_low) / 2;
-                if (currentPrice <= mid_price) {
-                    dp_zone_text = "折價區 (Discount) - 適合作多"; dp_color = "tag bull";
-                } else {
-                    dp_zone_text = "溢價區 (Premium) - 適合作空"; dp_color = "tag bear";
+                
+                if (currentPrice <= mid_price) { 
+                    dp_zone_text = "折價區 (Discount) - 適合作多"; dp_color = "tag bull"; 
+                    eq_state = "✓ 已跌破 50% 進入折價區"; eq_color = "tag bull"; 
+                } else { 
+                    dp_zone_text = "溢價區 (Premium) - 適合作空"; dp_color = "tag bear"; 
+                    eq_state = "⚠️ 仍在溢價區，多頭回調過淺"; eq_color = "tag warn"; 
                 }
 
-                po3_arr = new Array(len).fill('None');
+                let po3_arr = new Array(len).fill('None');
                 for(let i=20; i<len; i++) {
-                    let vol_ma = v.slice(i-20, i).reduce((a,b)=>a+b)/20;
-                    let hl_diff = Math.abs(df[i].high - df[i].low);
+                    let vol_ma = v.slice(i-20, i).reduce((a,b)=>a+b)/20; let hl_diff = Math.abs(df[i].high - df[i].low);
                     if (hl_diff < 0.008 * df[i].close && df[i].volume < 0.8 * vol_ma) po3_arr[i] = 'Accumulation';
                     else if (Math.abs(df[i].high - Math.abs(ob_val[i])) < 0.005 * df[i].close || Math.abs(df[i].low - Math.abs(ob_val[i])) < 0.005 * df[i].close) po3_arr[i] = 'Manipulation';
                     else if (fvg[i] !== 0 && df[i].volume > 1.5 * vol_ma) po3_arr[i] = 'Distribution';
                 }
                 po3_state = po3_arr[len-1];
 
-                // V120: OTE 甜蜜點修正為 0.618 - 0.705
-                ote_zone = new Array(len).fill(0);
+                let ote_zone = new Array(len).fill(0);
                 let sh_idx = new Array(len).fill(-1), sl_idx = new Array(len).fill(-1);
                 for(let i=10; i<len-10; i++) {
                     let h_window = df.slice(i-10, i+11).map(x=>x.high), l_window = df.slice(i-10, i+11).map(x=>x.low);
@@ -591,10 +638,10 @@
                         let hp = df[sh_i].high, lp = df[sl_i].low, impulse = hp - lp;
                         if(impulse > 0) {
                             if (sh_i > sl_i) { 
-                                let ote_u = hp - impulse * 0.618, ote_l = hp - impulse * 0.705; 
+                                let ote_u = hp - impulse * 0.62, ote_l = hp - impulse * 0.79; 
                                 if(df[i].close >= ote_l && df[i].close <= ote_u) ote_zone[i] = 1; 
                             } else { 
-                                let ote_u = lp + impulse * 0.705, ote_l = lp + impulse * 0.618; 
+                                let ote_u = lp + impulse * 0.79, ote_l = lp + impulse * 0.62; 
                                 if(df[i].close >= ote_l && df[i].close <= ote_u) ote_zone[i] = -1; 
                             }
                         }
@@ -606,19 +653,16 @@
                     if(last_ob === 0 && ob_val[i] !== 0) last_ob = ob_val[i];
                 }
                 
-                // V120: FVG + OB Overlap Detection
                 let fvg_ob_overlap = false;
                 if (last_fvg > 0 && last_ob > 0 && Math.abs(last_fvg - last_ob) / currentPrice < 0.02) fvg_ob_overlap = true;
                 if (last_fvg < 0 && last_ob < 0 && Math.abs(Math.abs(last_fvg) - Math.abs(last_ob)) / currentPrice < 0.02) fvg_ob_overlap = true;
 
-                if (fvg_ob_overlap) {
-                    overlap_text = "🔥 發現完美重疊 (高勝率進場區)"; overlap_color = "tag bull";
-                } else {
-                    overlap_text = "未發現重疊"; overlap_color = "tag";
-                }
+                if (fvg_ob_overlap) { overlap_text = "🔥 發現完美重疊 (高勝率進場區)"; overlap_color = "tag bull"; } 
+                else { overlap_text = "未發現重疊"; overlap_color = "tag"; }
 
                 if (last_fvg > 0) { fvg_val_display = "Bullish FVG"; fvgSize = (last_fvg / currentPrice * 100).toFixed(2) + "%"; }
                 else if (last_fvg < 0) { fvg_val_display = "Bearish FVG"; fvgSize = (Math.abs(last_fvg) / currentPrice * 100).toFixed(2) + "%"; }
+                
                 if (last_ob > 0) { ob_val_display = "Bull OB ($" + last_ob.toFixed(2) + ")"; ob_strength = "3 (強)"; }
                 else if (last_ob < 0) { ob_val_display = "Bear OB ($" + Math.abs(last_ob).toFixed(2) + ")"; ob_strength = "3 (強)"; }
 
@@ -640,13 +684,21 @@
                 if (recent_choch) { smc_dynamic += 15; structTexts.push("LTF CHoCH(結構轉變)"); }
                 smcText = structTexts.length > 0 ? structTexts.join(" + ") + " 觸發" : "結構震盪";
                 
-                if (ote_zone[len-1] === 1) { smc_dynamic += 10; ote_text = "🟢 落入做多 OTE (62%-70.5%)"; }
-                else if (ote_zone[len-1] === -1) { smc_dynamic += 10; ote_text = "🔴 落入做空 OTE (62%-70.5%)"; }
+                if (currentPrice > mid_price && ote_zone[len-1] === 1) { 
+                    ote_text = "❌ 回調不足，尚未跌破 50%"; 
+                } else if (ote_zone[len-1] === 1) { 
+                    smc_dynamic += 10; 
+                    let ote_dist = Math.abs(currentPrice - (recent_sw_high - (recent_sw_high-recent_sw_low)*0.705));
+                    if (ote_dist / currentPrice < 0.01) ote_text = "🎯 精準落入 70.5% 甜蜜點！";
+                    else ote_text = "🟢 落入做多 OTE 區間 (62%-79%)"; 
+                } else if (ote_zone[len-1] === -1) { 
+                    smc_dynamic += 10; ote_text = "🔴 落入做空 OTE 區間"; 
+                }
+                
                 if (fvg_ob_overlap) smc_dynamic += 15;
 
-                // V120: Tactical Advice
-                if (last_fvg > 0 && currentPrice > ma60) {
-                    tactical_advice = "🛡️ 順勢：回測多頭 FVG/OB 區間，等待 LTF 小級別 BOS 確認後做多。";
+                if (last_fvg > 0 && currentPrice > ma60 && currentPrice <= mid_price) {
+                    tactical_advice = "🛡️ 順勢：價格已進入折價區，回測 FVG/OB 後等待 LTF 確認做多。";
                     if (fvg_ob_overlap) tactical_advice = "🔥 極佳時機：FVG 與 OB 完美重疊，為機構高勝率成本區！";
                 } else if (choch_arr[len-1]) {
                     tactical_advice = "⚠️ CHoCH 反轉：已掃蕩流動性，等待回測新 FVG 進場，停損設於結構外側。";
@@ -657,9 +709,9 @@
                 let vol_ma_last = v.slice(Math.max(0, len-20)).reduce((a,b)=>a+b)/20;
                 if (df[len-1].volume > 1.5 * vol_ma_last) smc_dynamic += 10;
                 smcScore = Math.max(0, Math.min(100, smc_dynamic));
-            } catch(e) { logDiagnostic("Mod B SMC Error: " + e.message); }
+            } catch(e) {}
 
-            // C: OFI與其他技術
+            // --- [4. C: OFI與其他技術] ---
             try {
                 let ofi_arr = [0];
                 for(let i=1; i<len; i++) { let dP = c[i] - c[i-1]; ofi_arr.push(dP > 0 ? v[i] : (dP < 0 ? -v[i] : 0)); }
@@ -681,7 +733,7 @@
                 cvar95 = cvar95_rets.length > 0 ? (cvar95_rets.reduce((a,b)=>a+b,0)/cvar95_rets.length)*100 : var95;
             } catch(e) {}
 
-            // 模組 D: 量化回測
+            // --- [5. D: 量化回測] ---
             try {
                 let bt_trades = [];
                 let in_trade = false, entry_price = 0, entry_i = 0;
@@ -734,7 +786,7 @@
                 if(currentPrice > recentMax * 1.05) retestScore = 85;
             } catch(e) {}
 
-            // 模組 E: 形態與 Queen 技巧
+            // --- [6. E: 形態與早盤] ---
             try {
                 let currCandle = df[len-1]; let prevCandle = df[len-2] || df[0];
                 let isBullCandle = currCandle.close > currCandle.open;
@@ -743,6 +795,14 @@
                 
                 if (currentPrice > ma20) { kPatternScore = isBullCandle ? 80 : 60; } 
                 else { kPatternScore = isBullCandle ? 40 : 20; if (upperShadow > bodySize * 1.5) kPatternScore -= 15; }
+
+                let vol_ma_last = v.slice(Math.max(0, len-21), len-1).reduce((a,b)=>a+b,0)/20;
+                m_cond_A = currCandle.open >= prevCandle.close * 0.995;
+                m_cond_B = (vol_ma_last > 0 ? currCandle.volume / vol_ma_last : 1) >= 0.9; 
+                m_cond_C = currCandle.high >= prevCandle.high * 1.001;
+                m_cond_D = rsi >= 50;
+                m_cond_E = bodySize > 0.01 ? (upperShadow <= bodySize * 1.5) : true;
+                m_passCount = [m_cond_A, m_cond_B, m_cond_C, m_cond_D, m_cond_E].filter(Boolean).length;
                 
                 q_ma_status = `MA5(${(c.slice(-5).reduce((a,b)=>a+b,0)/5).toFixed(1)}) > MA20(${ma20.toFixed(1)}) > MA60(${ma60.toFixed(1)})`;
                 let dev = 5, last_piv = df[0].close, last_piv_idx = 0, dir = 0;
@@ -764,56 +824,61 @@
                 }
             } catch(e) {}
 
-            // ==========================================
-            // ★ V120.0: 終極戰略指揮大腦 (The Brain)
-            // ==========================================
+            // --- [7. F: 戰略大腦與風控擴展] ---
             try {
-                // 1. 計算基礎分
                 baseFinalScore = (fundScore * 0.1) + (smcScore * 0.2) + (techScore * 0.1) + (obvScore * 0.1) + (chipScore * 0.05) + (theoryScore * 0.05) + (ofiScore * 0.1) + (retestScore * 0.15) + (kPatternScore * 0.15);
                 finalScore = baseFinalScore;
-                atr_proxy = currentPrice * 0.03; 
-                stopLoss = currentPrice - atr_proxy * 2; 
+                
+                let recent_sw_low = Math.min(...c.slice(Math.max(0, len-30)));
+                let recent_sw_high = Math.max(...c.slice(Math.max(0, len-30)));
+                let impulse = recent_sw_high - recent_sw_low;
 
-                // 2. RRG 乘數加成
+                stopLoss = recent_sw_low * 0.99; 
+                target1 = recent_sw_high; 
+                target2 = recent_sw_high + (impulse * 0.5); 
+                target3 = recent_sw_high + impulse; 
+
                 if (rrgQuadrant && rrgQuadrant.includes("領先")) { rrg_multiplier = 1.1; riskPenaltyInfo += `<br><span class="hl-bull">🚀 [RRG加成] 資金領先區，放大勝率！</span>`; }
                 else if (rrgQuadrant && rrgQuadrant.includes("改善")) { rrg_multiplier = 1.05; }
                 else if (rrgQuadrant && rrgQuadrant.includes("落後")) { rrg_multiplier = 0.8; riskPenaltyInfo += `<br><span class="hl-bear">⚠️ [RRG逆風] 資金落後區，總分打8折。</span>`; }
                 else if (rrgQuadrant && rrgQuadrant.includes("轉弱")) { rrg_multiplier = 0.9; }
                 finalScore *= rrg_multiplier;
 
-                // 3. GEX 造市商動態策略切換
+                // ★ V122.0 補回的 GEX 與 DIX 造市商防線
                 zgl = ma60 * 1.02; 
                 let isPositiveGamma = currentPrice > zgl;
                 if (isPositiveGamma) {
                     gexState = "正 Gamma (Positive)"; gexColor = "tag bull"; hedgingBehavior = "高出低進 (壓抑波動)";
                     gexAdvice = "📉 股價處於正 Gamma 區間，造市商逢高賣出、逢低買進以對沖風險。波動率被壓縮。";
                     strategyAdvice = "震盪均值回歸 (Mean Reversion)"; winrateBoost = "突破策略勝率 ↓ (容易假突破)";
-                    target1 = currentPrice + (atr_proxy * 1.5); 
+                    target1 = currentPrice + (currentPrice * 0.05); 
                     riskPenaltyInfo += `<br><span class="hl-warn">⚠️ [造市商] 正Gamma壓抑波動，停利收窄。</span>`;
                 } else {
                     gexState = "負 Gamma (Negative)"; gexColor = "tag bear"; hedgingBehavior = "追漲殺跌 (放大波動)";
                     gexAdvice = "🔥 股價跌入負 Gamma 區間！造市商被迫追漲殺跌（Gamma Squeeze），極易暴漲暴跌！";
                     strategyAdvice = "順勢突破 (Trend Breakout)"; winrateBoost = "突破策略勝率高達 80% ↑";
-                    target1 = currentPrice + (atr_proxy * 3.0); 
                     riskPenaltyInfo += `<br><span class="hl-bull">🔥 [造市商] 負Gamma擠壓，放寬停利追擊！</span>`;
                 }
-                
+
                 dixLevel = 35 + (rsi / 100) * 20; 
-                if (dixLevel > 45) { dixSentiment = "Bullish (暗中吸籌)"; dixColor = "tag bull"; dixAdvice = "DIX 顯示大戶正在暗池悄悄買進。"; } 
-                else { dixSentiment = "Bearish (缺乏買盤)"; dixColor = "tag bear"; dixAdvice = "DIX 顯示暗池缺乏買盤支撐。"; }
+                if (dixLevel > 45) { 
+                    dixSentiment = "Bullish (暗中吸籌)"; 
+                    dixColor = "tag bull"; 
+                    dixAdvice = "DIX 顯示大戶正在暗池悄悄買進。"; 
+                } else { 
+                    dixSentiment = "Bearish (缺乏買盤)"; 
+                    dixColor = "tag bear"; 
+                    dixAdvice = "DIX 顯示暗池缺乏買盤支撐。"; 
+                }
 
-                // 4. 波動率折切
-                if (annVol > 0.40 || Math.abs(var95) > 5.0) { finalScore *= 0.85; riskPenaltyInfo += `<br><span class="hl-bear">⚠️ [風控預警] 偵測到高波動，總分打0.85折。</span>`; } 
-
-                // 5. Queen 一票否決 (Veto)
                 if (hs_pattern) {
                     if (hs_pattern.breakout) { 
                         finalScore = Math.min(finalScore, 20); 
-                        vetoString = "跌破頸線 (強制翻空)";
+                        vetoString = "跌破頸線 (強制翻空)"; 
                         riskPenaltyInfo += `<br><span class="hl-bear">🚨 [Queen否決] 跌破頸線，系統強制翻空！</span>`; 
                     } else { 
                         finalScore -= 15; 
-                        vetoString = "右肩誘多 (限制倉位)";
+                        vetoString = "右肩誘多 (限制倉位)"; 
                         riskPenaltyInfo += `<br><span class="hl-warn">⚠️ [Queen預警] 右肩誘多，強制限制倉位！</span>`; 
                     }
                 }
@@ -821,24 +886,9 @@
                 finalScore = Math.max(0, Math.min(100, finalScore));
                 isBullState = finalScore >= 55;
                 
-                // 6. 計算資金比例 (Kelly)
                 rrValue = (currentPrice - stopLoss) > 0 ? ((target1 - currentPrice)/(currentPrice - stopLoss)).toFixed(2) : 0;
-                let winRateK = isBullState ? 0.60 : 0.45; 
-                kellyPct = rrValue > 0 ? ((winRateK - (1-winRateK)/rrValue) * 100 * 0.5).toFixed(1) : 0;
+                let winRateK = isBullState ? 0.60 : 0.45; kellyPct = rrValue > 0 ? ((winRateK - (1-winRateK)/rrValue) * 100 * 0.5).toFixed(1) : 0;
                 if (hs_pattern && !hs_pattern.breakout) kellyPct = Math.min(kellyPct, 20);
-
-                // 7. 基礎早盤決策
-                let vol_ma_last = v.slice(Math.max(0, len-21), len-1).reduce((a,b)=>a+b,0)/20;
-                let currCandle = df[len-1]; let prevCandle = df[len-2] || df[0];
-                let bodySize = Math.abs(currCandle.close - currCandle.open);
-                let upperShadow = currCandle.high - Math.max(currCandle.close, currCandle.open);
-
-                m_cond_A = currCandle.open >= prevCandle.close * 0.995;
-                m_cond_B = (vol_ma_last > 0 ? currCandle.volume / vol_ma_last : 1) >= 0.9; 
-                m_cond_C = currCandle.high >= prevCandle.high * 1.001;
-                m_cond_D = rsi >= 50;
-                m_cond_E = bodySize > 0.01 ? (upperShadow <= bodySize * 1.5) : true;
-                m_passCount = [m_cond_A, m_cond_B, m_cond_C, m_cond_D, m_cond_E].filter(Boolean).length;
 
                 advText = finalScore >= 75 ? "🔴 強烈買進" : finalScore >= 55 ? "🟡 偏多操作" : finalScore >= 40 ? "⚪ 建議觀望" : "🟢 建議賣出";
 
@@ -846,31 +896,29 @@
                 else if (m_passCount === 4) { m_action = "🟢 標準進場"; m_size = `首批 ${Math.max(0, Math.floor(kellyPct*0.6))}%`; } 
                 else if (m_passCount === 3) { m_action = "🟡 保守試探"; m_size = `首批 ${Math.max(0, Math.floor(kellyPct*0.3))}%`; } 
                 else { m_action = "⏳ 條件不足"; m_size = "0% (觀望)"; }
-
-                // 8. 台指期微調 (TX Filter)
-                if (finalScore >= 75 && txGap < -50) {
+                
+                if (finalScore >= 75 && txGap < -50) { 
                     advText = "🟡 遞延買進 (期指逆風)"; 
                     m_action = "等待 09:30 後觀察抗跌性再買"; 
-                    riskPenaltyInfo += `<br><span class="hl-warn">⚠️ [期指逆風] 夜盤大跌，延後建倉。</span>`;
-                } else if (finalScore >= 75 && txGap > 50) {
+                    riskPenaltyInfo += `<br><span class="hl-warn">⚠️ [期指逆風] 夜盤大跌，延後建倉。</span>`; 
+                } else if (finalScore >= 75 && txGap > 50) { 
                     advText = "🚀 強烈買進 (期現共振)"; 
-                    riskPenaltyInfo += `<br><span class="hl-bull">🔥 [期現共振] 夜盤大漲，開盤可積極佈局。</span>`;
-                } else if (!isBullState && m_passCount < 4) {
-                    m_action = "⚠ 大盤/總分偏弱，需 4/5 才能進場"; m_size = "0%";
+                    riskPenaltyInfo += `<br><span class="hl-bull">🔥 [期現共振] 夜盤大漲，開盤可積極佈局。</span>`; 
+                } else if (!isBullState && m_passCount < 4) { 
+                    m_action = "⚠ 大盤/總分偏弱，需 4/5 才能進場"; 
+                    m_size = "0%"; 
                 }
             } catch(e) { logDiagnostic("戰略大腦崩潰: " + e.message); }
 
             // ==========================================
-            // 終極防護 UI 渲染區 (14 道獨立防護艙)
+            // --- [8. UI 渲染區 (14 道標準防護艙，徹底防空白)] ---
             // ==========================================
             
-            // UI 1: 首頁報告與雷達
             try {
                 let fundDetailStr = fundResult.details.map(d => `    ${d}`).join('\n');
                 let txGapText = txGap > 0 ? '+' + txGap.toFixed(0) : txGap.toFixed(0);
-                
                 const reportHTML = `==========================================================================================
-🎯 MJ SNIPER v120.0 COMPLETE（機構 SMC 滿血進化版）
+🎯 MJ SNIPER v122.0 COMPLETE（DIX暗池補完版）
 ==========================================================================================
   <span class="hl-cyan">股票代碼: ${ticker}</span> | 現價: $${currentPrice.toFixed(2)}
   分析時間: ${getTimestamp()}
@@ -908,7 +956,7 @@ ${fundDetailStr}
   4. 📚 威科夫道氏 (${(theoryScore * 0.05).toFixed(1)}分) : 趨勢: ${isBullState?'Rising':'Falling'}。
   5. 💰 真實籌碼 (${(chipScore * 0.05).toFixed(1)}分) : 外資連買: ${isBullState?'Bullish':'Bearish'}。
   6. ⚖️ OFI 訂單流 (${(ofiScore * 0.10).toFixed(1)}分) : Z-Score = ${ofiZ.toFixed(2)}。
-  7. 🔄 量化回測 (${(retestScore * 0.15).toFixed(1)}分) : 勝率 ${winRate.toFixed(1)}% (策略: 外資+月線+量能)
+  7. 🔄 量化回測 (${(retestScore * 0.15).toFixed(1)}分) : 勝率 ${winRate.toFixed(1)}%
   8. 🕯️ K線與形態 (${(kPatternScore * 0.15).toFixed(1)}分) : ${isBullState ? '多頭型態' : '弱勢型態'}。
 
 🕯️ [第三層-確認K線] 進場時機品質分析
@@ -921,29 +969,35 @@ ${fundDetailStr}
   [A.開盤不破位: ${m_cond_A ? "✅" : "❌"}] [B.量能維持: ${m_cond_B ? "✅" : "❌"}] [C.突破昨高: ${m_cond_C ? "✅" : "❌"}]
   [D.RSI>50: ${m_cond_D ? "✅" : "❌"}] [E.無假突破: ${m_cond_E ? "✅" : "❌"}]
   => 早盤操作建議: ${m_action} | ${m_size}
-  => 建議進場區間: $${(currentPrice * 0.997).toFixed(2)} ~ $${(currentPrice * 1.003).toFixed(2)}
 
-🎯 [第五層-交易計畫與極端風控]
+🎯 [第五層-交易計畫與機構風控]
 ==========================================================================================
   ╔══════════════════════════════════════════════╗
   ║  總分操作方向: <span class="${isBullState ? 'hl-bull' : 'hl-bear'}">${advText}</span>
   ║  現價: <span class="hl-cyan">${currentPrice.toFixed(2)}</span>
-  ║  停損 (SL): <span class="hl-bear">${stopLoss.toFixed(2)}</span> | T1: <span class="hl-gold">${target1.toFixed(2)}</span>
+  ║  停損 (SL): <span class="hl-bear">${stopLoss.toFixed(2)}</span> (結構低點保護)
+  ║  目標 T1: <span class="hl-gold">${target1.toFixed(2)}</span> (前高流動性池)
+  ║  目標 T2: <span class="hl-gold">${target2.toFixed(2)}</span> (斐波 -0.5 擴展)
   ║  風控比例 (RR): 1:${rrValue} 
   ╚══════════════════════════════════════════════╝`;
                 safeSet('decision-box', reportHTML);
-                if(radarObj) { radarObj.data.datasets[0].data = [fundScore, smcScore, techScore, obvScore, theoryScore, chipScore, ofiScore, retestScore, kPatternScore]; radarObj.update(); }
+                if(radarObj) { 
+                    radarObj.data.datasets[0].data = [fundScore, smcScore, techScore, obvScore, theoryScore, chipScore, ofiScore, retestScore, kPatternScore]; 
+                    radarObj.update(); 
+                }
                 safeSet('bt-winrate', winRate.toFixed(1) + "%", "val");
                 safeSet('bt-sharpe', sharpe_bt.toFixed(2), "val");
                 safeSet('bt-status', retestStatus, (winRate > 50 ? "tag bull" : "tag bear"));
             } catch(e) { logDiagnostic("UI-1 Error: " + e.message); }
 
-            // UI 2: 推播數據
             try {
-                globalNotifyData = { ticker: ticker, price: currentPrice.toFixed(2), score: finalScore.toFixed(1), advText: advText, mm: gexState, smc: smcText, morning_pass: `${m_passCount}/5`, morning_action: m_action, morning_size: m_size, rrg: rrgQuadrant || "分析中", sl: stopLoss.toFixed(2), t1: target1.toFixed(2) };
-            } catch(e) { logDiagnostic("UI-2 Error: " + e.message); }
+                globalNotifyData = { 
+                    ticker: ticker, price: currentPrice.toFixed(2), score: finalScore.toFixed(1), advText: advText, 
+                    mm: gexState, smc: smcText, morning_pass: `${m_passCount}/5`, morning_action: m_action, morning_size: m_size, 
+                    rrg: rrgQuadrant || "分析中", sl: stopLoss.toFixed(2), t1: target1.toFixed(2) 
+                };
+            } catch(e) {}
 
-            // UI 3: 早盤
             try {
                 safeSet('m-cond-a', m_cond_A ? "✅ 通過" : "❌ 未通過", m_cond_A ? "tag bull" : "tag bear");
                 safeSet('m-cond-b', m_cond_B ? "✅ 通過" : "❌ 未通過", m_cond_B ? "tag bull" : "tag bear");
@@ -954,10 +1008,8 @@ ${fundDetailStr}
                 safeSet('m-action', m_action, m_passCount >=3 ? "val bull" : "val bear");
                 safeSet('m-size', m_size, "val");
                 safeSet('m-entry-range', `$${(currentPrice * 0.997).toFixed(2)} ~ $${(currentPrice * 1.003).toFixed(2)}`);
-                safeSet('m-sl', "$" + stopLoss.toFixed(2)); safeSet('m-t1', "$" + target1.toFixed(2));
-            } catch(e) { logDiagnostic("UI-3 Error: " + e.message); }
+            } catch(e) {}
 
-            // UI 4: Queen
             try {
                 safeSet('q-gap-up', `${df.filter((d,i)=>i>0 && d.open>df[i-1].high && d.close>d.open).length} 次`);
                 safeSet('q-gap-down', `${df.filter((d,i)=>i>0 && d.open<df[i-1].low && d.close<d.open).length} 次`);
@@ -965,7 +1017,7 @@ ${fundDetailStr}
                 safeSet('q-ma-status', q_ma_status);
                 if (hs_pattern) {
                     safeSet('q-pattern-status', hs_pattern.breakout ? "🚨 頸線突破 (做空訊號確認)" : "✅ 偵測到頭肩頂 (右肩誘多區)", hs_pattern.breakout ? "tag bear" : "tag warn");
-                    safeSet('q-ai-advice', `【AI 動態操作建議】\n若突破頸線 → 全出場 + 立即反手做空。\n若僅在右肩 → 優先減碼 (資金出貨區)。\n💡 提醒：型態完成前提早布局反手。`);
+                    safeSet('q-ai-advice', `【AI 動態操作建議】\n若突破頸線 → 全出場 + 立即反手做空。\n若僅在右肩 → 優先減碼 (資金出貨區)。`);
                     uniqueMarkers.push({ time: df[hs_pattern.p1.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '左肩' });
                     uniqueMarkers.push({ time: df[hs_pattern.p3.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '頭' });
                     uniqueMarkers.push({ time: df[hs_pattern.p5.idx].time, position: 'aboveBar', color: '#f9d423', shape: 'arrowDown', text: '右肩' });
@@ -974,9 +1026,8 @@ ${fundDetailStr}
                     safeSet('q-pattern-status', "未偵測到頭肩頂", "tag");
                     safeSet('q-ai-advice', `目前未偵測到完整頭肩頂 → 仍處於多頭趨勢。\n📋 建議：短線可小量做多，嚴格停損勿凹單。`);
                 }
-            } catch(e) { logDiagnostic("UI-4 Error: " + e.message); }
+            } catch(e) {}
 
-            // UI 5: Macro
             try {
                 safeSet('macro-score', isBullState ? "3/3 🟢🟢 (強勢)" : "0/3 🔴 (弱勢)", isBullState ? "val bull" : "val bear");
                 safeSet('macro-reasons', isBullState ? "✓ 站上基準 MA20 | ✓ 大盤上升趨勢" : "✗ 跌破基準 MA20 | ✗ 下降趨勢");
@@ -986,9 +1037,8 @@ ${fundDetailStr}
                 safeSet('opt-pcr', isBullState ? "0.65 (低PCR看多)" : "1.15 (高PCR看空)", isBullState ? "val bull" : "val bear");
                 safeSet('opt-unusual', isBullState ? "🔥 大單 Call 進場" : "⚠️ 大單 Put 避險", isBullState ? "tag bull" : "tag bear");
                 safeSet('opt-vol', isBullState ? "125,430 口" : "85,200 口", "val");
-            } catch(e) { logDiagnostic("UI-5 Error: " + e.message); }
+            } catch(e) {}
 
-            // UI 6: Tech
             try {
                 safeSet('pat-buy-score', isBullState ? "+4.5" : "0.0", isBullState ? "val bull" : "val");
                 safeSet('pat-sell-score', isBullState ? "0.0" : "-3.5", isBullState ? "val" : "val bear");
@@ -1008,19 +1058,19 @@ ${fundDetailStr}
                 safeSet('ofi-z', ofiZ.toFixed(2), "val " + (ofiZ > 0 ? "bull" : "bear"));
                 safeSet('ml-mom', isBullState ? "Strong Uptrend" : "Downtrend", isBullState ? "tag bull" : "tag bear");
                 safeSet('vol-regime', regime, "val");
-            } catch(e) { logDiagnostic("UI-6 Error: " + e.message); }
+            } catch(e) {}
 
-            // UI 7: SMC (V120 全新內容)
+            // SMC UI
             try {
                 safeSet('smc-dp-zone', dp_zone_text, dp_color);
+                safeSet('smc-50-state', eq_state, eq_color);
                 safeSet('smc-struct', smcText, "tag " + (recent_bos && !recent_choch ? "bull" : (recent_choch ? "warn" : "")));
                 safeSet('smc-level', swingHigh.toFixed(2), "val");
                 safeSet('smc-bars', bars_since_break > 0 ? bars_since_break : "--", "val");
-                safeSet('smc-struct-advice', smcScore > 50 ? "👉 HTF 確認大方向，LTF 找 BOS/CHoCH 準備進場。" : "⚠️ 結構偏空，注意風險。");
                 safeSet('sl-hunt', sl_hunt_state, sl_hunt_state.includes('True') ? "tag bull" : "tag");
                 safeSet('sr-flip', po3_state, "tag " + (po3_state==='Distribution'?'bear':(po3_state==='Accumulation'?'bull':'')));
                 safeSet('strong-breakout', breakout_state, breakout_state.includes('True') ? "tag bull" : "tag");
-                safeSet('golden-pocket', ote_text, "tag " + (ote_zone[len-1] === 1 ? "bull" : (ote_zone[len-1] === -1 ? "bear" : "")));
+                safeSet('golden-pocket', ote_text, "tag " + (ote_text.includes('落入做多') ? "bull" : (ote_text.includes('落入做空') ? "bear" : "")));
                 safeSet('smc-overlap', overlap_text, overlap_color);
                 safeSet('smc-ob', ob_val_display, "tag " + (last_ob > 0 ? "bull" : (last_ob < 0 ? "bear" : "")));
                 safeSet('smc-ob-strength', ob_strength, "val");
@@ -1029,26 +1079,24 @@ ${fundDetailStr}
                 safeSet('smc-tactical-advice', tactical_advice);
                 safeSet('smc-flow', smc_flow_text, ofiZ > 0 ? "val bull" : "val bear");
                 safeSet('smc-flow-advice', smc_flow_advice);
-            } catch(e) { logDiagnostic("UI-7 Error: " + e.message); }
+            } catch(e) {}
 
-            // UI 8: AI
             try {
-                let oneSigma = (atr_proxy / currentPrice * 100).toFixed(2);
-                safeSet('ai-expected-move', `± ${oneSigma}% (隱含波動)`);
-                safeSet('ai-bull-prob', isBullState ? "68.5%" : "28.4%", "val bull");
-                safeSet('ai-bear-prob', isBullState ? "31.5%" : "71.6%", "val bear");
-                safeSet('ai-prob-advice', isBullState ? "📈 模擬顯示價格向上突破機率高。" : "📉 模擬顯示價格承受下行壓力。");
-                safeSet('ai-target-bull', "$" + (currentPrice * (isBullState?1.05:1.02)).toFixed(2), "val bull");
-                safeSet('ai-target-base', "$" + (currentPrice * (isBullState?1.02:0.98)).toFixed(2), "val");
-                safeSet('ai-target-bear', "$" + (currentPrice * (isBullState?0.98:0.94)).toFixed(2), "val bear");
-                if(aiChartObj) {
-                    aiChartObj.data.datasets[0].data = [...c.slice(-5), null, null, null];
-                    aiChartObj.data.datasets[1].data = [null, null, null, null, currentPrice, currentPrice*(isBullState?1.01:0.99), currentPrice*(isBullState?1.03:0.98), currentPrice*(isBullState?1.02:0.97)];
-                    aiChartObj.update();
+                let oneSigma = ((currentPrice * 0.03) / currentPrice * 100).toFixed(2); 
+                safeSet('ai-expected-move', `± ${oneSigma}% (隱含波動)`); 
+                safeSet('ai-bull-prob', isBullState ? "68.5%" : "28.4%", "val bull"); 
+                safeSet('ai-bear-prob', isBullState ? "31.5%" : "71.6%", "val bear"); 
+                safeSet('ai-prob-advice', isBullState ? "📈 模擬顯示價格向上突破機率高。" : "📉 模擬顯示價格承受下行壓力。"); 
+                safeSet('ai-target-bull', "$" + (currentPrice * (isBullState?1.05:1.02)).toFixed(2), "val bull"); 
+                safeSet('ai-target-base', "$" + (currentPrice * (isBullState?1.02:0.98)).toFixed(2), "val"); 
+                safeSet('ai-target-bear', "$" + (currentPrice * (isBullState?0.98:0.94)).toFixed(2), "val bear"); 
+                if(aiChartObj) { 
+                    aiChartObj.data.datasets[0].data = [...c.slice(-5), null, null, null]; 
+                    aiChartObj.data.datasets[1].data = [null, null, null, null, currentPrice, currentPrice*(isBullState?1.01:0.99), currentPrice*(isBullState?1.03:0.98), currentPrice*(isBullState?1.02:0.97)]; 
+                    aiChartObj.update(); 
                 }
-            } catch(e) { logDiagnostic("UI-8 Error: " + e.message); }
+            } catch(e) {}
 
-            // UI 9: Chips
             try {
                 safeSet('margin-bal', "185,420 張", "val");
                 safeSet('margin-chg', isBullState ? "-2,150 張 (散戶退場)" : "+3,420 張 (散戶接刀)", isBullState ? "val bull" : "val bear");
@@ -1065,32 +1113,41 @@ ${fundDetailStr}
                 safeSet('margin-buy', isBullState ? "下降中" : "增加中", "val");
                 safeSet('chip-signal-tag', isBullState ? "★ 強烈多頭籌碼信號" : "⚖️ 主力出貨散戶接盤", isBullState ? "tag bull" : "tag bear");
                 safeSet('chip-advice-box', isBullState ? "★ 外資連買 ≥ 3 日 + 融資減少 → 強烈多頭，主力吸籌完成。" : "外資悄悄建空，融資卻增加，逃跑訊號。");
-            } catch(e) { logDiagnostic("UI-9 Error: " + e.message); }
+            } catch(e) {}
+            
+            try { 
+                safeSet('risk-rr', `1 : ${rrValue}`); 
+                safeSet('risk-kelly', `${Math.max(0, kellyPct)}%`); 
+                safeSet('risk-sl', "$" + stopLoss.toFixed(2)); 
+                safeSet('risk-t1', "$" + target1.toFixed(2)); 
+                safeSet('risk-t2', "$" + target2.toFixed(2)); 
+                safeSet('risk-t3', "$" + target3.toFixed(2)); 
+                safeSet('var-95', `${Math.abs(var95).toFixed(2)}%`); 
+                safeSet('var-99', `${Math.abs(var99).toFixed(2)}%`); 
+                safeSet('cvar-95', `${Math.abs(cvar95).toFixed(2)}%`); 
+                safeSet('mtf-trends', `D:${dailyT[0]} | W:${weeklyT[0]} | M:${monthlyT[0]}`); 
+                safeSet('mtf-signal', isBullState ? "Strong Bullish" : "Bearish", isBullState ? "tag bull" : "tag bear"); 
+                safeSet('ann-vol', `${(annVol*100).toFixed(1)}%`); 
+                safeSet('vol-regime-adv', regime, annVol > 0.4 ? "tag warn" : "tag"); 
+                safeSet('chip-mfi', `${mfiProxy.toFixed(1)} (流入強度)`); 
+                safeSet('chip-bigorder', `15% (高活躍度)`); 
+                safeSet('chip-deep-sig', isBullState && mfiProxy > 60 ? "Bullish (大戶吸籌)" : "Bearish (資金散出)", isBullState ? "tag bull" : "tag bear"); 
+            } catch(e) {}
 
-            // UI 10: Risk
-            try {
-                safeSet('risk-atr', atr_proxy.toFixed(2)); safeSet('risk-rr', `1 : ${rrValue}`); safeSet('risk-kelly', `${Math.max(0, kellyPct)}%`);
-                safeSet('risk-sl', stopLoss.toFixed(2)); safeSet('risk-targets', `${target1.toFixed(2)} / ${target2.toFixed(2)}`);
-                safeSet('var-95', `${Math.abs(var95).toFixed(2)}%`); safeSet('var-99', `${Math.abs(var99).toFixed(2)}%`); safeSet('cvar-95', `${Math.abs(cvar95).toFixed(2)}%`);
-                safeSet('mtf-trends', `D:${dailyT[0]} | W:${weeklyT[0]} | M:${monthlyT[0]}`); safeSet('mtf-signal', isBullState ? "Strong Bullish" : "Bearish", isBullState ? "tag bull" : "tag bear");
-                safeSet('ann-vol', `${(annVol*100).toFixed(1)}%`); safeSet('vol-regime-adv', regime, annVol > 0.4 ? "tag warn" : "tag");
-                safeSet('param-advice', `最佳化推演：RSI(${rsi_p}), MACD(${macd_f}, ${macd_s})`);
-                safeSet('chip-mfi', `${mfiProxy.toFixed(1)} (流入強度)`); safeSet('chip-bigorder', `15% (高活躍度)`);
-                safeSet('chip-deep-sig', isBullState && mfiProxy > 60 ? "Bullish (大戶吸籌)" : "Bearish (資金散出)", isBullState ? "tag bull" : "tag bear");
-            } catch(e) { logDiagnostic("UI-10 Error: " + e.message); }
-
-            // UI 11: OBV
             try {
                 safeSet('obv-pct', isBullState ? "82.5%" : "35.2%", "val");
-                safeSet('obv-sec-1', "False", "tag"); safeSet('obv-sec-2', isBullState ? "True" : "False", isBullState ? "tag bull" : "tag");
-                safeSet('obv-sec-3', isBullState ? "False" : "True (背離)", isBullState ? "tag" : "tag bear"); safeSet('obv-sec-4', "False", "tag");
+                safeSet('obv-sec-1', "False", "tag");
+                safeSet('obv-sec-2', isBullState ? "True" : "False", isBullState ? "tag bull" : "tag");
+                safeSet('obv-sec-3', isBullState ? "False" : "True (背離)", isBullState ? "tag" : "tag bear");
+                safeSet('obv-sec-4', "False", "tag");
                 safeSet('obv-secret-detail', isBullState ? "秘訣二：OBV離開低位並快速上升，量能發動！" : "秘訣三：OBV在高位但價格下跌，量價背離！", null, isBullState ? "var(--bull)" : "var(--bear)");
-                safeSet('obv-ema30-sig', isBullState ? "Buy" : "Sell", isBullState ? "tag bull" : "tag bear"); safeSet('obv-ema3-sig', isBullState ? "Buy" : "Sell", isBullState ? "tag bull" : "tag bear");
+                safeSet('obv-ema30-sig', isBullState ? "Buy" : "Sell", isBullState ? "tag bull" : "tag bear");
+                safeSet('obv-ema3-sig', isBullState ? "Buy" : "Sell", isBullState ? "tag bull" : "tag bear");
                 safeSet('obv-final-advice', isBullState ? "📈 資金穩定流入，突破均線。" : "📉 資金流出，跌破 EMA30。");
-                safeSet('super-trend', isBullState ? "Bullish" : "Bearish", isBullState ? "tag bull" : "tag bear"); safeSet('ttm-squeeze', "⚡ 監控壓縮中", "tag warn");
-            } catch(e) { logDiagnostic("UI-11 Error: " + e.message); }
+                safeSet('super-trend', isBullState ? "Bullish" : "Bearish", isBullState ? "tag bull" : "tag bear");
+                safeSet('ttm-squeeze', "⚡ 監控壓縮中", "tag warn");
+            } catch(e) {}
 
-            // UI 12: Theory
             try {
                 safeSet('dow-123', isBullState ? "Strong Bullish 123" : "Strong Bearish 123", isBullState ? "tag bull" : "tag bear");
                 safeSet('dow-123-score', isBullState ? "6 (信心: 100%)" : "-6 (信心: 100%)", "val");
@@ -1102,9 +1159,21 @@ ${fundDetailStr}
                 safeSet('wyk-signal', isBullState ? "Spring (彈簧測試)" : "Upthrust (推力測試)", isBullState ? "tag bull" : "tag bear");
                 safeSet('wyk-ad', isBullState ? "Rising (主力累積)" : "Falling (主力出貨)", isBullState ? "val bull" : "val bear", isBullState ? "var(--bull)" : "var(--bear)");
                 safeSet('wyk-advice', isBullState ? "★ 彈簧測試(Spring)：跌破支撐後低量快速收復。" : "⚠ 推力測試(Upthrust)：放量突破阻力後迅速回落。");
-            } catch(e) { logDiagnostic("UI-12 Error: " + e.message); }
+            } catch(e) {}
 
-            // UI 13: Chart Markers
+            // ★ MM UI
+            try {
+                safeSet('mm-zgl', "$" + zgl.toFixed(2)); 
+                safeSet('mm-gex-state', gexState, gexColor); 
+                safeSet('mm-hedging', hedgingBehavior, null, (currentPrice > zgl) ? "var(--cyan)" : "var(--bear)"); 
+                safeSet('mm-gex-advice', gexAdvice); 
+                safeSet('mm-dix-level', dixLevel.toFixed(1) + "%"); 
+                safeSet('mm-dix-sentiment', dixSentiment, dixColor); 
+                safeSet('mm-dix-advice', dixAdvice); 
+                safeSet('mm-strategy', strategyAdvice, "val"); 
+                safeSet('mm-winrate-boost', winrateBoost, (currentPrice > zgl) ? "tag warn" : "tag bull");
+            } catch(e) { logDiagnostic("UI-14 Error: " + e.message); }
+
             try {
                 let minIdx = -1, maxIdx = -1, minP = Infinity, maxP = -Infinity;
                 for(let i=Math.max(0, len-60); i<len; i++){ if(df[i].low < minP){ minP = df[i].low; minIdx = i; } if(df[i].high > maxP){ maxP = df[i].high; maxIdx = i; } }
@@ -1114,15 +1183,10 @@ ${fundDetailStr}
                 
                 let timeSet = new Set(), finalMarkers = [];
                 for(let m of uniqueMarkers) { let key = m.time + m.text; if(!timeSet.has(key)) { finalMarkers.push(m); timeSet.add(key); } }
-                finalMarkers.sort((a,b) => (a.time > b.time) ? 1 : -1);
+                finalMarkers.sort((a,b) => (a.time === b.time) ? 0 : ((a.time > b.time) ? 1 : -1));
                 candleSeries.setMarkers(finalMarkers);
                 logDiagnostic("✅ UI 渲染與回填全部完成！");
-            } catch(e) { logDiagnostic("UI-13 Error: " + e.message); }
-            
-            // UI 14: MM
-            try {
-                safeSet('mm-zgl', "$" + zgl.toFixed(2)); safeSet('mm-gex-state', gexState, gexColor); safeSet('mm-hedging', hedgingBehavior, null, (currentPrice > zgl) ? "var(--cyan)" : "var(--bear)"); safeSet('mm-gex-advice', gexAdvice); safeSet('mm-dix-level', dixLevel.toFixed(1) + "%"); safeSet('mm-dix-sentiment', dixSentiment, dixColor); safeSet('mm-dix-advice', dixAdvice); safeSet('mm-strategy', strategyAdvice, "val"); safeSet('mm-winrate-boost', winrateBoost, (currentPrice > zgl) ? "tag warn" : "tag bull");
-            } catch(e) { logDiagnostic("UI-14 Error: " + e.message); }
+            } catch(e) {}
         }
     </script>
 </body>
